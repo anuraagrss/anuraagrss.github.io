@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="Logo.ico" type="image/x-icon">
+  <title>Profile - Anuraag ravulaparthi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Professional Profile Timeline">
+
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
+    :root {
+  --bg-main: #F3F1EF;
+  --primary: #3a506b;
+  --secondary: #5bc0be;
+  --accent: #1c2541;
+  --timeline-dot: #5bc0be;
+  --timeline-line: #3a506b;
+  --timeline-card-bg: #fff;
+  --timeline-card-radius: 18px;
+  --timeline-card-shadow: 0 2px 12px rgba(60,80,107,0.08);
+  --font-main: "Cute Font", Roboto, sans-serif;
+  --base-font-size: 2vw;
+  --h1-font-size: 2.8vw;
+  --desc-font-size: 1.3vw;
+  --menu-font-size: 2vw;
+  --bubble-size: 7vw;
+  --transition: 0.4s ease;
+  --btn-size: 48px;
+  --bubble-bg: #5bc0be;
+  --bubble-hover: #3a506b;
+  --overlay-bg: rgba(243, 241, 239, 0.95);
+}
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      background: var(--bg-main);
+      font-family: var(--font-main);
+      color: var(--primary);
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100vw;
+      padding-top: 140px; /* Increased space for header + top bar */
+    }
+    /* Sticky profile header */
+    .profile-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      background: var(--bg-main);
+      z-index: 400;
+      text-align: center;
+      padding: 24px 0 12px 0;
+      box-shadow: 0 2px 12px rgba(60,80,107,0.07);
+      /* Remove border-bottom for blend-in effect */
+      border-bottom: none;
+    }
+    .profile-header h1 {
+      font-size: var(--h1-font-size);
+      color: var(--primary);
+      margin-bottom: 8px;
+      letter-spacing: 2px;
+    }
+    .profile-header p {
+      font-size: var(--desc-font-size);
+      color: var(--secondary);
+      margin-bottom: 0;
+    }
+    .timeline {
+      position: relative;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 60px 0 140px 0; /* Top, sides, extra bottom space */
+    }
+    .timeline-center {
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 4px;
+      /* End line above menu icon: subtract icon height + extra space */
+      height: calc(100% - 120px); /* 60px icon + 60px space */
+      transform: translateX(-50%);
+      background: var(--timeline-line);
+      z-index: 0;
+    }
+    .timeline-item {
+      position: relative;
+      width: 100%;
+      min-height: 160px;
+      display: flex;
+      margin-bottom: 40px;
+    }
+    .timeline-item.left {
+      justify-content: flex-end;
+    }
+    .timeline-item.right {
+      justify-content: flex-start;
+    }
+    .timeline-card {
+      background: var(--timeline-card-bg);
+      border-radius: var(--timeline-card-radius);
+      box-shadow: var(--timeline-card-shadow);
+      padding: 24px 32px;
+      color: var(--primary);
+      min-width: 220px;
+      max-width: 340px;
+      width: 90%;
+      z-index: 1;
+      position: relative;
+    }
+    .timeline-item.left .timeline-card {
+      margin-right: calc(50% + 32px);
+      text-align: right;
+    }
+    .timeline-item.right .timeline-card {
+      margin-left: calc(50% + 32px);
+      text-align: left;
+    }
+    .timeline-dot {
+      position: absolute;
+      left: 50%;
+      top: 32px;
+      transform: translateX(-50%);
+      width: 28px;
+      height: 28px;
+      background: var(--timeline-dot);
+      border-radius: 50%;
+      border: 4px solid var(--bg-main);
+      box-shadow: 0 2px 8px rgba(60,80,107,0.10);
+      z-index: 2;
+    }
+    @media (max-width: 900px) {
+      .timeline {
+        max-width: 98vw;
+        padding: 0;
+      }
+      .timeline-center {
+        display: none;
+      }
+      .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 32px;
+        min-height: 0;
+      }
+      .timeline-dot {
+        position: static;
+        left: 0;
+        transform: none;
+        margin-bottom: 16px;
+        top: 0;
+      }
+      .timeline-card {
+        min-width: 0;
+        max-width: 98vw;
+        width: 100%;
+        padding: 16px 12px;
+        margin: 0;
+        text-align: left !important;
+        left: 0 !important;
+        right: 0 !important;
+        background: var(--timeline-card-bg);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .timeline-item,
+      .timeline-item:nth-child(odd),
+      .timeline-item:nth-child(even) {
+        float: none;
+        width: 100%;
+        text-align: left;
+        padding: 0 12px;
+      }
+      .timeline-dot {
+        left: 0 !important;
+        transform: translateX(-50%) !important;
+      }
+    }
+    /* Social bar styles (reuse from main page) */
+    .social-bar {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: rgba(243,241,239,0.85);
+      padding: 18px 12px 18px 12px;
+      border-radius: 0 24px 24px 0;
+      box-shadow: 0 4px 24px rgba(60,80,107,0.12);
+      z-index: 300;
+      min-width: 56px;
+    }
+    .social-bar a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.85;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-left: 4px;
+    }
+    .social-bar a:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    .social-bar svg {
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10));
+      width: 36px;
+      height: 36px;
+    }
+    @media (max-width: 700px) {
+      .social-bar {
+        gap: 16px;
+        padding: 10px 6px 10px 6px;
+        border-radius: 0 16px 16px 0;
+        min-width: 44px;
+      }
+      .social-bar svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+    /* Overlay menu styles (reuse from main page) */
+    .nav-toggle {
+      position: absolute;
+      left: -9999px;
+    }
+    .nav-btn {
+      position: fixed;
+      bottom: 32px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      z-index: 10001 !important;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 4px 24px rgba(65,40,22,0.08);
+    }
+    .wavy-menu {
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: none;
+      position: relative;
+      z-index: 1;
+      transition: opacity var(--transition);
+    }
+    /* Down arrow icon for menu button (matches index (3).html style) */
+    .wavy-menu::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: none;
+      /* Exact wavy SVG from index (3).html */
+      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M5 20 Q 10 10, 15 20 T 25 20 T 35 20" stroke="black" stroke-width="4" fill="none"/></svg>') no-repeat center/contain;
+      background-color: var(--accent);
+    }
+    .up-arrow {
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: none;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.4s;
+    }
+    .up-arrow::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: none;
+      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
+      background-color: var(--accent);
+    }
+    /* Hamburger (X) icon styles */
+    .hamburger {
+      display: none;
+      position: fixed;
+      left: 50%;
+      bottom: 32px;
+      transform: translateX(-50%);
+      width: 60px;
+      height: 60px;
+      background: none;
+      pointer-events: auto;
+      z-index: 30001; /* Must be higher than .overlay */
+    }
+
+    /* Show hamburger (X) when menu is open */
+    .nav-toggle:checked + .nav-btn .hamburger {
+      display: block;
+    }
+
+    /* Style the X icon for visibility */
+    .nav-toggle:checked + .nav-btn .hamburger::before,
+    .nav-toggle:checked + .nav-btn .hamburger::after {
+      content: "";
+      position: absolute;
+      width: 40px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      left: 10px;
+      top: 28px;
+    }
+.nav-toggle:checked + .nav-btn .hamburger::before {
+      transform: rotate(45deg);
+    }
+.nav-toggle:checked + .nav-btn .hamburger::after {
+      transform: rotate(-45deg);
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: var(--overlay-bg);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+      z-index: 20000; /* Increased z-index to be above header/info-bar */
+    }
+    .nav-toggle:checked ~ .overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .menu {
+      list-style: none;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .menu li {
+      position: absolute;
+      width: var(--bubble-size);
+      height: var(--bubble-size);
+      border-radius: 50%;
+      background: var(--bubble-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity var(--transition),
+                  transform var(--transition),
+                  background var(--transition),
+                  color var(--transition);
+      box-shadow: 0 2px 12px rgba(60,80,107,0.12);
+    }
+    .nav-toggle:checked ~ .overlay .menu li {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .menu li a {
+      color: inherit;
+      text-decoration: none;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      font-size: var(--menu-font-size);
+      font-family: var(--font-main);
+    }
+    .menu li a:hover {
+      transform: scale(1.1);
+    }
+    .menu li:not(.about):not(.services) a:hover {
+      color: var(--accent);
+    }
+    .menu li.about a:hover,
+    .menu li.services a:hover {
+      color: #fff;
+    }
+    .menu li.home     { top: 15%;  left: 30%; }
+    .menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
+    .menu li.clients  { top: 45%;  left: 85%; }
+    .menu li.services { top: 75%;  left: 65%; background: var(--bubble-hover); color: #fff;}
+    .menu li.contact  { top: 70%;  left: 20%; }
+
+    @media (max-width: 700px) {
+      .menu li {
+        width: 70px;
+        height: 70px;
+        font-size: 1em;
+      }
+      .menu li.home     { top: 10%;  left: 20%; }
+      .menu li.about    { top:  5%;  left: 65%; }
+      .menu li.clients  { top: 40%;  left: 80%; }
+      .menu li.services { top: 70%;  left: 60%; }
+      .menu li.contact  { top: 65%;  left: 15%; }
+    }
+    /* Add extra space at the bottom of the timeline */
+    .timeline {
+      padding-bottom: 180px; /* Increased from 100px/140px for extra space above menu */
+    }
+    /* Elegant floating info bar styles */
+    .info-bar {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background: linear-gradient(135deg, #fff 70%, #eaf6f6 100%);
+      padding: 32px 28px 32px 24px;
+      border-radius: 32px 0 0 32px;
+      box-shadow: 0 8px 32px rgba(60,80,107,0.18), 0 1.5px 8px rgba(91,192,190,0.08);
+      z-index: 300;
+      min-width: 240px;
+      max-width: 340px;
+      font-size: 1.13em;
+      color: var(--primary);
+      border-left: 6px solid var(--accent);
+      backdrop-filter: blur(2px);
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+    .info-bar:hover {
+      box-shadow: 0 12px 48px rgba(60,80,107,0.22), 0 2px 12px rgba(91,192,190,0.12);
+      transform: translateY(-50%) scale(1.03);
+    }
+    .info-bar h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+      font-size: 1.22em;
+      color: var(--accent);
+      letter-spacing: 1px;
+      font-weight: bold;
+      text-shadow: 0 1px 0 #eaf6f6;
+    }
+    .info-bar ul {
+      margin: 0 0 18px 0;
+      padding-left: 22px;
+    }
+    .info-bar li {
+      margin-bottom: 8px;
+      font-size: 1em;
+      line-height: 1.5;
+      position: relative;
+    }
+    .info-bar li::before {
+      content: "★";
+      color: var(--secondary);
+      font-size: 0.95em;
+      margin-right: 8px;
+      vertical-align: middle;
+      opacity: 0.7;
+    }
+    @media (max-width: 900px) {
+      .info-bar {
+        position: static;
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 18px 10px;
+        margin-bottom: 16px;
+        border-left: none;
+        backdrop-filter: none;
+      }
+    }
+    /* Top bar for profile image and download button */
+    .top-bar {
+      position: fixed;
+      top: 24px;
+      left: 0;
+      width: 100vw;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 500;
+      pointer-events: none;
+    }
+    .profile-pic {
+      margin-left: 32px;
+      pointer-events: auto;
+    }
+    .profile-pic img {
+      width: 64px;
+      height: 64px;
+      object-fit: cover;
+      border-radius: 50%;
+      
+      box-shadow: 0 2px 12px rgba(60,80,107,0.10);
+      background: #fff;
+    }
+    .download-btn {
+      margin-right: 32px;
+      background: var(--bubble-bg);
+      color: var(--primary);
+      border-radius: 32px;
+      padding: 10px 22px 10px 18px;
+      font-size: 1.08em;
+      font-family: var(--font-main);
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 2px 12px rgba(60,80,107,0.10);
+      text-decoration: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+      pointer-events: auto;
+    }
+    .download-btn:hover {
+      background: var(--bubble-hover);
+      color: var(--bubble-bg);
+      box-shadow: 0 6px 24px rgba(60,80,107,0.18);
+      transform: scale(1.05);
+    }
+    @media (max-width: 700px) {
+      .top-bar {
+        top: 10px;
+      }
+      .profile-pic {
+        margin-left: 10px;
+      }
+      .download-btn {
+        margin-right: 10px;
+        padding: 8px 14px 8px 12px;
+        font-size: 1em;
+      }
+      .profile-pic img {
+        width: 44px;
+        height: 44px;
+      }
+      .profile-header {
+        padding: 12px 0 6px 0;
+        font-size: 1em;
+      }
+      body {
+        padding-top: 60px;
+      }
+    }
+    /* Add to your style block */
+    .simple-info {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background: #F3F1EF;
+      padding: 18px 16px;
+      border-radius: 20px 0 0 20px;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
+      min-width: 180px;
+      max-width: 220px;
+      font-size: 1em;
+      color: #222;
+      z-index: 300;
+    }
+    .simple-info h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.08em;
+      color: #444;
+      font-weight: bold;
+    }
+    .simple-info ul {
+      margin: 0 0 12px 0;
+      padding-left: 16px;
+    }
+    .simple-info li {
+      margin-bottom: 8px;
+      font-size: 0.98em;
+      line-height: 1.4;
+    }
+    .simple-info .school {
+      color: #888;
+      font-size: 0.92em;
+    }
+    @media (max-width: 900px) {
+      .simple-info {
+        position: static;
+        width: 100%;
+        border-radius: 0;
+        box-shadow: none;
+        padding: 12px 8px;
+        margin-bottom: 12px;
+        font-size: 1em;
+        max-width: 100vw;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- hidden toggle -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <!-- menu button -->
+  <label for="nav-toggle" class="nav-btn up-arrow-btn">
+    <span class="up-arrow"></span>
+    <span class="hamburger"></span>
+  </label>
+
+  <div class="profile-header">
+    <h1>Anuraag Ravulaparthi</h1>
+    <p>Professional Experience Timeline</p>
+  </div>
+
+  <div class="timeline">
+    <div class="timeline-center"></div>
+    <!-- Timeline items: alternate left/right, each with a dot -->
+    <div class="timeline-item left">
+      <div class="timeline-dot"></div>
+      <div class="timeline-card">
+        <h3>ExxonMobil (formerly Pioneer Natural Resources) &mdash; 2018 &ndash; Present</h3>
+        <p> <h3>Platform Owner</h3>
+    <ul>
+      <li>Owned a core application platform, leading migration, re-implementation, and retirement of all solutions as part of the Exxon/Pioneer technology integration.</li>
+      <li>Contributed to a $600M enterprise-wide integration initiative, unifying systems, tools, and processes between ExxonMobil and Pioneer.</li>
+      <li>Led system and process evaluations to define and deliver platform outcomes: architecture decisions, migration plans, implementation roadmaps, and retirement strategies.</li>
+      <li>Collaborated with engineering, cybersecurity, infrastructure, and compliance teams to align execution, manage change, and mitigate risk.</li>
+      <li>Oversaw delivery on the ExxonMobil side, ensuring on-time implementation across workstreams and integration partners.</li>
+      <li>Rationalized and modernized legacy systems to reduce technical debt and accelerate digital enablement across business units.</li>
+    </ul></p>
+      </div>
+    </div>
+    <div class="timeline-item right">
+      <div class="timeline-dot"></div>
+      <div class="timeline-card">
+        <h2>Solution Arhchitect</h2>
+        <p>
+
+    <h3>Water Management Platform – Solution Architect</h3>
+    <ul>
+      <li>Led design and delivery of scalable Purchase-to-Pay applications managing over $300M in annual spend.</li>
+      <li>Improved operational efficiency by 40% by simplifying workflows and reducing manual data entry through smarter system integration.</li>
+      <li>Partnered with teams to define the product roadmap and integrate with ERP, invoicing, and asset management systems.</li>
+      <li>Guided Agile delivery from PoCs to full-scale rollout, including features like vendor support via Copilot.</li>
+    </ul>
+
+    <h3>Emerging Tech &amp; Automation – Solution Architect</h3>
+
+    <h4>Microsoft Power Platform Projects</h4>
+    <ul>
+      <li>Established a Community of Excellence to drive governance, adoption, and manual process reduction.</li>
+      <li>Oversaw a portfolio of 30+ custom apps on Power Platform and Dynamics 365, improving day-to-day operations.</li>
+      <li>Defined roadmaps, supported teams from idea to launch, and led change management to drive adoption.</li>
+    </ul>
+
+    <h4>Blockchain Consortium Initiative</h4>
+    <ul>
+      <li>Partnered with a cross-industry consortium to explore decentralized solutions for supply chain transparency and smart contracts.</li>
+      <li>Led architecture evaluations (Hyperledger Fabric, Ethereum) to enable secure, auditable transactions.</li>
+      <li>Built smart contract prototypes streamlining invoice approvals and vendor reconciliation.</li>
+      <li>Reduced vendor payment cycles from 40 days to 2 days, improving invoice-to-pay and vendor satisfaction.</li>
+    </ul>
+
+    <h4>Emission Detection System Initiative</h4>
+    <ul>
+      <li>Architected an AI + IoT solution for real-time methane and carbon detection, targeting $2M+ in ESG compliance and risk mitigation.</li>
+      <li>Integrated Azure IoT and AI Vision with sensor data to automate visual and chemical emissions monitoring.</li>
+      <li>Enabled predictive alerting and reduced manual inspection hours by 60% in field deployments.</li>
+      <li>Supported ESG reporting automation and improved environmental transparency across operations.</li>
+    </ul>
+
+    <h4>Software Decision Matrix Initiative</h4>
+    <ul>
+      <li>Designed a decision framework to streamline demand intake and guide software selection for project teams.</li>
+      <li>Accelerated and improved decisions using evaluation criteria across functionality, cost, scalability, and security.</li>
+      <li>Reduced software evaluation time by 30% and improved alignment with enterprise architecture standards.</li>
+      <li>Supported 12+ project teams in choosing fit-for-purpose tools, reducing redundancy and improving delivery efficiency.</li>
+    </ul>
+
+    <h4>Robotic Process Automation (RPA) Initiative</h4>
+    <ul>
+      <li>Led evaluation and selection of RPA tools to meet technical and operational needs.</li>
+      <li>Managed rollout of automation solutions delivering over $1.7M in annual savings by reducing repetitive, manual tasks.</li>
+      <li>Drove user engagement and adoption through internal awareness and cross-team support.</li>
+      <li>Built governance, delivery, and change frameworks to move organizations from strategy to sustained execution.</li>
+      <li>Influenced major architecture and platform decisions to ensure long-term business value and scalability.</li>
+      <li>Acted as the bridge between business and IT, converting complex challenges into actionable strategies with measurable outcomes.</li>
+    </ul>
+  </section></p>
+      </div>
+    </div>
+    <div class="timeline-item left">
+      <div class="timeline-dot"></div>
+      <div class="timeline-card">
+        <h2>Expert Advisor</h2></h2>
+        <h3>BCG Platinion (Boston Consulting Group) &mdash; 2018</h3>
+        <p><ul>
+      <li>Advised Fortune 500 leadership across telecom, beverage, and entertainment sectors.</li>
+      <li>Led cross-functional digital transformation strategies delivering 25–40% operational efficiency gains and accelerating innovation.</li>
+      <li>Identified 40+ enterprise technology and process gaps, turning them into opportunities for savings, growth, and agility.</li>
+      <li>Shaped and prioritized $20M+ in digital investments including automation, cloud modernization, and advanced analytics.</li>
+      <li>Facilitated C-level strategy sessions and enterprise workshops to define transformation KPIs and embed digital into core models.</li>
+      <li>Established governance, delivery, and change frameworks to drive sustained execution.</li>
+      <li>Influenced architecture and platform choices to support long-term business value and scalability.</li>
+      <li>Served as a trusted bridge between business and IT to produce clear, measurable outcomes.</li>
+    </ul></p>
+      </div>
+    </div>
+    <div class="timeline-item right">
+      <div class="timeline-dot"></div>
+      <div class="timeline-card">
+        <h2>Co-Founder/Program Manager</h2>
+        <h3>Northhill Technologies &mdash; 2011 &ndash; 2016</h3>
+        <p><ul>
+      <li>Spearheaded fundraising and investor relations, securing early-stage capital and strategic partnerships.</li>
+      <li>Drove finance process automation, reducing manual processing time by 60% and accelerating claim throughput.</li>
+      <li>Orchestrated full lifecycle delivery of a healthcare order management system, improving efficiency by 40% with role-based access for 100+ users.</li>
+      <li>Delivered a scalable training &amp; placement platform that increased NGO user engagement to empower underserved communities.</li>
+      <li>Directed development and launch of a smart city food platform with 350+ restaurant partners and 2,000+ daily users, boosting local growth.</li>
+      <li>Designed and implemented an emergency blood donor alert system, improving donor response times by 35%.</li>
+    </ul></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Bar -->
+  <div class="info-bar simple-info">
+    <h3>Education</h3>
+    <ul>
+      <li>MBA, International Management<br><span class="school">NWMSU</span></li>
+      <li>MS, Applied Computer Science<br><span class="school">NWMSU</span></li>
+      <li>B.Tech, Chemical Engineering<br><span class="school">JNTU</span></li>
+    </ul>
+    <h3>Achievements</h3>
+    <ul>
+      <li>Raised $200K+ for a tech startup</li>
+      <li>Rotaract International Award for Innovation (Asia)</li>
+      <li>Led strategic initiatives saving $300M+ for global organizations</li>
+    </ul>
+  </div>
+
+  <!-- full-screen overlay -->
+  <div class="overlay">
+    <ul class="menu">
+          <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
+      <li class="about"><a href="Professional.html" title="Learn more About me">About</a></li>
+      <li class="nomad"><a href="nomad.html" title="Nomad journeys & travel">Nomad</a></li>
+      <li class="professional"><a href="Profile.html" title="Professional experience">404</a></li>
+      <li class="contact"><a href="Contact.html" title="Contact me">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Social Bar -->
+  <div class="social-bar">
+    <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
+    </a>
+    <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#5bc0be"/>
+        <path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/>
+      </svg>
+    </a>
+    <a href="https://twitter.com/" target="_blank" aria-label="Twitter">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
+    </a>
+    <a href="mailto:rssanuraag@gmail.com" aria-label="Gmail">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#F3F1EF"/>
+        <rect x="7" y="10" width="18" height="12" rx="3" fill="#fff"/>
+        <polyline points="7,10 16,18 25,10" stroke="#3a506b" stroke-width="2" fill="none"/>
+        <polyline points="7,22 7,10 16,18 25,10 25,22" stroke="#3a506b" stroke-width="2" fill="none"/>
+      </svg>
+    </a>
+  </div>
+
+  <!-- Profile Top Bar -->
+  <div class="top-bar">
+    <div class="profile-pic">
+      <img src="Avatar.png" alt="Anuraag ravulaparthi">
+    </div>
+    <a href="Anuraag Resume-link.pdf" class="download-btn" download>
+      <span>Download PDF</span>
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+        <circle cx="11" cy="11" r="11" fill="#5bc0be"/>
+        <path d="M11 6v7m0 0l-3-3m3 3l3-3" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</body>
+</html>

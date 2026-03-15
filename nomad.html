@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="Logo.png" type="image/x-icon">
+  <title>Nomad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Anuraag's journeys and interactive world map">
+  <script src="https://cdn.amcharts.com/lib/4/core.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/maps.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/geodata/worldLow.js"></script>
+  <script src="https://cdn.amcharts.com/lib/4/themes/animated.js"></script>
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
+    :root {
+
+--bg-main: #F3F1EF;
+  --primary: #3a506b;
+  --secondary: #5bc0be;
+  --accent: #1c2541;
+  --bubble-bg: #5bc0be;
+  --bubble-hover: #3a506b;
+  --overlay-bg: rgba(60, 80, 107, 0.92);
+  --face-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  --face-radius: 16px;
+  --desc-bg: rgba(60,80,107,0.95);
+  --desc-radius: 24px;
+  --desc-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --desc-color: #fff;
+  --font-main: "Cute Font", Roboto, sans-serif;
+  --base-font-size: 2vw;
+  --h1-font-size: 2.8vw;
+  --desc-font-size: 1.3vw;
+  --menu-font-size: 2vw;
+  --text-color: #222;
+  --nav-shadow: 0 4px 24px rgba(0,0,0,0.08);
+  --nav-radius: 24px;
+  --btn-size: 40px;
+  --bubble-size: 7vw;
+  --transition: 0.4s ease;
+    }
+    body {
+      background: var(--bg-main);
+      font-family: "Cute Font", Roboto, sans-serif;
+      color: var(--primary);
+    }
+    .nomad-header {
+      text-align: center;
+      margin-top: 48px;
+      margin-bottom: 24px;
+    }
+    .nomad-header h1 {
+      font-size: 3vw;
+      color: var(--primary);
+      letter-spacing: 2px;
+      margin-bottom: 12px;
+    }
+    .nomad-header p {
+      font-size: 1.3vw;
+      color: var(--secondary);
+      margin-bottom: 0;
+    }
+    #chartdiv {
+      width: 90vw;
+      max-width: 1200px;
+      height: 70vh;
+      margin: 0 auto 48px auto;
+      border-radius: 24px;
+      box-shadow: none;
+      background: transparent;
+      z-index: 1;
+    }
+    .visited-list {
+      max-width: 900px;
+      margin: 0 auto 48px auto;
+      background: #F3F1EF;
+      color: var(--primary);
+      box-shadow: 0 2px 12px rgba(68,68,68,0.07);
+      border-radius: 18px;
+      padding: 24px 32px;
+      font-size: 1.2vw;
+    }
+    .visited-list h2 {
+      font-size: 1.6vw;
+      color: var(--primary);
+      margin-bottom: 12px;
+      letter-spacing: 1px;
+    }
+    .visited-list ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      columns: 2;
+    }
+    .visited-list li {
+      margin-bottom: 8px;
+      padding-left: 12px;
+      position: relative;
+    }
+    .visited-list li::before {
+      content: "•";
+      color: var(--secondary);
+      position: absolute;
+      left: 0;
+    }
+    /* Bubble Overlay Menu styles */
+    .nav-toggle {
+      position: absolute;
+      left: -9999px;
+    }
+    .nav-btn.up-arrow-btn {
+      position: fixed !important;
+      left: 50% !important;
+      bottom: 32px !important;
+      top: auto !important;
+      right: auto !important;
+      transform: translateX(-50%) !important;
+      width: 60px;
+      height: 60px;
+      z-index: 10001 !important; /* higher than overlay */
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 4px 24px rgba(65,40,22,0.08);
+    }
+    .up-arrow {
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: none;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.4s;
+    }
+    .up-arrow::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: none;
+      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
+      background-color: var(--accent);
+    }
+    .hamburger {
+      display: none;
+    }
+    .nav-toggle:not(:checked) + .nav-btn .up-arrow {
+      opacity: 1;
+    }
+    .nav-toggle:checked + .nav-btn .up-arrow {
+      opacity: 0;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(45deg);
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(-45deg);
+    }
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(243, 241, 239, 0.95);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s;
+      z-index: 9999; /* ensure overlay is above all other elements */
+    }
+    .nav-toggle:checked ~ .overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .menu {
+      list-style: none;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .menu li {
+      position: absolute;
+      width: 7vw;
+      height: 7vw;
+      min-width: 120px;
+      border-radius: 50%;
+      background: var(--bubble-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity 0.4s, transform 0.4s, background 0.4s, color 0.4s;
+      box-shadow: 0 2px 12px rgba(60,80,107,0.12);
+    }
+    .menu li.about,
+    .menu li.professional {
+      background: var(--bubble-hover);
+      color: #fff;
+    }
+    .menu li a {
+      color: inherit;
+      text-decoration: none;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      font-size: 2vw;
+      font-family: "Cute Font", Roboto, sans-serif;
+      white-space: nowrap;
+    }
+    .menu li a:hover {
+      transform: scale(1.1);
+    }
+    .nav-toggle:checked ~ .overlay .menu li {
+      opacity: 1;
+      transform: scale(1);
+      pointer-events: auto;
+    }
+    .menu li.home     { top: 15%;  left: 30%; }
+    .menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
+    .menu li.nomad    { top: 45%;  left: 85%; }
+    .menu li.professional { top: 75%;  left: 65%; background: var(--bubble-hover); color: #fff;}
+    .menu li.contact  { top: 70%;  left: 20%; }
+    /* Social Bar styles */
+    .social-bar {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: rgba(243,241,239,0.85);
+      padding: 18px 12px 18px 12px;
+      border-radius: 0 24px 24px 0;
+      box-shadow: 0 4px 24px rgba(65,40,22,0.12);
+      z-index: 300;
+      min-width: 56px;
+    }
+    .social-bar a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.85;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-left: 4px;
+    }
+    .social-bar a:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    .social-bar svg {
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(65,40,22,0.10));
+      width: 36px;
+      height: 36px;
+    }
+    /* Travel Facts Bar */
+    .travel-facts-bar {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      background: none;
+      border-radius: 0;
+      box-shadow: none;
+      padding: 0;
+      z-index: 250;
+      min-width: unset;
+      max-width: unset;
+      width: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+    .travel-facts-bar h2 {
+      display: none;
+    }
+    .travel-facts-bar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    .travel-facts-bar li {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+      font-size: 1.05vw;
+      color: var(--primary);
+      background: none;
+      box-shadow: none;
+    }
+    .fact-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 8px;
+      opacity: 0.92;
+      transition: opacity 0.2s;
+      background: none;
+      box-shadow: none;
+    }
+    .travel-facts-bar li:hover .fact-icon {
+      opacity: 1;
+    }
+    .fact-text {
+      font-family: "Cute Font", Roboto, sans-serif;
+      font-size: 1.1vw;
+      color: var(--primary);
+      text-align: center;
+      background: none;
+      box-shadow: none;
+      margin: 0;
+      padding: 0;
+    }
+    /* Travel Highlights Section */
+    .travel-highlights {
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+      background: #F3F1EF;
+      color: var(--primary);
+      box-shadow: 0 2px 12px rgba(68,68,68,0.07);
+      border-radius: 18px;
+      padding: 24px 32px;
+    }
+    .travel-highlights h2 {
+      font-size: 1.6vw;
+      color: var(--primary);
+      margin-bottom: 18px;
+      letter-spacing: 1px;
+    }
+    .facts-row {
+      display: flex;
+      gap: 32px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .fact {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      max-width: 220px;
+      text-align: center;
+    }
+    .fact-icon {
+      width: 48px;
+      height: 48px;
+      margin-bottom: 12px;
+    }
+    @media (max-width: 900px) {
+      .travel-facts-bar {
+        position: static;
+        width: 100%;
+        flex-direction: row;
+        justify-content: center;
+        align-items: flex-start;
+        margin-bottom: 24px;
+        transform: none;
+      }
+      .travel-facts-bar ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 18px;
+      }
+      .travel-facts-bar li {
+        margin-bottom: 0;
+        margin-right: 18px;
+      }
+      .fact-icon { width: 32px; height: 32px; }
+      .fact-text { font-size: 2vw; }
+    }
+    /* Updated menu item styles */
+    .menu li {
+      background: var(--bubble-bg); /* teal bubble */
+      color: var(--accent);         /* dark text */
+    }
+    .menu li.about,
+    .menu li.professional {
+      background: var(--bubble-hover); /* dark blue bubble */
+      color: #fff;                     /* white text */
+    }
+    .travel-stories-list {
+  max-width: 900px;
+  margin: 0 auto 48px auto;
+  background: #F3F1EF;
+  color: var(--primary);
+  box-shadow: 0 2px 12px rgba(68,68,68,0.07);
+  border-radius: 18px;
+  padding: 24px 32px;
+  font-size: 1.2vw;
+}
+.travel-stories-list h2 {
+  font-size: 1.6vw;
+  color: var(--primary);
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+.story-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.story-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(68,68,68,0.06);
+  padding: 0;
+  transition: box-shadow 0.2s;
+  overflow: hidden;
+}
+.story-card.expanded {
+  box-shadow: 0 4px 16px rgba(68,68,68,0.12);
+}
+.story-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 18px 22px;
+  font-size: 1.2vw;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  font-family: "Cute Font", Roboto, sans-serif;
+}
+.story-arrow {
+  font-size: 1.5vw;
+  transition: transform 0.3s;
+}
+.story-card.expanded .story-arrow {
+  transform: rotate(180deg);
+}
+.story-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+  background: #F3F1EF;
+  padding: 0 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.story-card.expanded .story-content {
+  max-height: 800px;
+  padding: 18px 22px;
+}
+.story-img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(68,68,68,0.10);
+  object-fit: cover;
+}
+/* Remove country cards CSS */
+.country-cards,
+.country-card,
+.country-flag,
+.country-info,
+.country-title,
+.country-date,
+.country-desc {
+  /* Remove or comment out these blocks */
+}
+.travel-stories-list {
+  max-width: 1100px;
+  margin: 0 auto 48px auto;
+  background: #F3F1EF;
+  color: var(--primary);
+  box-shadow: 0 2px 12px rgba(68,68,68,0.07);
+  border-radius: 18px;
+  padding: 24px 32px;
+  font-size: 1.2vw;
+}
+.travel-stories-list h2 {
+  font-size: 1.6vw;
+  color: var(--primary);
+  margin-bottom: 18px;
+  letter-spacing: 1px;
+}
+.story-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 28px;
+}
+.story-card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(68,68,68,0.06);
+  padding: 0;
+  transition: box-shadow 0.2s;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.story-card.expanded {
+  box-shadow: 0 4px 16px rgba(68,68,68,0.12);
+}
+.story-toggle {
+  width: 100%;
+  background: none;
+  border: none;
+  outline: none;
+  padding: 0;
+  font-size: 1.2vw;
+  color: var(--primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  font-family: "Cute Font", Roboto, sans-serif;
+  transition: background 0.2s;
+}
+.story-thumb {
+  width: 100%;
+  height: 180px;
+  object-fit: cover;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 2px 8px rgba(68,68,68,0.10);
+  margin-bottom: 0;
+  transition: filter 0.2s;
+}
+.story-toggle:hover .story-thumb {
+  filter: brightness(0.95) blur(1px);
+}
+.story-title {
+  font-size: 1.15vw;
+  color: var(--primary);
+  margin: 12px 0 6px 0;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+.story-arrow {
+  font-size: 1.5vw;
+  margin-bottom: 12px;
+  transition: transform 0.3s;
+}
+.story-card.expanded .story-arrow {
+  transform: rotate(180deg);
+}
+.story-content {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease, padding 0.4s;
+  background: #F3F1EF;
+  padding: 0 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.story-card.expanded .story-content {
+  max-height: 800px;
+  padding: 18px 22px 22px 22px;
+}
+.story-img {
+  width: 100%;
+  max-width: 420px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  box-shadow: 0 2px 8px rgba(68,68,68,0.10);
+  object-fit: cover;
+}
+@media (max-width: 900px) {
+  .story-cards-grid {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+  .story-thumb {
+    height: 140px;
+  }
+  .story-title {
+    font-size: 2vw;
+  }
+}
+  </style>
+
+</head>
+<body>
+ 
+  <!-- Navigation toggle for overlay menu -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <label for="nav-toggle" class="nav-btn up-arrow-btn">
+    <span class="up-arrow"></span>
+    <span class="hamburger"></span>
+  </label>
+  <!-- Overlay menu with navigation links -->
+  <div class="overlay">
+    <ul class="menu">
+      <li class="home"><a href="index.html" title="Go to Home">Home</a></li>
+      <li class="about"><a href="Professional.html" title="Learn more About me">About</a></li>
+      <li class="nomad"><a href="nomad.html" title="Nomad journeys & travel">Nomad</a></li>
+      <li class="professional"><a href="Profile.html" title="Professional experience">404</a></li>
+      <li class="contact"><a href="Contact.html" title="Contact me">Contact</a></li>
+    </ul>
+  </div>
+
+  <!-- Social media bar with icons/links -->
+  <div class="social-bar">
+    <!-- LinkedIn icon -->
+    <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
+    </a>
+    <!-- Polarsteps icon -->
+    <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#5bc0be"/>
+        <path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/>
+      </svg>
+    </a>
+    <!-- Twitter icon -->
+    <a href="https://twitter.com/" target="_blank" aria-label="Twitter">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
+    </a>
+    <!-- Gmail icon -->
+    <a href="mailto:rssanuraag@gmail.com" aria-label="Gmail">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#F3F1EF"/>
+        <rect x="7" y="10" width="18" height="12" rx="3" fill="#fff"/>
+        <polyline points="7,10 16,18 25,10" stroke="#3a506b" stroke-width="2" fill="none"/>
+        <polyline points="7,22 7,10 16,18 25,10 25,22" stroke="#3a506b" stroke-width="2" fill="none"/>
+      </svg>
+    </a>
+  </div>
+
+  <div class="travel-facts-bar">
+    <h2>Travel Facts</h2>
+    <ul>
+      <li>
+        <span class="fact-icon">
+          <svg viewBox="0 0 32 32" width="32" height="32" fill="none">
+            <circle cx="16" cy="16" r="15" stroke="#bfa07a" stroke-width="2" fill="#F3F1EF"/>
+            <path d="M8 16a8 8 0 0016 0" stroke="#412816" stroke-width="2" fill="none"/>
+            <ellipse cx="16" cy="16" rx="7" ry="12" stroke="#412816" stroke-width="2" fill="none"/>
+          </svg>
+        </span>
+        <span class="fact-text">Visited all 7 continents</span>
+      </li>
+      <li>
+        <span class="fact-icon">
+          <svg viewBox="0 0 32 32" width="32" height="32" fill="none">
+            <circle cx="16" cy="16" r="15" stroke="#bfa07a" stroke-width="2" fill="#F3F1EF"/>
+            <path d="M6 20 L26 12 M16 6 L16 26" stroke="#412816" stroke-width="2" fill="none"/>
+            <polygon points="16,6 19,13 13,13" fill="#bfa07a"/>
+          </svg>
+        </span>
+        <span class="fact-text">flown every major airline</span>
+      </li>
+      <li>
+        <span class="fact-icon">
+          <svg viewBox="0 0 32 32" width="32" height="32" fill="none">
+            <circle cx="16" cy="16" r="15" stroke="#bfa07a" stroke-width="2" fill="#F3F1EF"/>
+            <path d="M8 20 Q12 14 16 20 Q20 26 24 20" stroke="#412816" stroke-width="2" fill="none"/>
+          </svg>
+        </span>
+        <span class="fact-text">Crossed all major oceans</span>
+      </li>
+      <li>
+        <span class="fact-icon">
+          <svg viewBox="0 0 32 32" width="32" height="32" fill="none">
+            <circle cx="16" cy="16" r="15" stroke="#bfa07a" stroke-width="2" fill="#F3F1EF"/>
+            <rect x="10" y="13" width="12" height="8" rx="2" fill="#412816"/>
+            <circle cx="16" cy="17" r="3" fill="#bfa07a"/>
+          </svg>
+        </span>
+
+        
+        
+        <span class="fact-text">Made friends in 40+ countries</span>
+      </li>
+    </ul>
+  </div>
+  <div class="nomad-header">
+    <h1>Nomad Journeys</h1>
+    <p>Explore the world I've visited and my travel stories.</p>
+  </div>
+  <div id="chartdiv"></div>
+  <!-- Remove country cards HTML -->
+  
+<div class="travel-stories-list">
+  <h2>My Travel Stories</h2>
+  <div class="story-cards-grid">
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/skydive.jpeg" alt="Sky dive" class="story-thumb">
+        <span class="story-title">Jump out of a plane !</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/skydive.jpeg" alt="Sky dive"  class="story-img">
+        <p>
+          So there I was, jumping out of a plane over the Palm Islands in Dubai—once. And naturally, like any rational human being, I thought, ‘You know what would make this even better? Doing it again… on the same day.’ Because why just experience sheer adrenaline and the stunning aerial view once, when you can double the thrill and risk? Needless to say, my second jump felt exactly like the first… only with a little more smug satisfaction and slightly more panic.
+        </p>
+      </div>
+    </div>
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/inca.jpeg" alt="machupichu" class="story-thumb">
+        <span class="story-title">Inca world exploration!</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/inca.jpeg" alt="machupichu" class="story-img">
+        <p>
+          So I hiked the Inca Trail once—because obviously, a leisurely stroll through breathtaking Andean landscapes and ancient ruins isn’t enough. Naturally, I thought, ‘Why stop at one day of grueling climbs, questionable altitude sickness, and awe-inspiring views when I can do it all again?’ Spoiler: the second day was just as brutal, just with more blisters and slightly less dignity. Some people take scenic walks; I take scenic masochism.
+        </p>
+      </div>
+    </div>
+    <!-- New story cards below -->
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/iceland.jpeg" alt="Iceland" class="story-thumb">
+        <span class="story-title">Chasing Northern Lights in Iceland</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/iceland.jpeg" alt="Iceland" class="story-img">
+        <p>
+          So I went to chase the Northern Lights once, because standing in freezing darkness staring at the sky sounded like a solid plan. But of course, one night wasn’t enough—why not freeze my toes off again, just for a second round of dancing green lights? The second night was basically the same: cold, magical, and me pretending my teeth weren’t chattering. Some people chase sunsets; I chase hypothermia in style.
+        </p>
+      </div>
+    </div>
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/amazon.jpeg" alt="amazon" class="story-thumb">
+        <span class="story-title">Amazon!!! Sunrise</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/amazon.jpeg" alt="amazon" class="story-img">
+        <p>
+        So I woke up at an unholy hour to catch the Amazon sunrise—because apparently, watching the sky turn gold while surrounded by mosquitoes and jungle noise sounded like a great idea. One sunrise wasn’t enough, of course—so I did it again the same day. Twice the awe, twice the bug spray, twice the questioning of my life choices. Some people hit snooze; I chase sunrises in the middle of nowhere.
+      </div>
+    </div>
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/aus.jpg" alt="great barier reef" class="story-thumb">
+        <span class="story-title">Great barier reef</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/aus.jpg" alt="great barier reef" class="story-img">
+        <p>
+         So I went snorkeling the Great Barrier Reef once, because swimming with colorful fish in crystal-clear water seemed like a chill day. But apparently, one round of floating among corals wasn’t enough—so I went back the same day. Twice the awe, twice the sunburn, twice the awkward flailing trying not to touch anything. Some people relax on beaches; I go full marine biologist-slash-acrobat.
+        </p>
+      </div>
+    </div>
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/dive.jpeg" alt="shark" class="story-thumb">
+        <span class="story-title">Dive with sharks</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/dive.jpeg" alt="shark" class="story-img">
+        <p>
+          So I went diving with sharks once, because apparently, I like making questionable life choices. But one brush with razor-toothed predators wasn’t enough—so I went back the same day. Twice the adrenaline, twice the heart-stopping moments, twice the awkward mental pep talks: ‘Don’t look like lunch.’ Some people do spa days; I play hide-and-seek with apex predators.
+        </p>
+      </div>
+    </div>
+    <div class="story-card">
+      <button class="story-toggle" onclick="this.parentElement.classList.toggle('expanded')">
+        <img src="images/us.jpeg" alt="USA Roadtrip" class="story-thumb">
+        <span class="story-title">Cross-country Roadtrip USA</span>
+        <span class="story-arrow">&#9660;</span>
+      </button>
+      <div class="story-content">
+        <img src="images/us.jpeg" alt="USA Roadtrip" class="story-img">
+        <p>
+          I drove coast-to-coast across the USA. From deserts to mountains, diners to motels, every mile was a new adventure. I learned that the best playlist is the one you sing to yourself when the radio signal fades.
+        </p>
+      </div>
+    </div>
+    <!-- End new cards -->
+  </div>
+</div>
+
+  <script>
+    am4core.ready(function() {
+      am4core.useTheme(am4themes_animated);
+
+      var chart = am4core.create("chartdiv", am4maps.MapChart);
+      chart.geodata = am4geodata_worldLow;
+      chart.projection = new am4maps.projections.Miller();
+
+      // Updated visited countries with flags as icons
+      var visited = [
+        { id: "IN", name: "India", icon: '<img src="https://flagcdn.com/in.svg" width="32" height="24" alt="India flag">', info: "India" },
+        { id: "LK", name: "Srilanka", icon: '<img src="https://flagcdn.com/lk.svg" width="32" height="24" alt="Sri Lanka flag">', info: "Srilanka" },
+        { id: "TH", name: "Thailand", icon: '<img src="https://flagcdn.com/th.svg" width="32" height="24" alt="Thailand flag">', info: "Thailand" },
+        { id: "KR", name: "South Korea", icon: '<img src="https://flagcdn.com/kr.svg" width="32" height="24" alt="South Korea flag">', info: "South Korea" },
+        { id: "AU", name: "Australia", icon: '<img src="https://flagcdn.com/au.svg" width="32" height="24" alt="Australia flag">', info: "Australia" },
+        { id: "US", name: "Usa", icon: '<img src="https://flagcdn.com/us.svg" width="32" height="24" alt="USA flag">', info: "Usa" },
+        { id: "MX", name: "Mexico", icon: '<img src="https://flagcdn.com/mx.svg" width="32" height="24" alt="Mexico flag">', info: "Mexico" },
+        { id: "PE", name: "Peru", icon: '<img src="https://flagcdn.com/pe.svg" width="32" height="24" alt="Peru flag">', info: "Peru" },
+        { id: "CL", name: "Chile", icon: '<img src="https://flagcdn.com/cl.svg" width="32" height="24" alt="Chile flag">', info: "Chile" },
+        { id: "AR", name: "Argentina", icon: '<img src="https://flagcdn.com/ar.svg" width="32" height="24" alt="Argentina flag">', info: "Argentina" },
+        { id: "PN", name: "Easter island", icon: '<img src="https://flagcdn.com/pa.svg" width="32" height="24" alt="Easter Island flag">', info: "Easter island" }, // Easter Island uses Chile's flag, but you can use pa.svg or cl.svg
+        { id: "IS", name: "Iceland", icon: '<img src="https://flagcdn.com/is.svg" width="32" height="24" alt="Iceland flag">', info: "Iceland" },
+        { id: "FR", name: "France", icon: '<img src="https://flagcdn.com/fr.svg" width="32" height="24" alt="France flag">', info: "France" },
+        { id: "ES", name: "Spain", icon: '<img src="https://flagcdn.com/es.svg" width="32" height="24" alt="Spain flag">', info: "Spain" },
+        { id: "LU", name: "Luxembourg", icon: '<img src="https://flagcdn.com/lu.svg" width="32" height="24" alt="Luxembourg flag">', info: "Luxembourg" },
+        { id: "IT", name: "Italy", icon: '<img src="https://flagcdn.com/it.svg" width="32" height="24" alt="Italy flag">', info: "Italy" },
+        { id: "GR", name: "Greece", icon: '<img src="https://flagcdn.com/gr.svg" width="32" height="24" alt="Greece flag">', info: "Greece" },
+        { id: "PT", name: "Portugal", icon: '<img src="https://flagcdn.com/pt.svg" width="32" height="24" alt="Portugal flag">', info: "Portugal" },
+        { id: "DE", name: "Germany", icon: '<img src="https://flagcdn.com/de.svg" width="32" height="24" alt="Germany flag">', info: "Germany" },
+        { id: "TR", name: "Turkey", icon: '<img src="https://flagcdn.com/tr.svg" width="32" height="24" alt="Turkey flag">', info: "Turkey" },
+        { id: "CH", name: "Swiss", icon: '<img src="https://flagcdn.com/ch.svg" width="32" height="24" alt="Switzerland flag">', info: "Swiss" },
+        { id: "VN", name: "Vietnam", icon: '<img src="https://flagcdn.com/vn.svg" width="32" height="24" alt="Vietnam flag">', info: "Vietnam" },
+        { id: "AE", name: "UAE", icon: '<img src="https://flagcdn.com/ae.svg" width="32" height="24" alt="UAE flag">', info: "UAE" },
+        { id: "CZ", name: "Czech Republic", icon: '<img src="https://flagcdn.com/cz.svg" width="32" height="24" alt="Czech Republic flag">', info: "Czech Republic" },
+        { id: "VA", name: "Vatican city", icon: '<img src="https://flagcdn.com/va.svg" width="32" height="24" alt="Vatican City flag">', info: "Vatican city" },
+        { id: "PL", name: "Poland", icon: '<img src="https://flagcdn.com/pl.svg" width="32" height="24" alt="Poland flag">', info: "Poland" },
+        { id: "BE", name: "Belgium", icon: '<img src="https://flagcdn.com/be.svg" width="32" height="24" alt="Belgium flag">', info: "Belgium" },
+        { id: "NL", name: "Netherlands", icon: '<img src="https://flagcdn.com/nl.svg" width="32" height="24" alt="Netherlands flag">', info: "Netherlands" },
+        { id: "PR", name: "Puertorico", icon: '<img src="https://flagcdn.com/pr.svg" width="32" height="24" alt="Puerto Rico flag">', info: "Puertorico" },
+        { id: "AT", name: "Austria", icon: '<img src="https://flagcdn.com/at.svg" width="32" height="24" alt="Austria flag">', info: "Austria" },
+        { id: "BR", name: "Brazil", icon: '<img src="https://flagcdn.com/br.svg" width="32" height="24" alt="Brazil flag">', info: "Brazil" },
+        { id: "PK", name: "Pakistan", icon: '<img src="https://flagcdn.com/pk.svg" width="32" height="24" alt="Pakistan flag">', info: "Pakistan" },
+        { id: "BD", name: "Bangladesh", icon: '<img src="https://flagcdn.com/bd.svg" width="32" height="24" alt="Bangladesh flag">', info: "Bangladesh" },
+        { id: "NP", name: "Nepal", icon: '<img src="https://flagcdn.com/np.svg" width="32" height="24" alt="Nepal flag">', info: "Nepal" },
+        { id: "GB", name: "Uk", icon: '<img src="https://flagcdn.com/gb.svg" width="32" height="24" alt="UK flag">', info: "Uk" },
+        { id: "HK", name: "Hongkong", icon: '<img src="https://flagcdn.com/hk.svg" width="32" height="24" alt="Hong Kong flag">', info: "Hongkong" },
+        { id: "JP", name: "Japan", icon: '<img src="https://flagcdn.com/jp.svg" width="32" height="24" alt="Japan flag">', info: "Japan" },
+        { id: "KP", name: "North korea (DmZ)", icon: '<img src="https://flagcdn.com/kp.svg" width="32" height="24" alt="North Korea flag">', info: "North korea (DmZ)" },
+        { id: "IS", name: "Iceland", icon: '<img src="https://flagcdn.com/is.svg" width="32" height="24" alt="Iceland flag">', info: "Iceland" },
+        { id: "AQ", name: "Antarctica", icon: '<img src="https://flagcdn.com/aq.svg" width="32" height="24" alt="Antarctica flag">', info: "Antarctica" }
+      ];
+
+      var polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
+      polygonSeries.useGeodata = true;
+
+      polygonSeries.mapPolygons.template.fill = am4core.color("#f3f1ef");
+      polygonSeries.mapPolygons.template.stroke = am4core.color("#888");
+      polygonSeries.mapPolygons.template.strokeWidth = 0.5;
+
+      polygonSeries.data = visited.map(function(c) {
+        return {
+          id: c.id,
+          name: c.name,
+          fill: am4core.color("#d6d3ce"),
+          info: c.info,
+          icon: c.icon
+        };
+      });
+
+      polygonSeries.mapPolygons.template.propertyFields.fill = "fill";
+      polygonSeries.mapPolygons.template.tooltipHTML = "{icon}<br><strong>{name}</strong><br>{info}";
+
+      polygonSeries.mapPolygons.template.events.on("hit", function(ev) {
+        chart.zoomToMapObject(ev.target);
+        var country = visited.find(c => c.id === ev.target.dataItem.dataContext.id);
+        if (country) {
+          var popupHtml = `
+            <div style="text-align:center;">
+              ${country.icon}
+              <div><strong>${country.name}</strong></div>
+              <div>${country.info}</div>
+            </div>
+          `;
+          chart.openPopup(popupHtml, "auto", "auto");
+        }
+      });
+    });
+  </script>
+</body>
+</html>

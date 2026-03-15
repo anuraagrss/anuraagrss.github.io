@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="Logo.ico" type="image/x-icon">
+  <title>404-Nomad</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="404-Nomad peek overlay menu">
+
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
+    :root {
+      --bg-main: #F3F1EF;
+      --primary: #3a506b;
+      --secondary: #5bc0be;
+      --accent: #1c2541;
+      --bubble-bg: #5bc0be;
+      --bubble-hover: #3a506b;
+      --overlay-bg: rgba(60, 80, 107, 0.92);
+      --face-shadow: 0 8px 32px rgba(0,0,0,0.08);
+      --face-radius: 16px;
+      --desc-bg: rgba(60,80,107,0.95);
+      --desc-radius: 24px;
+      --desc-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --desc-color: #fff;
+      --font-main: "Cute Font", Roboto, sans-serif;
+      --base-font-size: 2vw;         /* Slightly reduced from 2.2vw */
+      --h1-font-size: 2.8vw;         /* Slightly bigger than previous */
+      --desc-font-size: 1.3vw;       /* Slightly bigger than previous */
+      --menu-font-size: 2vw;         /* Responsive menu font size */
+      --text-color: #222;
+      --nav-shadow: 0 4px 24px rgba(0,0,0,0.08);
+      --nav-radius: 24px;
+      --btn-size: 40px;
+      --bubble-size: 7vw;            /* Responsive bubble size for menu circles */
+      --transition: 0.4s ease;
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      min-height: 100vh;
+      overflow-x: hidden;
+      background: var(--bg-main);
+    }
+    body {
+      font-family: var(--font-main);
+      font-size: var(--base-font-size);
+      color: var(--primary);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      width: 100vw;
+      background: var(--bg-main);
+    }
+    main {
+      flex: 1;
+      width: 100vw;
+      height: 100vh;
+      min-height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: stretch;
+      padding: 0;
+      background: transparent;
+    }
+    .face {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: none;
+      border-radius: 0;
+      overflow: hidden;
+      background: transparent;
+      border: none;
+    }
+    .face-bg-img {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      width: 900px;
+      height: 900px;
+      max-width: 90vw;
+      max-height: 80vh;
+      object-fit: cover;
+      transform: translate(-50%, -50%);
+      z-index: 0; /* <-- Make sure this is below designer/coder */
+      pointer-events: none;
+      user-select: none;
+      
+      display: block; /* <-- Ensure image is visible */
+    }
+    .designer, .coder {
+      z-index: 1; /* <-- Ensure these are above the image */
+      flex: 1 1 50%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.4s;
+      overflow: hidden;
+      background: transparent;
+      border: none !important;
+      box-shadow: none !important;
+      outline: none !important;
+    }
+    .designer:focus, .coder:focus {
+      outline: none !important;
+    }
+    .designer .description,
+    .coder .description {
+      opacity: 0;
+      pointer-events: none;
+      position: relative;
+      left: auto;
+      top: auto;
+      transform: none;
+      background: none;
+      color: var(--primary);
+      padding: 0;
+      border-radius: 0;
+      box-shadow: none;
+      text-align: center;
+      max-width: 320px;
+      transition: opacity 0.4s;
+      z-index: 3;
+    }
+    .designer:hover .description,
+    .designer:focus .description,
+    .coder:hover .description,
+    .coder:focus .description {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .designer .description h1,
+    .coder .description h1 {
+      margin-bottom: 12px;
+      font-size: var(--h1-font-size);
+      letter-spacing: 2px;
+      color: var(--primary);
+    }
+    .designer .description p,
+    .coder .description p {
+      font-size: var(--desc-font-size);
+      line-height: 1.4;
+      color: var(--primary);
+    }
+    .designer::after,
+    .coder::after {
+      display: none !important;
+    }
+    @media (max-width: 900px) {
+      body {
+        font-size: 3vw;
+      }
+      .face-bg-img {
+        width: 90vw;
+        height: 40vh;
+        max-width: 90vw;
+        max-height: 40vh;
+      }
+      .face {
+        flex-direction: column;
+      }
+      .designer, .coder {
+        width: 100vw;
+        height: 50vh;
+      }
+      .designer .description h1,
+      .coder .description h1 {
+        font-size: 5vw;
+      }
+      .designer .description p,
+      .coder .description p {
+        font-size: 2.5vw;
+      }
+      .menu li {
+        width: 10vw;
+        height: 10vw;
+      }
+      .menu li a {
+        font-size: 3vw;
+      }
+    }
+    @media (max-width: 500px) {
+      body {
+        font-size: 4vw;
+      }
+      .designer .description h1,
+      .coder .description h1 {
+        font-size: 7vw;
+      }
+      .designer .description p,
+      .coder .description p {
+        font-size: 4vw;
+      }
+      .menu li {
+        width: 14vw;
+        height: 14vw;
+      }
+      .menu li a {
+        font-size: 4vw;
+      }
+    }
+
+    /* Bubble Overlay Menu (unchanged) */
+    .nav-toggle {
+      position: absolute;
+      left: -9999px;
+    }
+    .nav-btn {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: var(--btn-size);
+      height: var(--btn-size);
+      cursor: pointer;
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .wavy-menu {
+      display: block;
+      width: var(--btn-size);
+      height: var(--btn-size);
+      background: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      transition: opacity var(--transition);
+    }
+    .wavy-menu::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: none;
+      /* SVG zigzag/wavy line */
+      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M5 20 Q 10 10, 15 20 T 25 20 T 35 20" stroke="black" stroke-width="4" fill="none"/></svg>') no-repeat center/contain;
+      background-color: var(--accent);
+    }
+    .hamburger {
+      display: none;
+    }
+    .nav-toggle:not(:checked) + .nav-btn .wavy-menu {
+      opacity: 1;
+    }
+    .nav-toggle:checked + .nav-btn .wavy-menu {
+      opacity: 0;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(45deg);
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(243, 241, 239, 0.85); /* More transparent #F3F1EF */
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition);
+      z-index: 150;
+    }
+    .nav-toggle:checked ~ .overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .menu {
+      list-style: none;
+      position: relative;
+      width: 100%;
+      height: 100%;
+    }
+    .menu li {
+      position: absolute;
+      width: var(--bubble-size);
+      height: var(--bubble-size);
+      border-radius: 50%;
+      background: var(--bubble-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-weight: bold;
+      opacity: 0;
+      transform: scale(0.6);
+      transition: opacity var(--transition),
+                  transform var(--transition),
+                  background var(--transition),
+                  color var(--transition);
+      box-shadow: 0 2px 12px rgba(60,80,107,0.12);
+    }
+    .nav-toggle:checked ~ .overlay .menu li {
+      opacity: 1;
+      transform: scale(1);
+    }
+    .menu li a {
+      color: inherit;
+      text-decoration: none;
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.2s;
+      font-size: var(--menu-font-size);
+      font-family: var(--font-main);
+    }
+    .menu li a:hover {
+      transform: scale(1.1);
+    }
+
+    /* Alternate font color on hover based on circle color */
+    .menu li:not(.about):not(.services) a:hover {
+      color: var(--accent);
+    }
+    .menu li.about a:hover,
+    .menu li.services a:hover {
+      color: #fff;
+    }
+    .menu li.home     { top: 15%;  left: 30%; }
+    .menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
+    .menu li.nomad  { top: 45%;  left: 85%; }
+    .menu li.professional { top: 75%;  left: 65%; background: var(--bubble-hover); color: #fff;}
+    .menu li.contact  { top: 70%;  left: 20%; }
+
+    @media (max-width: 700px) {
+      main {
+        height: 100vh;
+        min-height: 100vh;
+        padding: 0;
+      }
+      .face {
+        flex-direction: column;
+      }
+      .designer, .coder {
+        width: 100vw;
+        height: 50vh;
+      }
+      .face-bg-img {
+        width: 100vw;
+        height: 100vh;
+      }
+      .menu li {
+        width: 70px;
+        height: 70px;
+        font-size: 1em;
+      }
+      .menu li.home     { top: 10%;  left: 20%; }
+      .menu li.about    { top:  5%;  left: 65%; }
+      .menu li.nomad  { top: 40%;  left: 80%; }
+      .menu li.professional { top: 70%;  left: 60%; }
+      .menu li.contact  { top: 65%;  left: 15%; }
+    }
+
+    .nav-btn.up-arrow-btn {
+      position: fixed !important;
+      left: 50% !important;
+      bottom: 32px !important;
+      top: auto !important;
+      right: auto !important;
+      transform: translateX(-50%) !important;
+      width: 60px;
+      height: 60px;
+      z-index: 200;
+      background: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      border-radius: 50%;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    }
+    .up-arrow {
+      display: block;
+      width: 40px;
+      height: 40px;
+      background: none;
+      position: relative;
+      z-index: 1;
+      transition: opacity var(--transition);
+    }
+    .up-arrow::before {
+      content: '';
+      display: block;
+      width: 100%;
+      height: 100%;
+      background: none;
+      /* Unique SVG up arrow: double chevron with a circle */
+      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
+      background-color: var(--accent);
+    }
+    .hamburger {
+      display: none;
+    }
+    .nav-toggle:not(:checked) + .nav-btn .up-arrow {
+      opacity: 1;
+    }
+    .nav-toggle:checked + .nav-btn .up-arrow {
+      opacity: 0;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger {
+      display: block;
+      position: relative;
+      width: 100%;
+      height: 4px;
+      background: transparent;
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::before {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(45deg);
+    }
+    .nav-toggle:checked + .nav-btn .hamburger::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 4px;
+      top: 0;
+      transform: rotate(-45deg);
+    }
+
+    .social-bar {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      background: rgba(243,241,239,0.85);
+      padding: 18px 12px 18px 12px;
+      border-radius: 0 24px 24px 0;
+      box-shadow: 0 4px 24px rgba(60,80,107,0.12);
+      z-index: 300;
+      min-width: 56px;
+    }
+    .social-bar a {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.85;
+      transition: opacity 0.2s, transform 0.2s;
+      margin-left: 4px;
+    }
+    .social-bar a:hover {
+      opacity: 1;
+      transform: scale(1.15);
+    }
+    .social-bar svg {
+      display: block;
+      filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10));
+      width: 36px;
+      height: 36px;
+    }
+    @media (max-width: 700px) {
+      .social-bar {
+        gap: 16px;
+        padding: 10px 6px 10px 6px;
+        border-radius: 0 16px 16px 0;
+        min-width: 44px;
+      }
+      .social-bar svg {
+        width: 28px;
+        height: 28px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <main>
+    <div class="face">
+      <img class="face-bg-img" src="Avatar.jpg" alt="Anuraag's face">
+      <div class="designer" tabindex="0" onclick="window.location.href='Profile.html'">
+        <div class="description">
+          <h1>engineer</h1>
+          <p>a passionate engineer solving everyday problems with tech and common sense</p>
+        </div>
+      </div>
+      <div class="coder" tabindex="0" onclick="window.location.href='nomad.html'">
+        <div class="description">
+          <h1 href="nomad.html">nomad</h1>
+          <p>capturing the world through my lens and learning from life’s many perspectives</p>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- hidden toggle -->
+  <input type="checkbox" id="nav-toggle" class="nav-toggle">
+  <!-- hamburger / X button -->
+  <label for="nav-toggle" class="nav-btn up-arrow-btn">
+    <span class="up-arrow"></span>
+    <span class="hamburger"></span>
+  </label>
+  <!-- full-screen overlay -->
+  <div class="overlay">
+    <ul class="menu">
+            <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
+      <li class="about"><a href="Professional.html" title="Learn more About me">About</a></li>
+      <li class="nomad"><a href="nomad.html" title="Nomad journeys & travel">Nomad</a></li>
+      <li class="professional"><a href="Profile.html" title="Professional experience">404</a></li>
+      <li class="contact"><a href="Contact.html" title="Contact me">Contact</a></li>
+    </ul>
+  </div>
+
+  <div class="social-bar">
+    <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
+    </a>
+    <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
+      <!-- Polarsteps logo: location pin with a dot -->
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#5bc0be"/>
+        <path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/>
+      </svg>
+    </a>
+    <a href="https://twitter.com/" target="_blank" aria-label="Twitter">
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
+    </a>
+    <a href="mailto:rssanuraag@gmail.com" aria-label="Gmail">
+      <!-- Gmail logo: envelope with M -->
+      <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
+        <circle cx="16" cy="16" r="16" fill="#F3F1EF"/>
+        <rect x="7" y="10" width="18" height="12" rx="3" fill="#fff"/>
+        <polyline points="7,10 16,18 25,10" stroke="#3a506b" stroke-width="2" fill="none"/>
+        <polyline points="7,22 7,10 16,18 25,10 25,22" stroke="#3a506b" stroke-width="2" fill="none"/>
+      </svg>
+    </a>
+  </div>
+
+</body>
+</html>

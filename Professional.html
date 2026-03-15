@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="icon" href="Logo.ico" type="image/x-icon">
+  <title>About - Anuraag Ravulaparthi</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="About Anuraag Gravulaparthi - Product designer & traveler">
+  <link rel="shortcut icon" href="favicon.ico">
+ <link rel="stylesheet" href="styles/main.css">
+  <style>
+    @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
+    /* Make text more readable by darkening secondary/accent colors and increasing contrast */
+    :root {
+      --primary: #444444;
+      --secondary: #666666;
+      --accent: #222222;
+      --bubble-bg: #F3F1EF;
+      --bubble-hover: #e0e0e0;
+      --bg-main: #F3F1EF;
+    }
+    body {
+      background: var(--bg-main);
+      font-family: "Cute Font", Roboto, sans-serif;
+      color: var(--primary);
+      margin: 0;
+      padding: 0;
+    }
+    .content {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 16px 0 16px;
+    }
+    .main .row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 32px;
+      margin-bottom: 32px;
+    }
+    .col-5 {
+      flex: 1 1 340px;
+      max-width: 420px;
+    }
+    .col-7 {
+      flex: 2 1 480px;
+      max-width: 680px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    h1 {
+      font-size: 2.8vw;
+      color: var(--primary);
+      margin-bottom: 18px;
+      letter-spacing: 2px;
+    }
+    .intro {
+      font-size: 1.3vw;
+      color: var(--secondary);
+      margin-bottom: 12px;
+    }
+    .description {
+      font-size: 1.1vw;
+      color: var(--accent);
+      margin-bottom: 18px;
+    }
+    .major {
+      border-radius: 18px;
+      box-shadow: none;
+      max-width: 100%;
+      height: auto;
+    }
+    .snaps {
+      display: flex;
+      gap: 18px;
+      flex-wrap: wrap;
+      margin: 24px 0;
+      justify-content: center;
+    }
+    .snaps a img {
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
+      width: 120px;
+      height: 120px;
+      object-fit: cover;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .snaps a:hover img {
+      transform: scale(1.05);
+      box-shadow: 0 4px 16px rgba(65,40,22,0.14);
+    }
+    section.dark {
+      background: #F3F1EF;
+      border-radius: 18px;
+      margin: 32px 0;
+      padding: 32px 0;
+    }
+    section.light {
+      background: #fff;
+      border-radius: 18px;
+      margin: 32px 0;
+      padding: 32px 0;
+    }
+    h2 {
+      font-size: 2vw;
+      color: var(--primary);
+      margin-bottom: 16px;
+      letter-spacing: 1px;
+    }
+    ul.ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      font-size: 1.1vw;
+      color: var(--secondary);
+    }
+    ul.ul li {
+      margin-bottom: 8px;
+      padding-left: 12px;
+      position: relative;
+    }
+    ul.ul li::before {
+      content: "•";
+      color: var(--accent);
+      position: absolute;
+      left: 0;
+    }
+    .pie-chart {
+      display: flex;
+      gap: 48px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .designer, .coder {
+      min-width: 180px;
+    }
+    .pie-chart img {
+      max-width: 220px;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.10);
+    }
+    .bar-chart {
+      list-style: none;
+      padding: 0;
+      margin: 24px 0 0 0;
+      width: 100%;
+      max-width: 600px;
+    }
+    .bar-chart li {
+      display: flex;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+    .bar-chart .skill {
+      flex: 1;
+      font-size: 1.1vw;
+      color: #444;
+      padding-right: 18px;
+      min-width: 180px;
+    }
+    .bar-chart .percent {
+      position: relative;
+      height: 22px;
+      border-radius: 11px;
+      background: linear-gradient(90deg, #bfa07a 0%, #5bc0be 100%);
+      color: #fff;
+      font-weight: bold;
+      font-size: 1vw;
+      line-height: 22px;
+      text-align: right;
+      padding-right: 16px;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
+      transition: width 0.4s;
+      min-width: 80px;
+      overflow: hidden;
+    }
+    @media (max-width: 900px) {
+      .main .row, .pie-chart {
+        flex-direction: column;
+        gap: 18px;
+      }
+      .col-5, .col-7 {
+        max-width: 100vw;
+        flex: 1 1 100vw;
+      }
+      h1 { font-size: 6vw; }
+      h2 { font-size: 4vw; }
+      .intro, .description, ul.ul, .bar-chart, .bar-chart .label, .bar-chart .skill, .bar-chart .percent, .top, .footer .left {
+        font-size: 3vw;
+      }
+      .snaps a img { width: 80px; height: 80px; }
+      .bar-chart .skill {
+        font-size: 3vw;
+        min-width: 100px;
+      }
+      .bar-chart .percent {
+        font-size: 2vw;
+        min-width: 50px;
+        height: 18px;
+        line-height: 18px;
+        padding-right: 8px;
+      }
+    }
+    #img-main img.major {
+      max-width: 280px;
+      height: auto;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(68,68,68,0.10);
+      margin: 0 auto;
+      display: block;
+    }
+    #text-main {
+      font-size: 1.5vw;
+    }
+    #text-main h1 {
+      font-size: 3vw;
+    }
+    #text-main .intro {
+      font-size: 2vw;
+    }
+    #text-main .description {
+      font-size: 1.5vw;
+    }
+    @media (max-width: 900px) {
+      #img-main img.major {
+        max-width: 100px;
+      }
+      #text-main {
+        font-size: 3vw;
+      }
+      #text-main h1 {
+        font-size: 6vw;
+      }
+      #text-main .intro {
+        font-size: 4vw;
+      }
+      #text-main .description {
+        font-size: 3vw;
+      }
+    }
+    /* Add to your <style> block for vertical bar chart styling */
+    .vertical-bar-chart {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      margin: 32px 0 0 0;
+      min-height: 260px;
+    }
+    .bar-axis {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      font-size: 1em;
+      color: #888;
+      margin-bottom: 8px;
+      padding-right: 32px;
+    }
+    .bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 18px;
+      width: 100%;
+    }
+    .bar-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 38px;
+    }
+    .bar {
+      width: 38px;
+      border-radius: 8px 8px 0 0;
+      transition: height 0.4s;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.10);
+    }
+    .bar-label {
+      margin-top: 8px;
+      font-size: 0.95em;
+      color: #444;
+      text-align: center;
+      word-break: break-word;
+      max-width: 80px;
+    }
+    @media (max-width: 900px) {
+      .bars {
+        height: 120px;
+        gap: 8px;
+        padding-right: 0;
+      }
+      .bar-item {
+        width: 22px;
+      }
+      .bar {
+        width: 22px;
+      }
+      .bar-label {
+        font-size: 0.8em;
+        max-width: 40px;
+      }
+    }
+    .bar-axis-vertical {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 200px;
+      margin-right: 16px;
+      font-size: 1em;
+      color: #888;
+      align-items: flex-end;
+    }
+  </style>
+</head>
+<body>
+  <div class="content about clearfix">
+    <section class="main">
+      <div class="row">
+        <div id="text-main" class="col-5 text-main">
+          <h1>about.</h1>
+          <p class="intro">I'm a passionate engineer based in houston texas, United states.</p>
+          <p class="description">
+            I’m an engineer and passionate nomad, blending technology and adventure to solve real-world problems. My journey spans continents and industries, from building scalable solutions for global organizations to capturing stories through travel and innovation. Whether architecting digital platforms or exploring new cultures, I thrive on learning, connecting, and making a meaningful impact wherever I go.
+          </p>
+        </div>
+        <div id="img-main" class="col-7 align-c">
+          <img class="major preload" src="Avatar.png" alt="anuraag gravulaparthi ui designer">
+        </div>
+      </div>
+      <div id="snaps" class="row align-c snaps clearfix">
+        <a id="snaps-1" target="_blank" href="#" style="top: 0px;">
+          <img class="preload" src="1.jpg" alt="Mini me">
+        </a>
+        <a id="snaps-2" target="_blank" href="#" style="top: 0px;">
+          <img class="preload" src="3.jpg" alt="Sunny Sydney">
+        </a>
+        <a id="snaps-3" target="_blank" href="#" style="top: 0px;">
+          <img class="preload" src="4.jpg" alt="Home sweet home">
+        </a>
+        <a id="snaps-4" target="_blank" href="#" style="top: 0px;">
+          <img class="preload" src="5.jpg" alt="My workspace">
+        </a>
+        <a id="snaps-5" target="_blank" href="#" style="top: 0px;">
+          <img class="preload" src="2.jpg" alt="L-sit pullup">
+        </a>
+ 
+      </div>
+    </section>
+    <div id="content-detail">
+      <section class="light nopad-b">
+        <div class="row alt" style="display: flex; align-items: flex-start;">
+          <div class="col-5 ten-things" style="display: flex; flex-direction: column; justify-content: flex-start; padding-left: 32px;">
+            <h2>Random facts</h2>
+            <ul class="ul" style="padding-left: 12px;">
+              <li>I’ve visited over 50 countries and counting</li>
+              <li>I always travel with my camera and a journal</li>
+              <li>Street food is my favorite way to experience a new place</li>
+              <li>I’ve trekked to Everest Base Camp and dived the Great Barrier Reef</li>
+              <li>I love learning phrases in local languages</li>
+              <li>Sunrise hikes are my idea of a perfect morning</li>
+              <li>I collect postcards and stories from every destination</li>
+              <li>Maps and train tickets are my souvenirs</li>
+              <li>I believe every journey teaches something new</li>
+            </ul>
+          </div>
+          <div id="img-1" class="col-7 align-c" style="display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 0;">
+            <img class="major" src="background.jpeg" alt="minion" style="max-width: 320px; width: 320px; height: auto; box-shadow: none;">
+          </div>
+        </div>
+      </section>
+      <section id="bar-chart" class="dark nopad-b" style="width: 100vw; position: relative; left: 50%; right: 50%; margin-left: -50vw; margin-right: -50vw;">
+        <div style="width: 100vw; margin: 0 auto;">
+          <h2 class="align-r">My skills</h2>
+          <div class="vertical-bar-chart" style="display: flex; flex-direction: row; align-items: flex-end; width: 100%;">
+            <div class="bar-axis-vertical">
+              <span>Jedi</span>
+              <span>Ninja</span>
+              <span>Geek</span>
+              <span>Newbie</span>
+              <span></span>
+            </div>
+            <div class="bars" style="height:200px; flex: 1; width: 100%; justify-content: space-between;">
+              <div class="bar-item" style="width: 16vw;">
+                <div class="bar" style="height:190px; width:100%; background: linear-gradient(180deg, #5bc0be 0%, #bfa07a 100%);"></div>
+                <div class="bar-label">Dreaming</div>
+              </div>
+              <div class="bar-item" style="width: 16vw;">
+                <div class="bar" style="height:180px; width:100%; background: linear-gradient(180deg, #f7b267 0%, #5bc0be 100%);"></div>
+                <div class="bar-label">Travel photography</div>
+              </div>
+              <div class="bar-item" style="width: 16vw;">
+                <div class="bar" style="height:190px; width:100%; background: linear-gradient(180deg, #3a506b 0%, #bfa07a 100%);"></div>
+                <div class="bar-label">Storytelling</div>
+              </div>
+              <div class="bar-item" style="width: 16vw;">
+                <div class="bar" style="height:150px; width:100%; background: linear-gradient(180deg, #5bc0be 0%, #f7b267 100%);"></div>
+                <div class="bar-label">Innovation</div>
+              </div>
+              <div class="bar-item" style="width: 16vw;">
+                <div class="bar" style="height:80px; width:100%; background: linear-gradient(180deg, #bfa07a 0%, #3a506b 100%);"></div>
+                <div class="bar-label">Cross-cultural collaboration</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="light">
+        <div class="row alt">
+          <div class="col-5 text-middle">
+            <h2>My story</h2>
+            <p>Learn a little more about my journey as an engineer and nomad—how a love for problem-solving and exploration shaped my path. From coding in cafés halfway across the world to designing solutions for global teams, I’ve gathered lessons, travel stories, and inspiration along the way. You’ll also find a few of my favorite reads and glimpses of the first projects I built when this adventure began...</p>
+            <p><a class="transition" href="nomad.html">Read my story</a></p>
+          </div>
+          
+        </div>
+      </section>
+    </div>
+  </div>
+</body>
+</html>
