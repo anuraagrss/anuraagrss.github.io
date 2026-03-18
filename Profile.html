@@ -3,34 +3,35 @@
 <head>
   <meta charset="utf-8">
   <link rel="icon" href="Logo.ico" type="image/x-icon">
-  <title>Profile - Anuraag ravulaparthi</title>
+  <title>Profile - Anuraag Ravulaparthi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="Professional Profile Timeline">
 
   <style>
     @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
     :root {
-  --bg-main: #F3F1EF;
-  --primary: #3a506b;
-  --secondary: #5bc0be;
-  --accent: #1c2541;
-  --timeline-dot: #5bc0be;
-  --timeline-line: #3a506b;
-  --timeline-card-bg: #fff;
-  --timeline-card-radius: 18px;
-  --timeline-card-shadow: 0 2px 12px rgba(60,80,107,0.08);
-  --font-main: "Cute Font", Roboto, sans-serif;
-  --base-font-size: 2vw;
-  --h1-font-size: 2.8vw;
-  --desc-font-size: 1.3vw;
-  --menu-font-size: 2vw;
-  --bubble-size: 7vw;
-  --transition: 0.4s ease;
-  --btn-size: 48px;
-  --bubble-bg: #5bc0be;
-  --bubble-hover: #3a506b;
-  --overlay-bg: rgba(243, 241, 239, 0.95);
-}
+      --bg-main: #F3F1EF;
+      --primary: #3a506b;
+      --secondary: #5bc0be;
+      --accent: #1c2541;
+      --timeline-dot: #5bc0be;
+      --timeline-line: #3a506b;
+      --timeline-card-bg: #fff;
+      --timeline-card-radius: 18px;
+      --timeline-card-shadow: 0 2px 12px rgba(60,80,107,0.08);
+      --font-main: "Cute Font", Roboto, sans-serif;
+      --base-font-size: 2vw;
+      --h1-font-size: 2.8vw;
+      --desc-font-size: 1.3vw;
+      --menu-font-size: 2vw;
+      --bubble-size: 7vw;
+      --transition: 0.4s ease;
+      --btn-size: 48px;
+      --bubble-bg: #5bc0be;
+      --bubble-hover: #3a506b;
+      --overlay-bg: rgba(243, 241, 239, 0.95);
+    }
+
     html, body {
       width: 100%;
       height: 100%;
@@ -46,8 +47,9 @@
       flex-direction: column;
       min-height: 100vh;
       width: 100vw;
-      padding-top: 140px; /* Increased space for header + top bar */
+      padding-top: 140px;
     }
+
     /* Sticky profile header */
     .profile-header {
       position: fixed;
@@ -59,7 +61,6 @@
       text-align: center;
       padding: 24px 0 12px 0;
       box-shadow: 0 2px 12px rgba(60,80,107,0.07);
-      /* Remove border-bottom for blend-in effect */
       border-bottom: none;
     }
     .profile-header h1 {
@@ -73,19 +74,66 @@
       color: var(--secondary);
       margin-bottom: 0;
     }
+
+    /* New profile intro band */
+    .profile-intro {
+      max-width: 900px;
+      margin: 0 auto 32px auto;
+      padding: 18px 24px;
+      background: #fff;
+      border-radius: 18px;
+      box-shadow: 0 2px 12px rgba(60,80,107,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+    .profile-intro h2 {
+      margin: 0 0 6px 0;
+      font-size: 1.6vw;
+      color: var(--accent);
+    }
+    .profile-intro p {
+      margin: 0;
+      font-size: 1.1vw;
+    }
+    .intro-icons {
+      display: flex;
+      gap: 12px;
+    }
+    .intro-icon {
+      width: 52px;
+      height: 52px;
+    }
+    @media (max-width: 900px) {
+      .profile-intro {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 16px 14px;
+      }
+      .profile-intro h2 {
+        font-size: 1.3rem;
+      }
+      .profile-intro p {
+        font-size: 1rem;
+      }
+      .intro-icons {
+        justify-content: flex-start;
+      }
+    }
+
     .timeline {
       position: relative;
       max-width: 900px;
       margin: 0 auto;
-      padding: 60px 0 140px 0; /* Top, sides, extra bottom space */
+      padding: 60px 0 180px 0;
     }
     .timeline-center {
       position: absolute;
       left: 50%;
       top: 0;
       width: 4px;
-      /* End line above menu icon: subtract icon height + extra space */
-      height: calc(100% - 120px); /* 60px icon + 60px space */
+      height: calc(100% - 120px);
       transform: translateX(-50%);
       background: var(--timeline-line);
       z-index: 0;
@@ -104,7 +152,7 @@
       justify-content: flex-start;
     }
     .timeline-card {
-      background: var(--timeline-card-bg);
+      background: linear-gradient(135deg, #ffffff 70%, #f7fbfb 100%);
       border-radius: var(--timeline-card-radius);
       box-shadow: var(--timeline-card-shadow);
       padding: 24px 32px;
@@ -123,6 +171,7 @@
       margin-left: calc(50% + 32px);
       text-align: left;
     }
+
     .timeline-dot {
       position: absolute;
       left: 50%;
@@ -135,11 +184,23 @@
       border: 4px solid var(--bg-main);
       box-shadow: 0 2px 8px rgba(60,80,107,0.10);
       z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
+    .dot-icon {
+      width: 22px;
+      height: 22px;
+    }
+    .timeline-item:hover .timeline-dot {
+      transform: translateX(-50%) scale(1.05);
+      box-shadow: 0 4px 12px rgba(60,80,107,0.2);
+    }
+
     @media (max-width: 900px) {
       .timeline {
         max-width: 98vw;
-        padding: 0;
+        padding: 0 0 140px 0;
       }
       .timeline-center {
         display: none;
@@ -168,9 +229,6 @@
         right: 0 !important;
         background: var(--timeline-card-bg);
       }
-    }
-
-    @media (max-width: 900px) {
       .timeline-item,
       .timeline-item:nth-child(odd),
       .timeline-item:nth-child(even) {
@@ -184,7 +242,63 @@
         transform: translateX(-50%) !important;
       }
     }
-    /* Social bar styles (reuse from main page) */
+
+    /* Project strip cards */
+    .project-strip {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .project-card {
+      flex: 1 1 30%;
+      min-width: 180px;
+      background: #f6fbfb;
+      border-radius: 14px;
+      padding: 10px 12px;
+      border: 1px solid rgba(91,192,190,0.35);
+    }
+    .project-card h4 {
+      margin: 0 0 4px 0;
+      font-size: 0.98em;
+      color: var(--accent);
+    }
+    .project-card p {
+      margin: 0 0 6px 0;
+      font-size: 0.9em;
+    }
+    .project-card .tag {
+      display: inline-block;
+      font-size: 0.76em;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(58,80,107,0.08);
+      color: var(--accent);
+      margin-right: 4px;
+    }
+    @media (max-width: 900px) {
+      .project-strip {
+        flex-direction: column;
+      }
+    }
+
+    /* Optional details toggles */
+    .project-details {
+      margin-top: 10px;
+    }
+    .project-details summary {
+      cursor: pointer;
+      font-size: 0.95em;
+      color: var(--accent);
+    }
+    .project-details[open] summary {
+      font-weight: bold;
+    }
+    .project-details ul {
+      margin-top: 6px;
+    }
+
+    /* Social bar */
     .social-bar {
       position: fixed;
       top: 50%;
@@ -194,7 +308,7 @@
       flex-direction: column;
       gap: 24px;
       background: rgba(243,241,239,0.85);
-      padding: 18px 12px 18px 12px;
+      padding: 18px 12px;
       border-radius: 0 24px 24px 0;
       box-shadow: 0 4px 24px rgba(60,80,107,0.12);
       z-index: 300;
@@ -221,7 +335,7 @@
     @media (max-width: 700px) {
       .social-bar {
         gap: 16px;
-        padding: 10px 6px 10px 6px;
+        padding: 10px 6px;
         border-radius: 0 16px 16px 0;
         min-width: 44px;
       }
@@ -230,7 +344,8 @@
         height: 28px;
       }
     }
-    /* Overlay menu styles (reuse from main page) */
+
+    /* Overlay menu */
     .nav-toggle {
       position: absolute;
       left: -9999px;
@@ -260,14 +375,12 @@
       z-index: 1;
       transition: opacity var(--transition);
     }
-    /* Down arrow icon for menu button (matches index (3).html style) */
     .wavy-menu::before {
       content: '';
       display: block;
       width: 100%;
       height: 100%;
       background: none;
-      /* Exact wavy SVG from index (3).html */
       mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M5 20 Q 10 10, 15 20 T 25 20 T 35 20" stroke="black" stroke-width="4" fill="none"/></svg>') no-repeat center/contain;
       background-color: var(--accent);
     }
@@ -289,7 +402,7 @@
       mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
       background-color: var(--accent);
     }
-    /* Hamburger (X) icon styles */
+
     .hamburger {
       display: none;
       position: fixed;
@@ -300,15 +413,11 @@
       height: 60px;
       background: none;
       pointer-events: auto;
-      z-index: 30001; /* Must be higher than .overlay */
+      z-index: 30001;
     }
-
-    /* Show hamburger (X) when menu is open */
     .nav-toggle:checked + .nav-btn .hamburger {
       display: block;
     }
-
-    /* Style the X icon for visibility */
     .nav-toggle:checked + .nav-btn .hamburger::before,
     .nav-toggle:checked + .nav-btn .hamburger::after {
       content: "";
@@ -320,12 +429,13 @@
       left: 10px;
       top: 28px;
     }
-.nav-toggle:checked + .nav-btn .hamburger::before {
+    .nav-toggle:checked + .nav-btn .hamburger::before {
       transform: rotate(45deg);
     }
-.nav-toggle:checked + .nav-btn .hamburger::after {
+    .nav-toggle:checked + .nav-btn .hamburger::after {
       transform: rotate(-45deg);
     }
+
     .overlay {
       position: fixed;
       top: 0; left: 0;
@@ -334,7 +444,7 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity var(--transition);
-      z-index: 20000; /* Increased z-index to be above header/info-bar */
+      z-index: 20000;
     }
     .nav-toggle:checked ~ .overlay {
       opacity: 1;
@@ -383,13 +493,6 @@
     .menu li a:hover {
       transform: scale(1.1);
     }
-    .menu li:not(.about):not(.services) a:hover {
-      color: var(--accent);
-    }
-    .menu li.about a:hover,
-    .menu li.services a:hover {
-      color: #fff;
-    }
     .menu li.home     { top: 15%;  left: 30%; }
     .menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
     .menu li.clients  { top: 45%;  left: 85%; }
@@ -408,72 +511,55 @@
       .menu li.services { top: 70%;  left: 60%; }
       .menu li.contact  { top: 65%;  left: 15%; }
     }
-    /* Add extra space at the bottom of the timeline */
-    .timeline {
-      padding-bottom: 180px; /* Increased from 100px/140px for extra space above menu */
-    }
-    /* Elegant floating info bar styles */
-    .info-bar {
+
+    /* Info bar */
+    .simple-info {
       position: fixed;
       top: 50%;
       right: 0;
       transform: translateY(-50%);
-      background: linear-gradient(135deg, #fff 70%, #eaf6f6 100%);
-      padding: 32px 28px 32px 24px;
-      border-radius: 32px 0 0 32px;
-      box-shadow: 0 8px 32px rgba(60,80,107,0.18), 0 1.5px 8px rgba(91,192,190,0.08);
-      z-index: 300;
-      min-width: 240px;
-      max-width: 340px;
-      font-size: 1.13em;
-      color: var(--primary);
-      border-left: 6px solid var(--accent);
-      backdrop-filter: blur(2px);
-      transition: box-shadow 0.2s, transform 0.2s;
-    }
-    .info-bar:hover {
-      box-shadow: 0 12px 48px rgba(60,80,107,0.22), 0 2px 12px rgba(91,192,190,0.12);
-      transform: translateY(-50%) scale(1.03);
-    }
-    .info-bar h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
-      font-size: 1.22em;
-      color: var(--accent);
-      letter-spacing: 1px;
-      font-weight: bold;
-      text-shadow: 0 1px 0 #eaf6f6;
-    }
-    .info-bar ul {
-      margin: 0 0 18px 0;
-      padding-left: 22px;
-    }
-    .info-bar li {
-      margin-bottom: 8px;
+      background: #F3F1EF;
+      padding: 18px 16px;
+      border-radius: 20px 0 0 20px;
+      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
+      min-width: 180px;
+      max-width: 220px;
       font-size: 1em;
-      line-height: 1.5;
-      position: relative;
+      color: #222;
+      z-index: 300;
     }
-    .info-bar li::before {
-      content: "★";
-      color: var(--secondary);
-      font-size: 0.95em;
-      margin-right: 8px;
-      vertical-align: middle;
-      opacity: 0.7;
+    .simple-info h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.08em;
+      color: #444;
+      font-weight: bold;
+    }
+    .simple-info ul {
+      margin: 0 0 12px 0;
+      padding-left: 16px;
+    }
+    .simple-info li {
+      margin-bottom: 8px;
+      font-size: 0.98em;
+      line-height: 1.4;
+    }
+    .simple-info .school {
+      color: #888;
+      font-size: 0.92em;
     }
     @media (max-width: 900px) {
-      .info-bar {
+      .simple-info {
         position: static;
         width: 100%;
         border-radius: 0;
         box-shadow: none;
-        padding: 18px 10px;
-        margin-bottom: 16px;
-        border-left: none;
-        backdrop-filter: none;
+        padding: 12px 8px;
+        margin-bottom: 12px;
+        font-size: 1em;
+        max-width: 100vw;
       }
     }
+
     /* Top bar for profile image and download button */
     .top-bar {
       position: fixed;
@@ -495,7 +581,6 @@
       height: 64px;
       object-fit: cover;
       border-radius: 50%;
-      
       box-shadow: 0 2px 12px rgba(60,80,107,0.10);
       background: #fff;
     }
@@ -546,53 +631,6 @@
         padding-top: 60px;
       }
     }
-    /* Add to your style block */
-    .simple-info {
-      position: fixed;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      background: #F3F1EF;
-      padding: 18px 16px;
-      border-radius: 20px 0 0 20px;
-      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
-      min-width: 180px;
-      max-width: 220px;
-      font-size: 1em;
-      color: #222;
-      z-index: 300;
-    }
-    .simple-info h3 {
-      margin: 0 0 8px 0;
-      font-size: 1.08em;
-      color: #444;
-      font-weight: bold;
-    }
-    .simple-info ul {
-      margin: 0 0 12px 0;
-      padding-left: 16px;
-    }
-    .simple-info li {
-      margin-bottom: 8px;
-      font-size: 0.98em;
-      line-height: 1.4;
-    }
-    .simple-info .school {
-      color: #888;
-      font-size: 0.92em;
-    }
-    @media (max-width: 900px) {
-      .simple-info {
-        position: static;
-        width: 100%;
-        border-radius: 0;
-        box-shadow: none;
-        padding: 12px 8px;
-        margin-bottom: 12px;
-        font-size: 1em;
-        max-width: 100vw;
-      }
-    }
   </style>
 </head>
 <body>
@@ -607,122 +645,196 @@
 
   <div class="profile-header">
     <h1>Anuraag Ravulaparthi</h1>
-    <p>Professional Experience Timeline</p>
+    <p>Product, Platform &amp; AI Journey</p>
   </div>
+
+  <!-- Intro band -->
+  <section class="profile-intro">
+    <div class="intro-text">
+      <h2>Product &amp; Platform Leader</h2>
+      <p>
+        I lead AI-enabled platforms, automation, and large-scale integrations that move 
+        digital north star metrics and unlock measurable business value.
+      </p>
+    </div>
+    <div class="intro-icons">
+      <!-- Product SVG -->
+      <svg viewBox="0 0 64 64" class="intro-icon">
+        <rect x="8" y="12" width="48" height="40" rx="6" ry="6" fill="#5bc0be"/>
+        <rect x="16" y="20" width="32" height="8" rx="3" fill="#F3F1EF"/>
+        <rect x="16" y="32" width="18" height="8" rx="3" fill="#F3F1EF"/>
+        <rect x="16" y="32" width="8" height="8" rx="3" fill="#3a506b"/>
+      </svg>
+      <!-- AI / Brain SVG -->
+      <svg viewBox="0 0 64 64" class="intro-icon">
+        <circle cx="22" cy="28" r="10" fill="#5bc0be"/>
+        <circle cx="42" cy="28" r="10" fill="#3a506b"/>
+        <circle cx="22" cy="28" r="3" fill="#F3F1EF"/>
+        <circle cx="42" cy="28" r="3" fill="#F3F1EF"/>
+        <path d="M16 44h32" stroke="#3a506b" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <!-- Platform / Layers SVG -->
+      <svg viewBox="0 0 64 64" class="intro-icon">
+        <polygon points="32,10 10,20 32,30 54,20" fill="#3a506b"/>
+        <polygon points="32,30 10,40 32,50 54,40" fill="#5bc0be" opacity="0.85"/>
+      </svg>
+    </div>
+  </section>
 
   <div class="timeline">
     <div class="timeline-center"></div>
-    <!-- Timeline items: alternate left/right, each with a dot -->
+
+    <!-- ExxonMobil Timeline item -->
     <div class="timeline-item left">
-      <div class="timeline-dot"></div>
+      <div class="timeline-dot">
+        <svg viewBox="0 0 32 32" class="dot-icon">
+          <circle cx="16" cy="16" r="12" fill="#5bc0be"/>
+          <path d="M10 17l4 4 8-10" stroke="#F3F1EF" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="timeline-card">
-        <h3>ExxonMobil (formerly Pioneer Natural Resources) &mdash; 2018 &ndash; Present</h3>
-        <p> <h3>Platform Owner</h3>
-    <ul>
-      <li>Owned a core application platform, leading migration, re-implementation, and retirement of all solutions as part of the Exxon/Pioneer technology integration.</li>
-      <li>Contributed to a $600M enterprise-wide integration initiative, unifying systems, tools, and processes between ExxonMobil and Pioneer.</li>
-      <li>Led system and process evaluations to define and deliver platform outcomes: architecture decisions, migration plans, implementation roadmaps, and retirement strategies.</li>
-      <li>Collaborated with engineering, cybersecurity, infrastructure, and compliance teams to align execution, manage change, and mitigate risk.</li>
-      <li>Oversaw delivery on the ExxonMobil side, ensuring on-time implementation across workstreams and integration partners.</li>
-      <li>Rationalized and modernized legacy systems to reduce technical debt and accelerate digital enablement across business units.</li>
-    </ul></p>
+        <h3>ExxonMobil (formerly Pioneer Natural Resources) — 2018 – Present</h3>
+        <h3>Platform Owner / Product Lead</h3>
+        <ul>
+          <li>Own a core enterprise application platform, leading migration, re‑implementation, and retirement of solutions as part of the Exxon/Pioneer technology integration.</li>
+          <li>Shape a $600M+ integration initiative by unifying systems, tools, and processes and aligning stakeholders around clear platform outcomes.</li>
+          <li>Set architecture direction, migration roadmaps, and retirement strategies that reduce technical debt and accelerate digital enablement across business units.</li>
+          <li>Partner with engineering, cybersecurity, infrastructure, and compliance to balance speed, risk, and resilience for mission‑critical platforms.</li>
+          <li>Oversee execution across multiple workstreams, ensuring on‑time delivery and measurable impact on cost, risk, and user experience.</li>
+        </ul>
+
+        <!-- Project strip for Exxon -->
+        <div class="project-strip">
+          <div class="project-card">
+            <h4>Water Management Platform</h4>
+            <p>$300M+ spend, 40% efficiency lift, integrated P2P workflow.</p>
+            <span class="tag">Platform</span>
+            <span class="tag">Ops</span>
+          </div>
+          <div class="project-card">
+            <h4>AI + IoT Emissions</h4>
+            <p>Real‑time methane detection, 60% fewer manual inspections.</p>
+            <span class="tag">AI</span>
+            <span class="tag">ESG</span>
+          </div>
+          <div class="project-card">
+            <h4>RPA Portfolio</h4>
+            <p>$1.7M+ annual savings from scaled automation.</p>
+            <span class="tag">Automation</span>
+            <span class="tag">Scale</span>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Solution Architect Timeline item -->
     <div class="timeline-item right">
-      <div class="timeline-dot"></div>
+      <div class="timeline-dot">
+        <svg viewBox="0 0 32 32" class="dot-icon">
+          <circle cx="16" cy="16" r="12" fill="#5bc0be"/>
+          <path d="M10 17l4 4 8-10" stroke="#F3F1EF" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="timeline-card">
-        <h2>Solution Arhchitect</h2>
-        <p>
+        <h2>Solution Architect</h2>
 
-    <h3>Water Management Platform – Solution Architect</h3>
-    <ul>
-      <li>Led design and delivery of scalable Purchase-to-Pay applications managing over $300M in annual spend.</li>
-      <li>Improved operational efficiency by 40% by simplifying workflows and reducing manual data entry through smarter system integration.</li>
-      <li>Partnered with teams to define the product roadmap and integrate with ERP, invoicing, and asset management systems.</li>
-      <li>Guided Agile delivery from PoCs to full-scale rollout, including features like vendor support via Copilot.</li>
-    </ul>
+        <h3>Water Management Platform – Product &amp; Solution Lead</h3>
+        <ul>
+          <li>Lead design and delivery of scalable Purchase‑to‑Pay applications managing $300M+ in annual spend.</li>
+          <li>Improve operational efficiency by 40% through simplified workflows and smarter systems integration.</li>
+          <li>Define the product roadmap and integrations with ERP, invoicing, and asset management to support end‑to‑end spend visibility.</li>
+          <li>Guide Agile delivery from PoC to full rollout, including features like Copilot‑enabled vendor support.</li>
+        </ul>
 
-    <h3>Emerging Tech &amp; Automation – Solution Architect</h3>
+        <h3>Emerging Tech &amp; Automation – Solution Architect</h3>
 
-    <h4>Microsoft Power Platform Projects</h4>
-    <ul>
-      <li>Established a Community of Excellence to drive governance, adoption, and manual process reduction.</li>
-      <li>Oversaw a portfolio of 30+ custom apps on Power Platform and Dynamics 365, improving day-to-day operations.</li>
-      <li>Defined roadmaps, supported teams from idea to launch, and led change management to drive adoption.</li>
-    </ul>
+        <h4>Microsoft Power Platform</h4>
+        <ul>
+          <li>Establish a Community of Excellence to govern, scale, and de‑risk low‑code adoption across the enterprise.</li>
+          <li>Oversee a portfolio of 30+ custom apps on Power Platform and Dynamics 365 that streamline day‑to‑day operations.</li>
+          <li>Define roadmaps and coach teams from idea to launch, driving adoption and measurable time‑savings.</li>
+        </ul>
 
-    <h4>Blockchain Consortium Initiative</h4>
-    <ul>
-      <li>Partnered with a cross-industry consortium to explore decentralized solutions for supply chain transparency and smart contracts.</li>
-      <li>Led architecture evaluations (Hyperledger Fabric, Ethereum) to enable secure, auditable transactions.</li>
-      <li>Built smart contract prototypes streamlining invoice approvals and vendor reconciliation.</li>
-      <li>Reduced vendor payment cycles from 40 days to 2 days, improving invoice-to-pay and vendor satisfaction.</li>
-    </ul>
+        <h4>Blockchain Consortium</h4>
+        <ul>
+          <li>Partner with a cross‑industry consortium to explore decentralized solutions for supply chain transparency and smart contracts.</li>
+          <li>Evaluate architectures (Hyperledger Fabric, Ethereum) and design secure, auditable transaction flows.</li>
+          <li>Prototype smart contracts that cut vendor payment cycles from 40 days to 2 days and improve vendor satisfaction.</li>
+        </ul>
 
-    <h4>Emission Detection System Initiative</h4>
-    <ul>
-      <li>Architected an AI + IoT solution for real-time methane and carbon detection, targeting $2M+ in ESG compliance and risk mitigation.</li>
-      <li>Integrated Azure IoT and AI Vision with sensor data to automate visual and chemical emissions monitoring.</li>
-      <li>Enabled predictive alerting and reduced manual inspection hours by 60% in field deployments.</li>
-      <li>Supported ESG reporting automation and improved environmental transparency across operations.</li>
-    </ul>
+        <h4>Emission Detection (AI + IoT)</h4>
+        <ul>
+          <li>Architect an AI + IoT solution for real‑time methane and carbon detection, targeting $2M+ in ESG compliance and risk mitigation.</li>
+          <li>Integrate Azure IoT and AI Vision with sensor data to automate visual and chemical emissions monitoring.</li>
+          <li>Enable predictive alerting and reduce manual inspection hours by 60% in field deployments.</li>
+        </ul>
 
-    <h4>Software Decision Matrix Initiative</h4>
-    <ul>
-      <li>Designed a decision framework to streamline demand intake and guide software selection for project teams.</li>
-      <li>Accelerated and improved decisions using evaluation criteria across functionality, cost, scalability, and security.</li>
-      <li>Reduced software evaluation time by 30% and improved alignment with enterprise architecture standards.</li>
-      <li>Supported 12+ project teams in choosing fit-for-purpose tools, reducing redundancy and improving delivery efficiency.</li>
-    </ul>
+        <h4>Software Decision Matrix</h4>
+        <ul>
+          <li>Design a decision framework that streamlines demand intake and guides software selection for project teams.</li>
+          <li>Cut software evaluation time by 30% while improving alignment with enterprise architecture standards.</li>
+          <li>Support 12+ teams in choosing fit‑for‑purpose tools, reducing redundancy and improving delivery efficiency.</li>
+        </ul>
 
-    <h4>Robotic Process Automation (RPA) Initiative</h4>
-    <ul>
-      <li>Led evaluation and selection of RPA tools to meet technical and operational needs.</li>
-      <li>Managed rollout of automation solutions delivering over $1.7M in annual savings by reducing repetitive, manual tasks.</li>
-      <li>Drove user engagement and adoption through internal awareness and cross-team support.</li>
-      <li>Built governance, delivery, and change frameworks to move organizations from strategy to sustained execution.</li>
-      <li>Influenced major architecture and platform decisions to ensure long-term business value and scalability.</li>
-      <li>Acted as the bridge between business and IT, converting complex challenges into actionable strategies with measurable outcomes.</li>
-    </ul>
-  </section></p>
+        <h4>Robotic Process Automation (RPA)</h4>
+        <ul>
+          <li>Lead evaluation and selection of RPA platforms and scale automation solutions delivering $1.7M+ in annual savings.</li>
+          <li>Drive awareness, training, and governance to move the organization from pilots to sustained automation execution.</li>
+          <li>Act as the bridge between business and IT, converting complex challenges into automation strategies with measurable ROI.</li>
+        </ul>
       </div>
     </div>
+
+    <!-- BCG Timeline item -->
     <div class="timeline-item left">
-      <div class="timeline-dot"></div>
+      <div class="timeline-dot">
+        <svg viewBox="0 0 32 32" class="dot-icon">
+          <circle cx="16" cy="16" r="12" fill="#5bc0be"/>
+          <path d="M10 17l4 4 8-10" stroke="#F3F1EF" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="timeline-card">
-        <h2>Expert Advisor</h2></h2>
-        <h3>BCG Platinion (Boston Consulting Group) &mdash; 2018</h3>
-        <p><ul>
-      <li>Advised Fortune 500 leadership across telecom, beverage, and entertainment sectors.</li>
-      <li>Led cross-functional digital transformation strategies delivering 25–40% operational efficiency gains and accelerating innovation.</li>
-      <li>Identified 40+ enterprise technology and process gaps, turning them into opportunities for savings, growth, and agility.</li>
-      <li>Shaped and prioritized $20M+ in digital investments including automation, cloud modernization, and advanced analytics.</li>
-      <li>Facilitated C-level strategy sessions and enterprise workshops to define transformation KPIs and embed digital into core models.</li>
-      <li>Established governance, delivery, and change frameworks to drive sustained execution.</li>
-      <li>Influenced architecture and platform choices to support long-term business value and scalability.</li>
-      <li>Served as a trusted bridge between business and IT to produce clear, measurable outcomes.</li>
-    </ul></p>
+        <h2>Expert Advisor</h2>
+        <h3>BCG Platinion (Boston Consulting Group) — 2018</h3>
+        <ul>
+          <li>Advise Fortune 500 leadership across telecom, beverage, and entertainment on large‑scale digital transformation.</li>
+          <li>Lead cross‑functional strategies that deliver 25–40% efficiency gains and accelerate innovation roadmaps.</li>
+          <li>Identify 40+ technology and process gaps and translate them into opportunities for savings, growth, and agility.</li>
+          <li>Shape and prioritize $20M+ in digital investments across automation, cloud modernization, and advanced analytics.</li>
+          <li>Facilitate C‑level workshops to define transformation KPIs and embed digital into core operating models.</li>
+        </ul>
       </div>
     </div>
+
+    <!-- Northhill Timeline item -->
     <div class="timeline-item right">
-      <div class="timeline-dot"></div>
+      <div class="timeline-dot">
+        <svg viewBox="0 0 32 32" class="dot-icon">
+          <circle cx="16" cy="16" r="12" fill="#5bc0be"/>
+          <path d="M10 17l4 4 8-10" stroke="#F3F1EF" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
       <div class="timeline-card">
-        <h2>Co-Founder/Program Manager</h2>
-        <h3>Northhill Technologies &mdash; 2011 &ndash; 2016</h3>
-        <p><ul>
-      <li>Spearheaded fundraising and investor relations, securing early-stage capital and strategic partnerships.</li>
-      <li>Drove finance process automation, reducing manual processing time by 60% and accelerating claim throughput.</li>
-      <li>Orchestrated full lifecycle delivery of a healthcare order management system, improving efficiency by 40% with role-based access for 100+ users.</li>
-      <li>Delivered a scalable training &amp; placement platform that increased NGO user engagement to empower underserved communities.</li>
-      <li>Directed development and launch of a smart city food platform with 350+ restaurant partners and 2,000+ daily users, boosting local growth.</li>
-      <li>Designed and implemented an emergency blood donor alert system, improving donor response times by 35%.</li>
-    </ul></p>
+        <h2>Co‑Founder / Program Manager</h2>
+        <h3>Northhill Technologies — 2011 – 2016</h3>
+        <ul>
+          <li>Co‑found and scale a technology startup, leading fundraising, investor relations, and strategic partnerships.</li>
+          <li>Automate finance processes, reducing manual processing time by 60% and increasing claim throughput.</li>
+          <li>Lead end‑to‑end delivery of a healthcare order management system, improving efficiency by 40% for 100+ users.</li>
+          <li>Launch a training &amp; placement platform that increases NGO user engagement and unlocks access for underserved communities.</li>
+          <li>Deliver a smart city food platform with 350+ restaurant partners and 2,000+ daily users, driving local ecosystem growth.</li>
+          <li>Design an emergency blood donor alert system that improves donor response times by 35%.</li>
+        </ul>
       </div>
     </div>
   </div>
 
   <!-- Info Bar -->
-  <div class="info-bar simple-info">
+  <div class="simple-info">
     <h3>Education</h3>
     <ul>
       <li>MBA, International Management<br><span class="school">NWMSU</span></li>
@@ -740,7 +852,7 @@
   <!-- full-screen overlay -->
   <div class="overlay">
     <ul class="menu">
-          <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
+      <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
       <li class="about"><a href="Professional.html" title="Learn more About me">About</a></li>
       <li class="nomad"><a href="nomad.html" title="Nomad journeys & travel">Nomad</a></li>
       <li class="professional"><a href="Profile.html" title="Professional experience">404</a></li>
