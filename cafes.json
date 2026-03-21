@@ -1,0 +1,70 @@
+{
+  "cafes": [
+    {
+      "name": "Onibus Coffee",
+      "city": "Tokyo",
+      "country": "Japan",
+      "type": "Specialty Coffee",
+      "ordered": "Single origin pour-over, no milk",
+      "vibe": "Minimalist timber interior, jazz at just the right volume. The kind of quiet that doesn't feel empty.",
+      "story": "I found this place by getting completely lost in Nakameguro at 7am. The barista didn't speak English. I didn't speak Japanese. We communicated entirely through nods and the coffee said everything else. I sat there for two hours and didn't open my phone once.",
+      "rating": "★★★★★",
+      "img": null
+    },
+    {
+      "name": "Café de Flore",
+      "city": "Paris",
+      "country": "France",
+      "type": "Classic Parisian",
+      "ordered": "Café crème, croissant",
+      "vibe": "Every table has a story. Sartre sat here. Hemingway probably argued here. You can feel the weight of it.",
+      "story": "Tourist trap? Maybe. But when you're there at 8am before the tour groups arrive, with a crème and a croissant and the whole boulevard to yourself, you understand exactly why this place has survived a hundred years. Some places earn their reputation.",
+      "rating": "★★★★☆",
+      "img": null
+    },
+    {
+      "name": "Proud Mary",
+      "city": "Melbourne",
+      "country": "Australia",
+      "type": "Australian Specialty",
+      "ordered": "Flat white, banana bread",
+      "vibe": "Bright, loud, full of people who take their coffee more seriously than most people take anything.",
+      "story": "Melbourne taught me that coffee is a culture, not a beverage. This place had a waitlist at 9am on a Tuesday. I waited 20 minutes and every second was worth it. The flat white was the best I've ever had, and I've had a lot of flat whites.",
+      "rating": "★★★★★",
+      "img": null
+    },
+    {
+      "name": "The Barn",
+      "city": "Berlin",
+      "country": "Germany",
+      "type": "Specialty Third Wave",
+      "ordered": "Black filter, nothing else",
+      "vibe": "Industrial and precise. Like drinking coffee inside a philosophy lecture. In the best way.",
+      "story": "Berlin runs on coffee and existential dread and I mean that as a compliment. The Barn is where the serious drinkers go. No oat milk here. No flavour syrups. Just coffee done with the kind of rigour that Germans apply to everything. I respected it.",
+      "rating": "★★★★☆",
+      "img": null
+    },
+    {
+      "name": "Blue Tokai — Lado Sarai",
+      "city": "New Delhi",
+      "country": "India",
+      "type": "Indian Specialty",
+      "ordered": "Cold brew, black",
+      "vibe": "Home base. Where I come back to. The smell alone is enough.",
+      "story": "When I'm back in India and need to think, I come here. Something about the familiarity of it — the same stools, the same roast, the same barista who still doesn't remember my name but always gets my order right. Home doesn't have to be a place. Sometimes it's a cup.",
+      "rating": "★★★★★",
+      "img": null
+    },
+    {
+      "name": "Caffe Sant'Eustachio",
+      "city": "Rome",
+      "country": "Italy",
+      "type": "Roman Classic",
+      "ordered": "Gran caffè, with sugar (they put it in, no choice)",
+      "vibe": "Standing room only. Tiny cups. Maximum opinion about everything.",
+      "story": "They add sugar to the espresso before they give it to you and if you ask them not to, they'll argue with you about it. They're right. I was wrong. It's the best coffee in Rome, possibly Italy, possibly the world, and I say that as someone who doesn't take sugar. Some things are better when you're not in control.",
+      "rating": "★★★★★",
+      "img": null
+    }
+  ]
+}
