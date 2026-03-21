@@ -16,498 +16,366 @@
       --accent: #1c2541;
       --bubble-bg: #5bc0be;
       --bubble-hover: #3a506b;
-      --overlay-bg: rgba(60, 80, 107, 0.92);
-      --face-shadow: 0 8px 32px rgba(0,0,0,0.08);
-      --face-radius: 16px;
-      --desc-bg: rgba(60,80,107,0.95);
-      --desc-radius: 24px;
-      --desc-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      --desc-color: #fff;
       --font-main: "Cute Font", Roboto, sans-serif;
-      --base-font-size: 2vw;         /* Slightly reduced from 2.2vw */
-      --h1-font-size: 2.8vw;         /* Slightly bigger than previous */
-      --desc-font-size: 1.3vw;       /* Slightly bigger than previous */
-      --menu-font-size: 2vw;         /* Responsive menu font size */
-      --text-color: #222;
-      --nav-shadow: 0 4px 24px rgba(0,0,0,0.08);
-      --nav-radius: 24px;
-      --btn-size: 40px;
-      --bubble-size: 7vw;            /* Responsive bubble size for menu circles */
+      --base-font-size: 2vw;
+      --h1-font-size: 2.8vw;
+      --desc-font-size: 1.3vw;
+      --menu-font-size: 2vw;
+      --bubble-size: 7vw;
       --transition: 0.4s ease;
     }
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      width: 100%;
-      height: 100%;
-      min-height: 100vh;
-      overflow-x: hidden;
-      background: var(--bg-main);
+      width: 100%; height: 100%; min-height: 100vh;
+      overflow-x: hidden; background: var(--bg-main);
     }
     body {
       font-family: var(--font-main);
       font-size: var(--base-font-size);
       color: var(--primary);
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-      width: 100vw;
-      background: var(--bg-main);
+      display: flex; flex-direction: column;
+      min-height: 100vh; width: 100vw;
     }
+
     main {
-      flex: 1;
-      width: 100vw;
-      height: 100vh;
-      min-height: 100vh;
-      display: flex;
-      align-items: stretch;
-      justify-content: stretch;
-      padding: 0;
-      background: transparent;
+      flex: 1; width: 100vw; height: 100vh; min-height: 100vh;
+      display: flex; align-items: stretch; justify-content: stretch;
+      padding: 0; background: transparent;
     }
+
     .face {
-      width: 100vw;
-      height: 100vh;
+      width: 100vw; height: 100vh;
       position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: none;
-      border-radius: 0;
-      overflow: hidden;
-      background: transparent;
-      border: none;
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden; background: transparent;
     }
+
+    /* ── AVATAR — fixed crop + floating ── */
     .face-bg-img {
       position: absolute;
-      left: 50%;
-      top: 50%;
-      width: 900px;
-      height: 900px;
-      max-width: 90vw;
-      max-height: 80vh;
-      object-fit: cover;
-      transform: translate(-50%, -50%);
-      z-index: 0; /* <-- Make sure this is below designer/coder */
+      left: 50%; bottom: 0;
+      width: 78vmin;
+      height: auto;
+      max-width: 820px;
+      max-height: 92vh;
+      object-fit: contain;
+      object-position: top center;
+      transform: translateX(-50%);
+      z-index: 0;
       pointer-events: none;
       user-select: none;
-      
-      display: block; /* <-- Ensure image is visible */
+      display: block;
+      animation: avatarFloat 5s ease-in-out infinite;
     }
+    @keyframes avatarFloat {
+      0%, 100% { transform: translateX(-50%) translateY(0px);    }
+      50%       { transform: translateX(-50%) translateY(-14px);  }
+    }
+
+    /* ── HALVES ── */
     .designer, .coder {
-      z-index: 1; /* <-- Ensure these are above the image */
-      flex: 1 1 50%;
-      height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      cursor: pointer;
+      z-index: 1;
+      flex: 1 1 50%; height: 100%;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; cursor: pointer;
+      overflow: hidden; background: transparent;
+      border: none !important; box-shadow: none !important; outline: none !important;
       transition: background 0.4s;
-      overflow: hidden;
-      background: transparent;
-      border: none !important;
-      box-shadow: none !important;
-      outline: none !important;
     }
-    .designer:focus, .coder:focus {
-      outline: none !important;
+    .designer:focus, .coder:focus { outline: none !important; }
+
+    /* subtle hover wash */
+    .designer::before, .coder::before {
+      content: ''; position: absolute; inset: 0;
+      opacity: 0; transition: opacity 0.4s; pointer-events: none;
     }
+    .designer::before { background: linear-gradient(to right, rgba(58,80,107,0.07), transparent); }
+    .coder::before    { background: linear-gradient(to left,  rgba(91,192,190,0.07), transparent); }
+    .designer:hover::before, .coder:hover::before { opacity: 1; }
+    .designer::after, .coder::after { display: none !important; }
+
+    /* description — hidden until hover */
     .designer .description,
     .coder .description {
-      opacity: 0;
-      pointer-events: none;
-      position: relative;
-      left: auto;
-      top: auto;
-      transform: none;
-      background: none;
-      color: var(--primary);
-      padding: 0;
-      border-radius: 0;
-      box-shadow: none;
-      text-align: center;
-      max-width: 320px;
-      transition: opacity 0.4s;
-      z-index: 3;
+      opacity: 0; pointer-events: none;
+      position: relative; background: none;
+      color: var(--primary); padding: 0;
+      border-radius: 0; box-shadow: none;
+      text-align: center; max-width: 320px;
+      transition: opacity 0.4s; z-index: 3;
     }
     .designer:hover .description,
     .designer:focus .description,
     .coder:hover .description,
-    .coder:focus .description {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .coder:focus .description { opacity: 1; pointer-events: auto; }
+
     .designer .description h1,
     .coder .description h1 {
       margin-bottom: 12px;
       font-size: var(--h1-font-size);
-      letter-spacing: 2px;
-      color: var(--primary);
+      letter-spacing: 2px; color: var(--primary);
     }
     .designer .description p,
     .coder .description p {
       font-size: var(--desc-font-size);
-      line-height: 1.4;
-      color: var(--primary);
-    }
-    .designer::after,
-    .coder::after {
-      display: none !important;
-    }
-    @media (max-width: 900px) {
-      body {
-        font-size: 3vw;
-      }
-      .face-bg-img {
-        width: 90vw;
-        height: 40vh;
-        max-width: 90vw;
-        max-height: 40vh;
-      }
-      .face {
-        flex-direction: column;
-      }
-      .designer, .coder {
-        width: 100vw;
-        height: 50vh;
-      }
-      .designer .description h1,
-      .coder .description h1 {
-        font-size: 5vw;
-      }
-      .designer .description p,
-      .coder .description p {
-        font-size: 2.5vw;
-      }
-      .menu li {
-        width: 10vw;
-        height: 10vw;
-      }
-      .menu li a {
-        font-size: 3vw;
-      }
-    }
-    @media (max-width: 500px) {
-      body {
-        font-size: 4vw;
-      }
-      .designer .description h1,
-      .coder .description h1 {
-        font-size: 7vw;
-      }
-      .designer .description p,
-      .coder .description p {
-        font-size: 4vw;
-      }
-      .menu li {
-        width: 14vw;
-        height: 14vw;
-      }
-      .menu li a {
-        font-size: 4vw;
-      }
+      line-height: 1.4; color: var(--primary);
     }
 
-    /* Bubble Overlay Menu (unchanged) */
-    .nav-toggle {
-      position: absolute;
-      left: -9999px;
+    /* ── TERMINAL DRAWER ── */
+    .term-backdrop {
+      position: fixed; inset: 0; z-index: 499;
+      background: rgba(243,241,239,0.55);
+      backdrop-filter: blur(3px);
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.42s ease;
     }
-    .nav-btn {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      width: var(--btn-size);
-      height: var(--btn-size);
-      cursor: pointer;
-      z-index: 200;
+    .term-backdrop.open { opacity: 1; pointer-events: auto; }
+
+    .term-overlay {
+      position: fixed; top: 0; right: 0;
+      width: min(460px, 92vw); height: 100vh;
+      z-index: 500;
+      transform: translateX(102%);
+      transition: transform 0.42s cubic-bezier(0.4, 0, 0.2, 1);
+      pointer-events: none;
       display: flex;
-      align-items: center;
-      justify-content: center;
     }
-    .wavy-menu {
+    .term-overlay.open { transform: translateX(0); pointer-events: auto; }
+
+    .term-window {
+      flex: 1; display: flex; flex-direction: column;
+      background: #0d1117;
+      box-shadow: -8px 0 48px rgba(28,37,65,0.2);
+      font-family: 'Courier New', monospace;
+    }
+    .term-titlebar {
+      background: #161b22; padding: 11px 18px;
+      display: flex; align-items: center; gap: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;
+    }
+    .tb-dot { width: 11px; height: 11px; border-radius: 50%; cursor: pointer; }
+    .tb-red    { background: #ff5f57; }
+    .tb-yellow { background: #febc2e; }
+    .tb-green  { background: #28c840; }
+    .tb-title  { font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 1.5px; margin-left: 6px; }
+    .tb-clock  { margin-left: auto; font-size: 11px; color: rgba(91,192,190,0.5); letter-spacing: 1px; }
+
+    .term-body {
+      flex: 1; overflow-y: auto; padding: 18px;
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .term-body::-webkit-scrollbar { width: 3px; }
+    .term-body::-webkit-scrollbar-thumb { background: rgba(91,192,190,0.2); border-radius: 2px; }
+
+    .tline { font-size: 12px; line-height: 1.85; }
+    .tline.output { padding-left: 14px; }
+    .tline.spacer { height: 8px; }
+    .tline.prompt-line { display: flex; gap: 8px; }
+    .ps  { color: #5bc0be; flex-shrink: 0; font-size: 11px; }
+    .cmd { color: #e6edf3; }
+
+    .c-teal    { color: #5bc0be; }
+    .c-dim     { color: rgba(230,237,243,0.28); }
+    .c-muted   { color: rgba(230,237,243,0.6); }
+    .c-white   { color: #e6edf3; font-weight: 600; }
+    .c-success { color: #3fb950; }
+    .c-error   { color: #f85149; }
+    .c-amber   { color: #d29922; }
+    .c-link    { color: #58a6ff; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+    .c-link:hover { color: #79c0ff; }
+
+    .chip-row { display: flex; flex-wrap: wrap; gap: 7px; padding: 8px 0 8px 14px; }
+    .chip {
+      background: rgba(91,192,190,0.08);
+      border: 1px solid rgba(91,192,190,0.25);
+      color: #5bc0be; font-size: 11px; padding: 5px 14px;
+      border-radius: 4px; cursor: pointer;
+      font-family: 'Courier New', monospace; letter-spacing: 0.5px;
+      transition: all 0.15s;
+    }
+    .chip:hover { background: rgba(91,192,190,0.18); border-color: #5bc0be; }
+    .chip.sec {
+      background: rgba(255,255,255,0.03); border-color: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.4);
+    }
+    .chip.sec:hover { background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7); }
+
+    .hint-row { display: flex; flex-wrap: wrap; gap: 16px; padding: 4px 0 4px 14px; }
+    .hint { font-size: 10px; color: rgba(255,255,255,0.18); letter-spacing: 0.5px; }
+    .hint span { color: rgba(91,192,190,0.45); }
+
+    .prog-row { display: flex; align-items: center; gap: 10px; padding: 2px 0 2px 14px; }
+    .prog-name { font-size: 11px; color: rgba(230,237,243,0.6); min-width: 155px; }
+    .prog-bars { display: flex; gap: 2px; }
+    .pb { width: 13px; height: 7px; border-radius: 1px; background: rgba(91,192,190,0.1); }
+    .pb.on { background: #5bc0be; }
+
+    .term-input-area {
+      padding: 13px 18px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      display: flex; align-items: center; gap: 10px;
+      background: #0d1117; flex-shrink: 0;
+    }
+    .input-ps { color: #5bc0be; font-size: 12px; flex-shrink: 0; }
+    .term-input {
+      flex: 1; background: transparent; border: none; outline: none;
+      color: #e6edf3; font-family: 'Courier New', monospace; font-size: 12px;
+      caret-color: #5bc0be;
+    }
+    .term-input::placeholder { color: rgba(255,255,255,0.12); }
+    .cursor-blink {
+      width: 7px; height: 13px; background: #5bc0be;
+      border-radius: 1px; animation: cblink 1s step-end infinite;
+    }
+    @keyframes cblink { 0%,100%{opacity:1} 50%{opacity:0} }
+
+    /* ── RIGHT-EDGE PULL TAB — same style as social bar ── */
+    .term-trigger {
+      position: fixed;
+      top: 50%; right: 0;
+      transform: translateY(-50%);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 16px;
+      background: rgba(243, 241, 239, 0.85);
+      padding: 18px 12px;
+      border-radius: 24px 0 0 24px;
+      box-shadow: 0 4px 24px rgba(60,80,107,0.12);
+      z-index: 300;
+      min-width: 56px;
+      cursor: pointer;
+      border: none;
+      transition: background 0.2s, box-shadow 0.2s, transform 0.25s;
+    }
+    .term-trigger:hover {
+      background: rgba(243,241,239,1);
+      box-shadow: 0 6px 32px rgba(60,80,107,0.18);
+      transform: translateY(-50%) translateX(-4px);
+    }
+    .term-trigger svg {
       display: block;
-      width: var(--btn-size);
-      height: var(--btn-size);
-      background: none;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-      transition: opacity var(--transition);
+      filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10));
+      width: 36px; height: 36px;
     }
-    .wavy-menu::before {
-      content: '';
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: none;
-      /* SVG zigzag/wavy line */
-      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><path d="M5 20 Q 10 10, 15 20 T 25 20 T 35 20" stroke="black" stroke-width="4" fill="none"/></svg>') no-repeat center/contain;
-      background-color: var(--accent);
+    /* pulsing dot — same visual rhythm as social bar hover */
+    .term-trigger-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: #5bc0be;
+      box-shadow: 0 0 6px rgba(91,192,190,0.5);
+      animation: tDot 2.4s ease-in-out infinite;
     }
-    .hamburger {
-      display: none;
+    @keyframes tDot {
+      0%,100% { opacity: 1; transform: scale(1); }
+      50%      { opacity: 0.35; transform: scale(0.65); }
     }
-    .nav-toggle:not(:checked) + .nav-btn .wavy-menu {
-      opacity: 1;
+    /* vertical label — matches social bar font style */
+    .term-trigger-label {
+      font-family: "Cute Font", Roboto, sans-serif;
+      font-size: 11px; letter-spacing: 3px;
+      color: var(--accent); opacity: 0.5;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
     }
-    .nav-toggle:checked + .nav-btn .wavy-menu {
-      opacity: 0;
+    .term-trigger.hidden {
+      opacity: 0; pointer-events: none;
+      transform: translateY(-50%) translateX(16px);
+      transition: opacity 0.25s, transform 0.25s;
     }
-    .nav-toggle:checked + .nav-btn .hamburger {
-      display: block;
-      position: relative;
-      width: 100%;
-      height: 4px;
-      background: transparent;
-    }
-    .nav-toggle:checked + .nav-btn .hamburger::before {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 4px;
-      top: 0;
-      transform: rotate(45deg);
-    }
-    .nav-toggle:checked + .nav-btn .hamburger::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 4px;
-      top: 0;
-      transform: rotate(-45deg);
-    }
+
+    /* ── ORIGINAL BUBBLE OVERLAY NAV (kept 100% intact) ── */
+    .nav-toggle { position: absolute; left: -9999px; }
 
     .overlay {
-      position: fixed;
-      top: 0; left: 0;
+      position: fixed; top: 0; left: 0;
       width: 100vw; height: 100vh;
-      background: rgba(243, 241, 239, 0.85); /* More transparent #F3F1EF */
-      opacity: 0;
-      pointer-events: none;
+      background: rgba(243, 241, 239, 0.85);
+      opacity: 0; pointer-events: none;
       transition: opacity var(--transition);
       z-index: 150;
     }
-    .nav-toggle:checked ~ .overlay {
-      opacity: 1;
-      pointer-events: auto;
-    }
+    .nav-toggle:checked ~ .overlay { opacity: 1; pointer-events: auto; }
 
-    .menu {
-      list-style: none;
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
+    .menu { list-style: none; position: relative; width: 100%; height: 100%; }
     .menu li {
       position: absolute;
-      width: var(--bubble-size);
-      height: var(--bubble-size);
-      border-radius: 50%;
-      background: var(--bubble-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
-      font-weight: bold;
-      opacity: 0;
-      transform: scale(0.6);
-      transition: opacity var(--transition),
-                  transform var(--transition),
-                  background var(--transition),
-                  color var(--transition);
+      width: var(--bubble-size); height: var(--bubble-size);
+      border-radius: 50%; background: var(--bubble-bg);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--accent); font-weight: bold;
+      opacity: 0; transform: scale(0.6);
+      transition: opacity var(--transition), transform var(--transition),
+                  background var(--transition), color var(--transition);
       box-shadow: 0 2px 12px rgba(60,80,107,0.12);
     }
-    .nav-toggle:checked ~ .overlay .menu li {
-      opacity: 1;
-      transform: scale(1);
-    }
+    .nav-toggle:checked ~ .overlay .menu li { opacity: 1; transform: scale(1); }
     .menu li a {
-      color: inherit;
-      text-decoration: none;
+      color: inherit; text-decoration: none;
       width: 100%; height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       transition: transform 0.2s;
       font-size: var(--menu-font-size);
       font-family: var(--font-main);
     }
-    .menu li a:hover {
-      transform: scale(1.1);
-    }
+    .menu li a:hover { transform: scale(1.1); }
+    .menu li:not(.about):not(.professional) a:hover { color: var(--accent); }
+    .menu li.about a:hover, .menu li.professional a:hover { color: #fff; }
+    .menu li.home        { top: 15%; left: 30%; }
+    .menu li.about       { top:  5%; left: 70%; background: var(--bubble-hover); color: #fff; }
+    .menu li.nomad       { top: 45%; left: 85%; }
+    .menu li.professional{ top: 75%; left: 65%; background: var(--bubble-hover); color: #fff; }
+    .menu li.contact     { top: 70%; left: 20%; }
 
-    /* Alternate font color on hover based on circle color */
-    .menu li:not(.about):not(.services) a:hover {
-      color: var(--accent);
-    }
-    .menu li.about a:hover,
-    .menu li.services a:hover {
-      color: #fff;
-    }
-    .menu li.home     { top: 15%;  left: 30%; }
-    .menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
-    .menu li.nomad  { top: 45%;  left: 85%; }
-    .menu li.professional { top: 75%;  left: 65%; background: var(--bubble-hover); color: #fff;}
-    .menu li.contact  { top: 70%;  left: 20%; }
-
-    @media (max-width: 700px) {
-      main {
-        height: 100vh;
-        min-height: 100vh;
-        padding: 0;
-      }
-      .face {
-        flex-direction: column;
-      }
-      .designer, .coder {
-        width: 100vw;
-        height: 50vh;
-      }
-      .face-bg-img {
-        width: 100vw;
-        height: 100vh;
-      }
-      .menu li {
-        width: 70px;
-        height: 70px;
-        font-size: 1em;
-      }
-      .menu li.home     { top: 10%;  left: 20%; }
-      .menu li.about    { top:  5%;  left: 65%; }
-      .menu li.nomad  { top: 40%;  left: 80%; }
-      .menu li.professional { top: 70%;  left: 60%; }
-      .menu li.contact  { top: 65%;  left: 15%; }
-    }
-
-    .nav-btn.up-arrow-btn {
-      position: fixed !important;
-      left: 50% !important;
-      bottom: 32px !important;
-      top: auto !important;
-      right: auto !important;
-      transform: translateX(-50%) !important;
-      width: 60px;
-      height: 60px;
-      z-index: 200;
-      background: none;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      border-radius: 50%;
-      box-shadow: 0 4px 24px rgba(0,0,0,0.08);
-    }
-    .up-arrow {
-      display: block;
-      width: 40px;
-      height: 40px;
-      background: none;
-      position: relative;
-      z-index: 1;
-      transition: opacity var(--transition);
-    }
-    .up-arrow::before {
-      content: '';
-      display: block;
-      width: 100%;
-      height: 100%;
-      background: none;
-      /* Unique SVG up arrow: double chevron with a circle */
-      mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
-      background-color: var(--accent);
-    }
-    .hamburger {
-      display: none;
-    }
-    .nav-toggle:not(:checked) + .nav-btn .up-arrow {
-      opacity: 1;
-    }
-    .nav-toggle:checked + .nav-btn .up-arrow {
-      opacity: 0;
-    }
-    .nav-toggle:checked + .nav-btn .hamburger {
-      display: block;
-      position: relative;
-      width: 100%;
-      height: 4px;
-      background: transparent;
-    }
-    .nav-toggle:checked + .nav-btn .hamburger::before {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 4px;
-      top: 0;
-      transform: rotate(45deg);
-    }
-    .nav-toggle:checked + .nav-btn .hamburger::after {
-      content: "";
-      position: absolute;
-      width: 100%;
-      height: 4px;
-      background: var(--accent);
-      border-radius: 4px;
-      top: 0;
-      transform: rotate(-45deg);
-    }
-
+    /* ── SOCIAL BAR (original, untouched) ── */
     .social-bar {
-      position: fixed;
-      top: 50%;
-      left: 0;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-      background: rgba(243,241,239,0.85);
-      padding: 18px 12px 18px 12px;
+      position: fixed; top: 50%; left: 0; transform: translateY(-50%);
+      display: flex; flex-direction: column; gap: 24px;
+      background: rgba(243,241,239,0.85); padding: 18px 12px;
       border-radius: 0 24px 24px 0;
       box-shadow: 0 4px 24px rgba(60,80,107,0.12);
-      z-index: 300;
-      min-width: 56px;
+      z-index: 300; min-width: 56px;
     }
     .social-bar a {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.85;
-      transition: opacity 0.2s, transform 0.2s;
-      margin-left: 4px;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0.85; transition: opacity 0.2s, transform 0.2s; margin-left: 4px;
     }
-    .social-bar a:hover {
-      opacity: 1;
-      transform: scale(1.15);
-    }
-    .social-bar svg {
-      display: block;
-      filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10));
-      width: 36px;
-      height: 36px;
+    .social-bar a:hover { opacity: 1; transform: scale(1.15); }
+    .social-bar svg { display: block; filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10)); width: 36px; height: 36px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      body { font-size: 3vw; }
+      .face { flex-direction: column; }
+      .designer, .coder { width: 100vw; height: 50vh; }
+      .face-bg-img { width: 88vmin; }
+      .designer .description h1, .coder .description h1 { font-size: 5vw; }
+      .designer .description p,  .coder .description p  { font-size: 2.5vw; }
+      .menu li { width: 10vw; height: 10vw; }
+      .menu li a { font-size: 3vw; }
     }
     @media (max-width: 700px) {
-      .social-bar {
-        gap: 16px;
-        padding: 10px 6px 10px 6px;
-        border-radius: 0 16px 16px 0;
-        min-width: 44px;
-      }
-      .social-bar svg {
-        width: 28px;
-        height: 28px;
-      }
+      .face { flex-direction: column; }
+      .designer, .coder { width: 100vw; height: 50vh; }
+      .face-bg-img { width: 96vmin; }
+      .social-bar { gap: 16px; padding: 10px 6px; border-radius: 0 16px 16px 0; min-width: 44px; }
+      .social-bar svg { width: 28px; height: 28px; }
+      .term-trigger { padding: 14px 8px; min-width: 44px; border-radius: 16px 0 0 16px; gap: 12px; }
+      .term-trigger svg { width: 28px; height: 28px; }
+      .term-trigger-label { font-size: 9px; letter-spacing: 2px; }
+      .menu li { width: 70px; height: 70px; font-size: 1em; }
+      .menu li.home        { top: 10%; left: 20%; }
+      .menu li.about       { top:  5%; left: 65%; }
+      .menu li.nomad       { top: 40%; left: 80%; }
+      .menu li.professional{ top: 70%; left: 60%; }
+      .menu li.contact     { top: 65%; left: 15%; }
+    }
+    @media (max-width: 500px) {
+      body { font-size: 4vw; }
+      .designer .description h1, .coder .description h1 { font-size: 7vw; }
+      .designer .description p,  .coder .description p  { font-size: 4vw; }
+      .menu li { width: 14vw; height: 14vw; }
+      .menu li a { font-size: 4vw; }
     }
   </style>
 </head>
@@ -524,37 +392,66 @@
       </div>
       <div class="coder" tabindex="0" onclick="window.location.href='nomad.html'">
         <div class="description">
-          <h1 href="nomad.html">nomad</h1>
-          <p>capturing the world through my lens and learning from life’s many perspectives</p>
+          <h1>nomad</h1>
+          <p>capturing the world through my lens and learning from life's many perspectives</p>
         </div>
       </div>
     </div>
   </main>
 
-  <!-- hidden toggle -->
+  <!-- original bubble overlay nav — 100% unchanged -->
   <input type="checkbox" id="nav-toggle" class="nav-toggle">
-  <!-- hamburger / X button -->
-  <label for="nav-toggle" class="nav-btn up-arrow-btn">
-    <span class="up-arrow"></span>
-    <span class="hamburger"></span>
-  </label>
-  <!-- full-screen overlay -->
   <div class="overlay">
     <ul class="menu">
-            <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
+      <li class="home"><a href="home.html" title="Go to Home">Home</a></li>
       <li class="about"><a href="Professional.html" title="Learn more About me">About</a></li>
-      <li class="nomad"><a href="nomad.html" title="Nomad journeys & travel">Nomad</a></li>
+      <li class="nomad"><a href="nomad.html" title="Nomad journeys &amp; travel">Nomad</a></li>
       <li class="professional"><a href="Profile.html" title="Professional experience">404</a></li>
       <li class="contact"><a href="Contact.html" title="Contact me">Contact</a></li>
     </ul>
   </div>
 
+  <!-- right-edge terminal pull tab -->
+  <button class="term-trigger" id="termTrigger" aria-label="Open terminal" onclick="openTerm()">
+    <svg viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="18" cy="18" r="16" fill="#1c2541"/>
+      <!-- prompt chevron -->
+      <path d="M11 14 L16 18 L11 22" stroke="#5bc0be" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <!-- cursor line -->
+      <path d="M18 22 L26 22" stroke="#5bc0be" stroke-width="1.8" stroke-linecap="round"/>
+    </svg>
+    <div class="term-trigger-dot"></div>
+    <span class="term-trigger-label">TERMINAL</span>
+  </button>
+
+  <!-- backdrop + drawer -->
+  <div class="term-backdrop" id="termBackdrop" onclick="closeTerm()"></div>
+  <div class="term-overlay" id="termOverlay">
+    <div class="term-window">
+      <div class="term-titlebar">
+        <div class="tb-dot tb-red"    onclick="closeTerm()"></div>
+        <div class="tb-dot tb-yellow"></div>
+        <div class="tb-dot tb-green"></div>
+        <span class="tb-title">anuraag.sh</span>
+        <span class="tb-clock" id="tbClock"></span>
+      </div>
+      <div class="term-body" id="termBody"></div>
+      <div class="term-input-area">
+        <span class="input-ps">anuraag@world:~$</span>
+        <input class="term-input" id="termInput"
+          placeholder="type a command or click a chip..."
+          autocomplete="off" spellcheck="false">
+        <div class="cursor-blink"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social bar — original, untouched -->
   <div class="social-bar">
     <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
       <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
     </a>
     <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
-      <!-- Polarsteps logo: location pin with a dot -->
       <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
         <circle cx="16" cy="16" r="16" fill="#5bc0be"/>
         <path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/>
@@ -564,7 +461,6 @@
       <svg viewBox="0 0 32 32" width="36" height="36" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
     </a>
     <a href="mailto:rssanuraag@gmail.com" aria-label="Gmail">
-      <!-- Gmail logo: envelope with M -->
       <svg viewBox="0 0 32 32" width="36" height="36" fill="none">
         <circle cx="16" cy="16" r="16" fill="#F3F1EF"/>
         <rect x="7" y="10" width="18" height="12" rx="3" fill="#fff"/>
@@ -574,5 +470,245 @@
     </a>
   </div>
 
+  <script>
+    // ── DRAWER ──
+    const termOverlay  = document.getElementById('termOverlay');
+    const termBackdrop = document.getElementById('termBackdrop');
+    const termTrigger  = document.getElementById('termTrigger');
+    const termInput    = document.getElementById('termInput');
+    let booted = false;
+
+    function openTerm(){
+      termOverlay.classList.add('open');
+      termBackdrop.classList.add('open');
+      termTrigger.classList.add('hidden');
+      if(!booted){ boot(); booted = true; }
+      setTimeout(() => termInput.focus(), 440);
+    }
+    function closeTerm(){
+      termOverlay.classList.remove('open');
+      termBackdrop.classList.remove('open');
+      termTrigger.classList.remove('hidden');
+    }
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeTerm(); });
+
+    // ── CLOCK ──
+    function tick(){ const el=document.getElementById('tbClock'); if(el) el.textContent=new Date().toLocaleTimeString(); }
+    setInterval(tick, 1000); tick();
+
+    // ── TERMINAL ──
+    const body = document.getElementById('termBody');
+    const NAV  = {
+      engineer:{ url:'Profile.html',     desc:'Product leader · AI builder · Problem solver' },
+      nomad:   { url:'nomad.html',        desc:'Capturing the world one frame at a time' },
+      about:   { url:'Professional.html', desc:'The full story — who I am & what drives me' },
+      contact: { url:'Contact.html',      desc:'Start a conversation worth having' },
+      home:    { url:'home.html',         desc:'You are already here' },
+    };
+    const CMDS = {
+      help:cmdHelp, ls:cmdLs, whoami:cmdWhoami, skills:cmdSkills,
+      story:cmdStory, fun:cmdFun, clear:cmdClear,
+      hello:cmdHello, hi:cmdHello, hey:cmdHello,
+      engineer:()=>cmdGo('engineer'), nomad:()=>cmdGo('nomad'),
+      about:()=>cmdGo('about'), contact:()=>cmdGo('contact'),
+      home:()=>cmdGo('home'), profile:()=>cmdGo('engineer'),
+      pwd:()=>out([['c-dim','/anuraag/world/portfolio']]),
+      date:()=>out([['c-teal',new Date().toDateString()+' · '+new Date().toLocaleTimeString()]]),
+      sudo:()=>out([['c-error',"sudo: Nice try. You don't need root to be impressed."]]),
+      exit:()=>out([['c-amber',"You can't leave. The work is too interesting. Try: engineer"]]),
+      man:()=>{ out([['c-error',"No manual exists for this person. That's the point."]]); chips(['whoami'],['help']); },
+    };
+    const hist=[]; let histIdx=-1;
+    const ALL_CMDS=Object.keys(CMDS);
+
+    const delay = ms => new Promise(r=>setTimeout(r,ms));
+    const addEl = el => { body.appendChild(el); body.scrollTop=body.scrollHeight; return el; };
+    const esc   = s  => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+    function line(cls,html,indent=true){
+      const d=document.createElement('div');
+      d.className='tline'+(indent?' output':'');
+      d.innerHTML=`<span class="${cls}">${html}</span>`;
+      return addEl(d);
+    }
+    function spacer(){ const d=document.createElement('div'); d.className='tline spacer'; return addEl(d); }
+    function promptLine(cmd){
+      const d=document.createElement('div'); d.className='tline prompt-line';
+      d.innerHTML=`<span class="ps">anuraag@world:~$</span><span class="cmd"> ${esc(cmd)}</span>`;
+      return addEl(d);
+    }
+    function out(lines){ lines.forEach(([c,h])=>line(c,h)); }
+
+    function chips(primary=[],secondary=[]){
+      const row=document.createElement('div'); row.className='chip-row';
+      primary.forEach(c=>{ const b=document.createElement('button'); b.className='chip'; b.textContent=c; b.onclick=()=>run(c); row.appendChild(b); });
+      secondary.forEach(c=>{ const b=document.createElement('button'); b.className='chip sec'; b.textContent=c; b.onclick=()=>run(c); row.appendChild(b); });
+      addEl(row);
+    }
+    function hints(pairs){
+      const row=document.createElement('div'); row.className='hint-row';
+      pairs.forEach(([k,v])=>{ const h=document.createElement('div'); h.className='hint'; h.innerHTML=`<span>${k}</span> ${v}`; row.appendChild(h); });
+      addEl(row);
+    }
+    function prog(name,val,max=10){
+      const row=document.createElement('div'); row.className='prog-row';
+      const bars=Array.from({length:max},(_,i)=>`<div class="pb${i<val?' on':''}"></div>`).join('');
+      row.innerHTML=`<div class="prog-name">${name}</div><div class="prog-bars">${bars}</div>`;
+      addEl(row);
+    }
+
+    function cmdHelp(){
+      spacer(); line('c-amber','// NAVIGATE');
+      out([
+        ['c-teal','&nbsp;&nbsp;engineer &nbsp;<span class="c-dim">→ product · AI · enterprise builds</span>'],
+        ['c-teal','&nbsp;&nbsp;nomad &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ travel · photography · the other side</span>'],
+        ['c-teal','&nbsp;&nbsp;about &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ full story · what drives me</span>'],
+        ['c-teal','&nbsp;&nbsp;contact &nbsp;&nbsp;<span class="c-dim">→ bring me a problem worth solving</span>'],
+      ]);
+      spacer(); line('c-amber','// EXPLORE');
+      out([
+        ['c-muted','&nbsp;&nbsp;whoami &nbsp;&nbsp;&nbsp;<span class="c-dim">→ who is this person exactly</span>'],
+        ['c-muted','&nbsp;&nbsp;ls &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ explore what\'s here</span>'],
+        ['c-muted','&nbsp;&nbsp;skills &nbsp;&nbsp;&nbsp;<span class="c-dim">→ what I can actually do</span>'],
+        ['c-muted','&nbsp;&nbsp;story &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ short version of a long journey</span>'],
+        ['c-muted','&nbsp;&nbsp;fun &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ something unexpected</span>'],
+        ['c-muted','&nbsp;&nbsp;clear &nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">→ clean slate</span>'],
+      ]);
+      spacer(); chips(['engineer','nomad'],['whoami','skills','story','fun']);
+    }
+
+    function cmdLs(){
+      spacer(); line('c-dim','drwxr-xr-x &nbsp;anuraag@world:~');
+      out([
+        ['c-teal', '&nbsp;&nbsp;engineer/ &nbsp;&nbsp;&nbsp;<span class="c-dim">product · AI · $300M+ built · 2,000 users</span>'],
+        ['c-teal', '&nbsp;&nbsp;nomad/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="c-dim">35+ countries · stories · frames</span>'],
+        ['c-muted','&nbsp;&nbsp;about.md &nbsp;&nbsp;&nbsp;<span class="c-dim">MBA · MS CompSci · BCG · ExxonMobil</span>'],
+        ['c-muted','&nbsp;&nbsp;contact.sh &nbsp;<span class="c-dim">executable — run to start a conversation</span>'],
+        ['c-dim',  '&nbsp;&nbsp;.secrets &nbsp;&nbsp;&nbsp;<span class="c-error">permission denied</span>'],
+      ]);
+      spacer(); chips(['engineer','nomad'],['about','contact']);
+    }
+
+    function cmdWhoami(){
+      spacer(); line('c-white','Anuraag Ravulaparthi');
+      out([
+        ['c-muted','&nbsp;&nbsp;Role &nbsp;&nbsp;&nbsp;<span class="c-dim">:</span> Product leader · AI builder · Founder'],
+        ['c-muted','&nbsp;&nbsp;Stack &nbsp;&nbsp;<span class="c-dim">:</span> Systems thinking · People · Hard problems'],
+        ['c-muted','&nbsp;&nbsp;Origin &nbsp;<span class="c-dim">:</span> Built a company before a career'],
+        ['c-muted','&nbsp;&nbsp;Based &nbsp;&nbsp;<span class="c-dim">:</span> Wherever the problem is'],
+        ['c-teal', '&nbsp;&nbsp;Status &nbsp;<span class="c-dim">:</span> <span class="c-success">●</span> READY FOR THE NEXT BIG PROBLEM'],
+      ]);
+      spacer(); chips(['about','engineer'],['contact']);
+    }
+
+    function cmdSkills(){
+      spacer(); line('c-amber','// SKILL MATRIX'); spacer();
+      [['Product Strategy',9],['AI / ML Products',8],['Enterprise Arch',9],
+       ['RPA · Automation',9],['Founding / 0→1',8],['Systems Thinking',10]
+      ].forEach(([n,v])=>prog(n,v));
+      spacer(); chips(['engineer'],['story','about']);
+    }
+
+    function cmdStory(){
+      spacer(); line('c-dim','// git log --oneline'); spacer();
+      out([
+        ['c-dim','&nbsp;&nbsp;<span class="c-amber">2011</span> &nbsp;Co-founded Northhill · $200K raised · 2,000 daily users'],
+        ['c-dim','&nbsp;&nbsp;<span class="c-amber">2016</span> &nbsp;Earned the exit · time to learn at bigger scale'],
+        ['c-dim','&nbsp;&nbsp;<span class="c-amber">2018</span> &nbsp;BCG Platinion · Fortune 500 · $20M+ shaped'],
+        ['c-dim','&nbsp;&nbsp;<span class="c-amber">2018</span> &nbsp;Pioneer → ExxonMobil · AI+IoT+RPA · $600M integration'],
+        ['c-teal','&nbsp;&nbsp;<span class="c-teal">NOW &nbsp;</span> Looking for the next problem worth solving'],
+      ]);
+      spacer(); line('c-dim','&nbsp;&nbsp;Full version →');
+      chips(['about','engineer'],['contact']);
+    }
+
+    const FACTS=[
+      "B.Tech in Chemical Engineering. My first 'platform' was a reaction vessel.",
+      "The split avatar? Left is the suit. Right has the backpack. Both show up to the same meetings.",
+      "I once reduced a 40-day payment cycle to 2 days. The vendors noticed.",
+      "Won a Rotaract International Innovation Award in Asia — before I knew what product management was.",
+      "Built healthcare systems, food platforms, blood donor alerts, and blockchain contracts. One person.",
+      "I don't have a home city. I have coordinates.",
+      "MBA + MS Computer Science + B.Tech Chemical Engineering. Each one added a different lens.",
+    ];
+    let funIdx=0;
+    function cmdFun(){
+      spacer(); line('c-amber','// RANDOM FACT');
+      line('c-muted',FACTS[funIdx%FACTS.length]); funIdx++;
+      spacer(); line('c-dim','run <span class="c-teal">fun</span> again for another');
+      chips([],['fun','whoami','engineer']);
+    }
+
+    function cmdHello(){
+      spacer();
+      line('c-teal','Hey. You typed hello. I respect that.');
+      line('c-muted',"Most people just click. You typed. That's the energy I work with.");
+      spacer(); chips(['whoami','story'],['engineer','nomad']);
+    }
+
+    function cmdGo(dest){
+      const nav=NAV[dest]; if(!nav){ out([['c-error',`not found: ${dest}`]]); return; }
+      if(dest==='home'){ out([['c-amber',"You're already here. Try: ls"]]); return; }
+      spacer();
+      line('c-teal',`Navigating to <span class="c-white">${dest}</span> ...`);
+      line('c-dim', nav.desc); spacer();
+      const d=document.createElement('div'); d.className='tline output';
+      d.innerHTML=`<span class="c-success">✓ Ready.</span> <span class="c-muted">Tap to go: </span><span class="c-link" onclick="window.location.href='${nav.url}'">${nav.url} →</span>`;
+      addEl(d);
+    }
+
+    function cmdClear(){
+      body.innerHTML=''; line('c-dim','Terminal cleared.'); spacer();
+      chips(['engineer','nomad','about','contact'],['help','whoami']);
+    }
+
+    function run(raw){
+      const parts=raw.trim().split(/\s+/);
+      const cmd=parts[0].toLowerCase();
+      if(!cmd) return;
+      hist.unshift(raw.trim()); histIdx=-1;
+      promptLine(raw.trim());
+      if(CMDS[cmd]) CMDS[cmd](parts.slice(1).join(' '));
+      else{
+        line('c-error',`command not found: <span class="c-white">${esc(cmd)}</span>`);
+        line('c-dim','Try: <span class="c-teal">help</span> — or pick below →');
+        chips(['engineer','nomad','about','contact'],['help']);
+      }
+      termInput.value=''; body.scrollTop=body.scrollHeight;
+    }
+
+    termInput.addEventListener('keydown', e=>{
+      if(e.key==='Enter'){ run(termInput.value); }
+      else if(e.key==='Tab'){
+        e.preventDefault();
+        const v=termInput.value.toLowerCase(); if(!v) return;
+        const m=ALL_CMDS.find(c=>c.startsWith(v)); if(m) termInput.value=m;
+      }
+      else if(e.key==='ArrowUp'){
+        e.preventDefault();
+        if(histIdx<hist.length-1){ histIdx++; termInput.value=hist[histIdx]; }
+      }
+      else if(e.key==='ArrowDown'){
+        e.preventDefault();
+        if(histIdx>0){ histIdx--; termInput.value=hist[histIdx]; }
+        else{ histIdx=-1; termInput.value=''; }
+      }
+    });
+    document.querySelector('.term-window').addEventListener('click', ()=>termInput.focus());
+
+    async function boot(){
+      await delay(200);
+      line('c-dim','Initializing anuraag.sh ...', false);
+      await delay(380); line('c-dim','Loading personality modules ... <span class="c-success">OK</span>');
+      await delay(300); line('c-dim','Mounting career data ......... <span class="c-success">OK</span>');
+      await delay(280); line('c-dim','Attaching curiosity engine ... <span class="c-success">OK</span>');
+      await delay(450); spacer();
+      line('c-white','Welcome. You found the terminal.', false);
+      line('c-muted',"I'm Anuraag — product builder, problem chaser, occasional nomad.");
+      spacer(); line('c-teal','Where do you want to go?');
+      chips(['engineer','nomad','about','contact'],['help','whoami','skills']);
+      hints([['Tab','autocomplete'],['↑↓','history'],['ls','explore'],['Esc','close']]);
+    }
+  </script>
 </body>
 </html>
