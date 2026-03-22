@@ -969,11 +969,28 @@
 <!-- Toast -->
 <div id="toast"></div>
 
+<script>
+  // Non-module shim — wires auth buttons before the ES module loads
+  // Polls for window.signIn/signOut in case module hasn't executed yet
+  function _callWhenReady(fnName, ...args) {
+    if (typeof window[fnName] === 'function') {
+      window[fnName](...args);
+    } else {
+      // Module still loading — retry in 100ms
+      setTimeout(() => _callWhenReady(fnName, ...args), 100);
+    }
+  }
+  // These are called by onclick attributes in the HTML
+  function signIn()    { _callWhenReady('signIn'); }
+  function signOut()   { _callWhenReady('signOut'); }
+  function showPanel(n){ _callWhenReady('showPanel', n); }
+</script>
+
 <script type="module">
   import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
   import { getAuth, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, GoogleAuthProvider }
                               from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, doc, getDoc, setDoc, addDoc, deleteDoc,
+  import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
            collection, getDocs, query, orderBy, serverTimestamp }
                               from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
@@ -1053,15 +1070,17 @@
   }
 
   // ── SIGN IN / OUT ─────────────────────────────────────────────
+  // Defined synchronously so onclick attributes can call them immediately
   window.signIn = async function() {
     const btn = document.getElementById('googleBtn');
-    btn.disabled = true;
-    document.getElementById('auth-error').textContent = '';
+    if (btn) btn.disabled = true;
+    const errEl = document.getElementById('auth-error');
+    if (errEl) errEl.textContent = '';
     try {
       await signInWithPopup(auth, provider);
     } catch (e) {
-      document.getElementById('auth-error').textContent = `✗ ${e.message}`;
-      btn.disabled = false;
+      if (errEl) errEl.textContent = '✗ ' + e.message;
+      if (btn) btn.disabled = false;
     }
   };
 
@@ -1833,8 +1852,7 @@
     const fromCode=document.querySelector('[data-doc-id="'+docId+'"]')?.dataset?.from;
     if(!fromCode){ // fetch from firestore record
       try{
-        const {getDoc:gd}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-        const snap=await gd(doc(db,'flights',docId));
+        const snap=await getDoc(doc(db,'flights',docId));
         if(snap.exists()){
           const fd=snap.data();
           if(fd.from&&!fd.from_airport_photo){
@@ -1849,7 +1867,6 @@
       }catch(_){}
     }
     if(Object.keys(updates).length){
-      const {updateDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
       await updateDoc(doc(db,'flights',docId),updates);
       toast('✓ Flight enriched','ok');
       loadFlightsTable();
