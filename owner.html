@@ -459,6 +459,18 @@
         <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="6" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 1C4.8 1 3 2.8 3 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.2"/></svg>
         <span>Travel plans</span>
       </div>
+      <div class="nav-item" onclick="showPanel('countries')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5.5" stroke="currentColor" stroke-width="1.2"/><path d="M7 1.5C7 1.5 5 4 5 7s2 5.5 2 5.5M7 1.5C7 1.5 9 4 9 7s-2 5.5-2 5.5M1.5 7h11" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
+        <span>Countries</span>
+        <span class="nav-badge">MAP</span>
+      </div>
+
+      <div class="nav-section-label">Tools</div>
+      <div class="nav-item" onclick="window.open('award-search.html','_blank')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><path d="M2 9l2-2 3 1 5-5M9 3h2v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="4" cy="11" r="1.5" stroke="currentColor" stroke-width="1"/></svg>
+        <span>Award search</span>
+        <span class="nav-badge">MILES</span>
+      </div>
 
       <div class="nav-section-label" id="privateSection">Private</div>
       <div class="nav-item" id="journalNav" onclick="showPanel('journal')">
@@ -515,35 +527,134 @@
         <div class="panel-header">
           <div class="panel-eyebrow">// CONTENT MANAGEMENT</div>
           <div class="panel-title">FLIGHTS.</div>
-          <div class="panel-sub">Log and manage every flight in your inventory.</div>
+          <div class="panel-sub">Import your inventory · auto-enrich with aircraft data · track every mile.</div>
         </div>
+
+        <!-- STATS ROW -->
+        <div class="stat-row" id="flightStats" style="margin-bottom:24px"></div>
+
+        <!-- IMPORT SECTION -->
         <div class="section-card">
-          <div class="section-card-title">// ADD NEW FLIGHT</div>
+          <div class="section-card-title">// BULK IMPORT — EXCEL / CSV</div>
+
+          <!-- Drop zone -->
+          <div id="dropZone" style="border:2px dashed rgba(91,192,190,0.25);border-radius:10px;padding:32px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;margin-bottom:20px"
+            onclick="document.getElementById('fileInput').click()"
+            ondragover="event.preventDefault();this.style.borderColor='#5bc0be';this.style.background='rgba(91,192,190,0.05)'"
+            ondragleave="this.style.borderColor='rgba(91,192,190,0.25)';this.style.background=''"
+            ondrop="handleDrop(event)">
+            <div style="font-size:24px;margin-bottom:10px;opacity:0.4">✈</div>
+            <div style="font-size:12px;letter-spacing:1.5px;color:var(--muted)">DROP YOUR EXCEL OR CSV FILE HERE</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px;opacity:0.6">or click to browse · .xlsx, .csv supported</div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFile(this.files[0])">
+          </div>
+
+          <!-- Column mapping hint -->
+          <div style="font-size:10px;color:var(--muted);letter-spacing:0.5px;line-height:1.8;margin-bottom:16px">
+            <span style="color:var(--teal)">EXPECTED COLUMNS:</span>
+            Flight Number · From · To · Date · Time · Aircraft Type · Booking Date · Distance (Miles)<br>
+            <span style="opacity:0.6">Columns are matched by name — order doesn't matter. Your file matches this exactly.</span>
+          </div>
+
+          <!-- FR24 API token -->
+          <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:16px">
+            <div style="font-size:10px;letter-spacing:2px;color:var(--teal);margin-bottom:8px">// FLIGHTRADAR24 API TOKEN (OPTIONAL — for aircraft enrichment + GPS tracks)</div>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="form-input" id="adbKey" type="password" placeholder="FR24 bearer token…" style="flex:1">
+              <button class="btn btn-ghost" onclick="saveAdbKey()" style="white-space:nowrap">SAVE TOKEN</button>
+            </div>
+            <div style="font-size:10px;color:var(--muted);margin-top:6px;opacity:0.7">
+              Free sandbox at fr24api.flightradar24.com → Key management → Create token. Works with sandbox (no credits) and paid plans. Gives you tail number, aircraft type, actual times, and full GPS flight tracks.
+            </div>
+          </div>
+
+          <!-- Preview table -->
+          <div id="importPreview" style="display:none">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">
+              <div style="font-size:10px;letter-spacing:2px;color:var(--teal)" id="previewLabel">// PREVIEW</div>
+              <div style="display:flex;gap:8px">
+                <label style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--muted);cursor:pointer">
+                  <input type="checkbox" id="enrichToggle" checked style="accent-color:var(--teal)"> Auto-enrich with AeroDataBox
+                </label>
+                <button class="btn btn-primary" id="importBtn" onclick="importFlights()">IMPORT ALL TO FIRESTORE</button>
+              </div>
+            </div>
+            <div class="data-table-wrap" style="max-height:360px;overflow-y:auto">
+              <table>
+                <thead>
+                  <tr>
+                    <th>FLIGHT</th><th>FROM</th><th>TO</th><th>DATE</th><th>TIME</th><th>AIRCRAFT</th><th>DIST (MI)</th><th>STATUS</th>
+                  </tr>
+                </thead>
+                <tbody id="previewBody"></tbody>
+              </table>
+            </div>
+            <!-- Import progress -->
+            <div id="importProgress" style="display:none;margin-top:16px">
+              <div style="font-size:10px;letter-spacing:2px;color:var(--teal);margin-bottom:10px">// IMPORTING <span id="importProgressLabel">0 / 0</span></div>
+              <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden">
+                <div id="importProgressBar" style="height:100%;background:var(--teal);width:0%;transition:width 0.3s ease;border-radius:2px"></div>
+              </div>
+              <div id="importLog" style="margin-top:10px;max-height:120px;overflow-y:auto;font-size:10px;color:var(--muted);display:flex;flex-direction:column;gap:3px"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ADD SINGLE FLIGHT -->
+        <div class="section-card">
+          <div class="section-card-title">// ADD SINGLE FLIGHT</div>
           <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">FLIGHT NUMBER</label><input class="form-input" id="f-fn" placeholder="EK 202" style="text-transform:uppercase"></div>
             <div class="form-group"><label class="form-label">FROM (IATA)</label><input class="form-input" id="f-from" placeholder="DEL" maxlength="3" style="text-transform:uppercase"></div>
             <div class="form-group"><label class="form-label">TO (IATA)</label><input class="form-input" id="f-to" placeholder="DXB" maxlength="3" style="text-transform:uppercase"></div>
-            <div class="form-group"><label class="form-label">AIRLINE</label><input class="form-input" id="f-airline" placeholder="Emirates"></div>
           </div>
           <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">AIRLINE</label><input class="form-input" id="f-airline" placeholder="Emirates"></div>
             <div class="form-group"><label class="form-label">FROM CITY</label><input class="form-input" id="f-fromCity" placeholder="New Delhi"></div>
             <div class="form-group"><label class="form-label">TO CITY</label><input class="form-input" id="f-toCity" placeholder="Dubai"></div>
-            <div class="form-group"><label class="form-label">DATE (YYYY-MM)</label><input class="form-input" id="f-date" placeholder="2024-03"></div>
           </div>
           <div class="form-grid cols-3">
-            <div class="form-group"><label class="form-label">MILES</label><input class="form-input" id="f-miles" placeholder="1200" type="number"></div>
-            <div class="form-group"><label class="form-label">FROM LAT, LON</label><input class="form-input" id="f-fromCoords" placeholder="28.5562, 77.1000"></div>
-            <div class="form-group"><label class="form-label">TO LAT, LON</label><input class="form-input" id="f-toCoords" placeholder="25.2532, 55.3657"></div>
+            <div class="form-group"><label class="form-label">DATE (YYYY-MM-DD)</label><input class="form-input" id="f-date" placeholder="2024-03-15"></div>
+            <div class="form-group"><label class="form-label">CABIN</label>
+              <select class="form-select" id="f-cabin">
+                <option value="">— select —</option>
+                <option value="Economy">Economy</option>
+                <option value="Premium Economy">Premium Economy</option>
+                <option value="Business">Business</option>
+                <option value="First">First</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">SEAT</label><input class="form-input" id="f-seat" placeholder="11A"></div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">AIRCRAFT TYPE</label><input class="form-input" id="f-aircraft" placeholder="Boeing 777-300ER"></div>
+            <div class="form-group"><label class="form-label">TAIL NUMBER</label><input class="form-input" id="f-tail" placeholder="A6-EGE" style="text-transform:uppercase"></div>
+            <div class="form-group"><label class="form-label">DURATION (mins)</label><input class="form-input" id="f-duration" placeholder="195" type="number"></div>
           </div>
           <div class="form-grid cols-1">
             <div class="form-group"><label class="form-label">NOTES</label><input class="form-input" id="f-notes" placeholder="Window seat, chai from home…"></div>
           </div>
           <div class="btn-row">
             <button class="btn btn-primary" onclick="addFlight()">SAVE FLIGHT</button>
+            <button class="btn btn-ghost" onclick="enrichSingle()">ENRICH FROM FLIGHT NUMBER</button>
             <button class="btn btn-ghost" onclick="clearForm('flight')">CLEAR</button>
           </div>
         </div>
+
+        <!-- FLIGHT LOG -->
         <div class="section-card">
-          <div class="section-card-title">// FLIGHT LOG</div>
+          <div class="section-card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>// FLIGHT LOG</span>
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="flightSearch" placeholder="search routes, airlines…" style="width:200px;padding:6px 10px;font-size:11px" oninput="filterFlights(this.value)">
+              <select class="form-select" id="flightSort" style="width:160px;padding:6px 10px;font-size:11px" onchange="sortFlights(this.value)">
+                <option value="date-desc">Newest first</option>
+                <option value="date-asc">Oldest first</option>
+                <option value="airline">By airline</option>
+                <option value="miles">By distance</option>
+              </select>
+            </div>
+          </div>
           <div id="flightsTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading flights…</span></div></div>
         </div>
       </div>
@@ -695,6 +806,89 @@
         <div class="section-card">
           <div class="section-card-title">// TRIP LIST</div>
           <div id="travelTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading plans…</span></div></div>
+        </div>
+      </div>
+
+      <!-- ── COUNTRIES PANEL ── -->
+      <div class="panel" id="panel-countries">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// MAP DATA</div>
+          <div class="panel-title">COUNTRIES.</div>
+          <div class="panel-sub">Your visited countries — powers the globe and nomad page. Changes go live immediately.</div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stat-row" id="countryStats" style="margin-bottom:24px"></div>
+
+        <!-- Add country -->
+        <div class="section-card">
+          <div class="section-card-title">// ADD COUNTRY</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">COUNTRY NAME</label>
+              <input class="form-input" id="cn-name" placeholder="e.g. Japan">
+            </div>
+            <div class="form-group">
+              <label class="form-label">IATA/ISO CODE</label>
+              <input class="form-input" id="cn-id" placeholder="JP" maxlength="6" style="text-transform:uppercase">
+            </div>
+            <div class="form-group">
+              <label class="form-label">STATUS</label>
+              <select class="form-select" id="cn-status">
+                <option value="visited">Visited</option>
+                <option value="transiting">Transiting only (*)</option>
+                <option value="wishlist">Wishlist</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">LAT</label>
+              <input class="form-input" id="cn-lat" placeholder="36.2" type="number" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">LON</label>
+              <input class="form-input" id="cn-lon" placeholder="138.3" type="number" step="0.1">
+            </div>
+            <div class="form-group">
+              <label class="form-label">EMOJI (optional)</label>
+              <input class="form-input" id="cn-emoji" placeholder="❤️ 😍 📸">
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group">
+              <label class="form-label">NOTES</label>
+              <input class="form-input" id="cn-notes" placeholder="What you remember about it…">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addCountry()">ADD COUNTRY</button>
+            <button class="btn btn-ghost" onclick="clearForm('country')">CLEAR</button>
+          </div>
+        </div>
+
+        <!-- Country list -->
+        <div class="section-card">
+          <div class="section-card-title" style="display:flex;align-items:center;justify-content:space-between">
+            <span>// COUNTRY LIST</span>
+            <div style="display:flex;gap:8px;align-items:center">
+              <input class="form-input" id="countrySearch" placeholder="search…"
+                style="width:160px;padding:6px 10px;font-size:11px"
+                oninput="filterCountries(this.value)">
+              <select class="form-select" id="countryFilter"
+                style="width:140px;padding:6px 10px;font-size:11px"
+                onchange="filterCountries(document.getElementById('countrySearch').value)">
+                <option value="all">All</option>
+                <option value="visited">Visited</option>
+                <option value="transiting">Transiting</option>
+                <option value="wishlist">Wishlist</option>
+              </select>
+              <button class="btn btn-primary" onclick="saveCountries()" style="padding:6px 14px;font-size:10px">
+                SAVE ALL TO FIRESTORE
+              </button>
+            </div>
+          </div>
+          <div id="countriesList" style="margin-top:16px"></div>
         </div>
       </div>
 
@@ -855,6 +1049,7 @@
       `Signed in as ${currentUser.email} · Role: ${currentRole}`;
 
     loadAllCounts();
+    loadAdbKey();
   }
 
   // ── SIGN IN / OUT ─────────────────────────────────────────────
@@ -886,7 +1081,7 @@
     const titles = {
       home:'DASHBOARD', flights:'FLIGHTS', cafes:'CAFES',
       experiences:'EXPERIENCES', content:'PAGE CONTENT',
-      travel:'TRAVEL PLANS', journal:'JOURNAL', users:'USERS'
+      travel:'TRAVEL PLANS', countries:'COUNTRIES', journal:'JOURNAL', users:'USERS'
     };
     document.getElementById('topbarTitle').textContent = titles[name] || name.toUpperCase();
 
@@ -897,6 +1092,7 @@
     if (name === 'travel')      loadTravelTable();
     if (name === 'journal')     loadJournal();
     if (name === 'users')       loadUsers();
+    if (name === 'countries')   loadCountries();
     if (name === 'content')     loadContent();
   };
 
@@ -923,6 +1119,7 @@
   // ── CLEAR FORMS ───────────────────────────────────────────────
   window.clearForm = function(type) {
     const maps = {
+      country:    ['cn-name','cn-id','cn-lat','cn-lon','cn-emoji','cn-notes'],
       flight:     ['f-from','f-to','f-airline','f-fromCity','f-toCity','f-date','f-miles','f-fromCoords','f-toCoords','f-notes'],
       cafe:       ['c-name','c-type','c-city','c-country','c-ordered','c-vibe','c-story'],
       experience: ['e-loc','e-label','e-title','e-story','e-img'],
@@ -936,52 +1133,730 @@
   };
 
   // ── FLIGHTS ───────────────────────────────────────────────────
-  window.addFlight = async function() {
-    const fromCoords = (document.getElementById('f-fromCoords').value||'').split(',').map(s=>parseFloat(s.trim()));
-    const toCoords   = (document.getElementById('f-toCoords').value||'').split(',').map(s=>parseFloat(s.trim()));
-    const data = {
-      from:      (document.getElementById('f-from').value||'').toUpperCase().trim(),
-      to:        (document.getElementById('f-to').value||'').toUpperCase().trim(),
-      airline:   document.getElementById('f-airline').value.trim(),
-      from_city: document.getElementById('f-fromCity').value.trim(),
-      to_city:   document.getElementById('f-toCity').value.trim(),
-      date:      document.getElementById('f-date').value.trim(),
-      miles:     parseInt(document.getElementById('f-miles').value)||0,
-      from_lat:  fromCoords[0]||0, from_lon: fromCoords[1]||0,
-      to_lat:    toCoords[0]||0,   to_lon:   toCoords[1]||0,
-      notes:     document.getElementById('f-notes').value.trim(),
-      addedAt:   serverTimestamp(), addedBy: currentUser.uid
-    };
-    if (!data.from || !data.to) { toast('FROM and TO are required', 'err'); return; }
-    try {
-      await addDoc(collection(db, 'flights'), data);
-      toast('✓ Flight saved', 'ok');
-      clearForm('flight');
-      loadFlightsTable();
-    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  // Airport coordinate lookup (for haversine distance)
+  const AIRPORT_COORDS = {
+    DEL:[28.5562,77.1000],BOM:[19.0896,72.8656],HYD:[17.2403,78.4294],
+    MAA:[12.9941,80.1709],BLR:[13.1986,77.7066],CCU:[22.6547,88.4467],
+    DXB:[25.2532,55.3657],AUH:[24.4330,54.6511],DOH:[25.2606,51.6138],
+    SIN:[1.3644,103.9915],BKK:[13.6811,100.7470],HKG:[22.3080,113.9185],
+    NRT:[35.7720,140.3929],HND:[35.5494,139.7798],ICN:[37.4602,126.4407],
+    SYD:[-33.9399,151.1753],MEL:[-37.6690,144.8410],
+    LHR:[51.4700,-0.4543],LGW:[51.1537,-0.1821],CDG:[49.0097,2.5479],
+    AMS:[52.3086,4.7639],FRA:[50.0379,8.5622],MUC:[48.3537,11.7750],
+    MAD:[40.4936,-3.5668],BCN:[41.2971,2.0785],FCO:[41.8003,12.2389],
+    ZRH:[47.4647,8.5492],VIE:[48.1103,16.5697],IST:[41.2753,28.7519],
+    JFK:[40.6413,-73.7781],EWR:[40.6895,-74.1745],LAX:[33.9425,-118.4081],
+    ORD:[41.9742,-87.9073],DFW:[32.8998,-97.0403],MIA:[25.7959,-80.2870],
+    SFO:[37.6213,-122.3790],IAH:[29.9902,-95.3368],BOS:[42.3656,-71.0096],
+    ATL:[33.6407,-84.4277],SEA:[47.4502,-122.3088],LAS:[36.0840,-115.1537],
+    MCO:[28.4312,-81.3081],DEN:[39.8561,-104.6737],PHX:[33.4373,-112.0078],
+    YYZ:[43.6777,-79.6248],YVR:[49.1967,-123.1815],
+    GRU:[-23.4356,-46.4731],GIG:[-22.8099,-43.2506],EZE:[-34.8222,-58.5358],
+    LIM:[-12.0219,-77.1143],SCL:[-33.3930,-70.7858],BOG:[4.7016,-74.1469],
+    MEX:[19.4363,-99.0721],SJU:[18.4394,-66.0018],
+    CDG:[49.0097,2.5479],ORY:[48.7233,2.3794],
+    NBO:[-1.3192,36.9275],JNB:[-26.1392,28.2460],CPT:[-33.9648,18.6017],
+    CAI:[30.1219,31.4056],ADD:[8.9779,38.7993],
+    KUL:[2.7456,101.7072],MNL:[14.5086,121.0197],CGK:[-6.1256,106.6559],
+    KTM:[27.6966,85.3591],CMB:[7.1808,79.8841],DAC:[23.8433,90.3978],
+    LHE:[31.5216,74.4036],KHI:[24.9008,67.1681],
+    KEF:[63.9850,-22.6057],PRG:[50.1008,14.2600],WAW:[52.1657,20.9671],
+    BEG:[44.8184,20.3091],ZAG:[45.7429,16.0688],SJJ:[43.8246,18.3315],
+    OMO:[43.2828,17.8458],BVA:[49.4544,2.1128],LJU:[46.2237,14.4576],
+    CDG:[49.0097,2.5479],
+    IAD:[38.9531,-77.4565],DCA:[38.8521,-77.0377],BWI:[39.1754,-76.6683],
+    MDW:[41.7868,-87.7522],MCI:[39.2976,-94.7139],DTW:[42.2124,-83.3534],
+    MSP:[44.8848,-93.2223],PHL:[39.8744,-75.2424],CLT:[35.2140,-80.9431],
+    MKE:[42.9472,-87.8966],STL:[38.7487,-90.3700],PIT:[40.4915,-80.2329],
+    CLE:[41.4117,-81.8498],CMH:[39.9998,-82.8919],IND:[39.7173,-86.2944],
+    RDU:[35.8801,-78.7880],BNA:[36.1245,-86.6782],MEM:[35.0424,-89.9767],
+    MSY:[29.9934,-90.2580],AUS:[30.1975,-97.6664],SAT:[29.5337,-98.4698],
+    TPA:[27.9755,-82.5332],FLL:[26.0726,-80.1527],PBI:[26.6832,-80.0956],
+    SAN:[32.7338,-117.1933],PDX:[45.5887,-122.5975],SLC:[40.7884,-111.9778],
+    SJC:[37.3626,-121.9290],OAK:[37.7213,-122.2208],SMF:[38.6954,-121.5908],
+    ABQ:[35.0402,-106.6090],BDL:[41.9389,-72.6832],PVD:[41.7258,-71.4281],
   };
 
-  async function loadFlightsTable() {
-    const el = document.getElementById('flightsTable');
-    try {
-      const snap = await getDocs(query(collection(db,'flights'), orderBy('date','desc')));
-      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No flights logged yet</div></div>'; return; }
-      let html = `<div class="data-table-wrap"><table><thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>MILES</th><th>NOTES</th><th></th></tr></thead><tbody>`;
-      snap.forEach(d => {
-        const f = d.data();
-        html += `<tr>
-          <td class="mono">${f.from} → ${f.to}<br><span style="color:var(--muted);font-size:10px">${f.from_city||''} → ${f.to_city||''}</span></td>
-          <td class="muted">${f.airline||'—'}</td>
-          <td class="muted">${f.date||'—'}</td>
-          <td class="teal">${(f.miles||0).toLocaleString()}</td>
-          <td class="muted" style="font-style:italic;max-width:180px">${f.notes||'—'}</td>
-          <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('flights','${d.id}','flightsTable', loadFlightsTable)">DEL</button></div></td>
-        </tr>`;
-      });
-      html += '</tbody></table></div>';
-      el.innerHTML = html;
-    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  // Haversine great-circle distance in miles
+  function haversine(lat1,lon1,lat2,lon2) {
+    const R=3958.8, dLat=(lat2-lat1)*Math.PI/180, dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return Math.round(R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a)));
   }
+  function getDistance(from,to) {
+    const fc=AIRPORT_COORDS[from], tc=AIRPORT_COORDS[to];
+    if(fc&&tc) return haversine(fc[0],fc[1],tc[0],tc[1]);
+    return null;
+  }
+
+  // Airline IATA → name
+  const AIRLINE_NAMES = {
+    AF:'Air France',UA:'United Airlines',W6:'Wizz Air',JU:'Air Serbia',
+    OU:'Croatia Airlines',KL:'KLM',AA:'American Airlines',EK:'Emirates',
+    QR:'Qatar Airways',SQ:'Singapore Airlines',AI:'Air India',BA:'British Airways',
+    LH:'Lufthansa',TK:'Turkish Airlines',EY:'Etihad',DL:'Delta',WN:'Southwest',
+    B6:'JetBlue',NK:'Spirit',F9:'Frontier',G4:'Allegiant',AS:'Alaska',
+    AC:'Air Canada',WS:'WestJet',AM:'Aeromexico',LA:'LATAM',AV:'Avianca',
+    CM:'Copa',G3:'Gol',AD:'Azul',FR:'Ryanair',U2:'easyJet',VY:'Vueling',
+    IB:'Iberia',AZ:'ITA Airways',LX:'Swiss',OS:'Austrian',SK:'SAS',
+    AY:'Finnair',LO:'LOT',OK:'Czech',A3:'Aegean','6E':'IndiGo',
+    SV:'Saudi Arabian',MS:'EgyptAir',ET:'Ethiopian',SA:'South African',
+    KQ:'Kenya Airways',AT:'Royal Air Maroc',NH:'ANA',JL:'Japan Airlines',
+    KE:'Korean Air',OZ:'Asiana',CX:'Cathay Pacific',MH:'Malaysia',
+    TG:'Thai',GA:'Garuda',CI:'China Airlines',BR:'EVA Air',
+    NZ:'Air New Zealand',QF:'Qantas',VA:'Virgin Australia',JQ:'Jetstar',
+  };
+
+  // FR24 API token
+  // ── FR24 API ─────────────────────────────────────────────────
+  // Replaces AeroDataBox. Uses FR24 official REST API.
+  // Sandbox token works free with sample data — no credits consumed.
+  // Production token uses credits from your Explorer/Essential/Advanced plan.
+
+  const FR24_BASE = 'https://fr24api.flightradar24.com/api';
+  let adbApiKey = null; // variable name kept for compatibility
+
+  async function loadAdbKey() {
+    try {
+      const snap = await getDoc(doc(db,'config','fr24'));
+      if(snap.exists()&&snap.data().api_key) {
+        adbApiKey=snap.data().api_key;
+        document.getElementById('adbKey').placeholder='FR24 token saved ✓';
+      }
+    } catch(_){}
+  }
+
+  window.saveAdbKey = async function() {
+    const key=document.getElementById('adbKey').value.trim();
+    if(!key) return;
+    await setDoc(doc(db,'config','fr24'),{
+      api_key:key, saved_by:currentUser.uid, saved_at:new Date().toISOString()
+    });
+    adbApiKey=key;
+    document.getElementById('adbKey').value='';
+    document.getElementById('adbKey').placeholder='FR24 token saved ✓';
+    toast('✓ FR24 token saved','ok');
+  };
+
+  // ── ENRICHMENT FUNCTIONS ─────────────────────────────────────
+
+  // FR24: Step 1 — flight summary (aircraft, times, distance, runway)
+  // Step 2 — flight track (full ADS-B GPS positions)
+  async function enrichFlight(flightNum, date) {
+    if(!adbApiKey||!flightNum||!date) return null;
+    try {
+      const fn=flightNum.replace(/\s+/g,'').toUpperCase();
+      const dateStr=date.split('T')[0];
+
+      // Build a 24-hour window around the flight date
+      const dateFrom=dateStr+'T00:00:00Z';
+      const dateTo  =dateStr+'T23:59:59Z';
+
+      // Step 1: Flight Summary Full
+      const summaryUrl=`${FR24_BASE}/v1/historic/flight-summaries/full`+
+        `?flight_number=${encodeURIComponent(fn)}`+
+        `&date_from=${encodeURIComponent(dateFrom)}`+
+        `&date_to=${encodeURIComponent(dateTo)}`;
+
+      const sRes=await fetch(summaryUrl,{
+        headers:{
+          'Authorization':`Bearer ${adbApiKey}`,
+          'Accept':'application/json'
+        }
+      });
+      if(!sRes.ok) return null;
+
+      const sData=await sRes.json();
+      // FR24 returns { data: [...flights] }
+      const flights=sData.data||sData.results||sData;
+      const flight=Array.isArray(flights)?flights[0]:flights;
+      if(!flight) return null;
+
+      // Extract fields from FR24 Flight Summary Full response
+      // Field names based on FR24 official schema
+      const depAirport = flight.departure || flight.orig || {};
+      const arrAirport = flight.arrival   || flight.dest || {};
+      const aircraft   = flight.aircraft  || {};
+
+      // Step 2: Flight Track (full GPS path) — needs flight fid
+      let flightPath=null;
+      let adsb_track=null;
+      const fid=flight.fr24_id||flight.fid||flight.id;
+      if(fid){
+        try{
+          const tRes=await fetch(`${FR24_BASE}/v1/historic/flight-tracks/${fid}`,{
+            headers:{'Authorization':`Bearer ${adbApiKey}`,'Accept':'application/json'}
+          });
+          if(tRes.ok){
+            const tData=await tRes.json();
+            const track=tData.data||tData;
+            // Track points: array of {lat, lon, alt, spd, ts}
+            if(Array.isArray(track)&&track.length>0){
+              adsb_track=track.map(p=>({
+                lat: p.lat||p.latitude,
+                lon: p.lon||p.longitude||p.lng,
+                alt: p.alt||p.altitude,
+                spd: p.spd||p.speed,
+                ts:  p.ts||p.timestamp
+              })).filter(p=>p.lat&&p.lon);
+              flightPath=adsb_track; // real ADS-B path
+            }
+          }
+        }catch(_){}
+      }
+
+      // Fall back to great-circle if no ADS-B track
+      if(!flightPath){
+        const dLat=depAirport.airport?.coordinates?.latitude||depAirport.lat||null;
+        const dLon=depAirport.airport?.coordinates?.longitude||depAirport.lon||null;
+        const aLat=arrAirport.airport?.coordinates?.latitude||arrAirport.lat||null;
+        const aLon=arrAirport.airport?.coordinates?.longitude||arrAirport.lon||null;
+        if(dLat&&dLon&&aLat&&aLon){
+          flightPath=greatCirclePoints(dLat,dLon,aLat,aLon,30);
+        }
+      }
+
+      return {
+        fr24_id:       fid || null,
+        aircraft_type: aircraft.model||aircraft.type||aircraft.icao_type||null,
+        tail_number:   aircraft.registration||aircraft.reg||null,
+        duration_mins: flight.duration||flight.duration_mins||null,
+        distance_km:   flight.distance||flight.great_circle_distance||null,
+        runway_dep:    flight.dep_runway||flight.takeoff_runway||null,
+        runway_arr:    flight.arr_runway||flight.landing_runway||null,
+        // Departure
+        dep_terminal:  depAirport.terminal||null,
+        dep_gate:      depAirport.gate||null,
+        dep_scheduled: depAirport.scheduled_time||depAirport.sched||null,
+        dep_actual:    depAirport.actual_time||depAirport.actual||null,
+        // Arrival
+        arr_terminal:  arrAirport.terminal||null,
+        arr_gate:      arrAirport.gate||null,
+        arr_scheduled: arrAirport.scheduled_time||arrAirport.sched||null,
+        arr_actual:    arrAirport.actual_time||arrAirport.actual||null,
+        // Track
+        flight_path:   flightPath,
+        adsb_track:    adsb_track, // full GPS positions stored separately
+      };
+    } catch(e){
+      console.warn('FR24 enrichment failed:',e.message);
+      return null;
+    }
+  }
+
+  // Great-circle arc waypoints between two lat/lon points (n steps)
+  function greatCirclePoints(lat1,lon1,lat2,lon2,n=20){
+    const toRad=d=>d*Math.PI/180, toDeg=r=>r*180/Math.PI;
+    const φ1=toRad(lat1),λ1=toRad(lon1),φ2=toRad(lat2),λ2=toRad(lon2);
+    const d=2*Math.asin(Math.sqrt(Math.sin((φ2-φ1)/2)**2+Math.cos(φ1)*Math.cos(φ2)*Math.sin((λ2-λ1)/2)**2));
+    if(d===0) return [{lat:lat1,lon:lon1},{lat:lat2,lon:lon2}];
+    const pts=[];
+    for(let i=0;i<=n;i++){
+      const f=i/n;
+      const A=Math.sin((1-f)*d)/Math.sin(d), B=Math.sin(f*d)/Math.sin(d);
+      const x=A*Math.cos(φ1)*Math.cos(λ1)+B*Math.cos(φ2)*Math.cos(λ2);
+      const y=A*Math.cos(φ1)*Math.sin(λ1)+B*Math.cos(φ2)*Math.sin(λ2);
+      const z=A*Math.sin(φ1)+B*Math.sin(φ2);
+      pts.push({lat:toDeg(Math.atan2(z,Math.sqrt(x**2+y**2))),lon:toDeg(Math.atan2(y,x))});
+    }
+    return pts;
+  }
+
+  // Planespotters: aircraft photo by tail number
+  async function getAircraftPhoto(tailNumber) {
+    if(!tailNumber) return null;
+    try {
+      const res=await fetch(`https://api.planespotters.net/pub/photos/reg/${encodeURIComponent(tailNumber)}`);
+      if(!res.ok) return null;
+      const data=await res.json();
+      const photo=data.photos?.[0];
+      if(!photo) return null;
+      return {
+        url:          photo.thumbnail_large?.src || photo.thumbnail?.src || null,
+        full_url:     photo.link || null,
+        photographer: photo.photographer || null,
+        source:       'planespotters.net'
+      };
+    } catch(_){ return null; }
+  }
+
+  // Unsplash: airport photo by name (free, no key needed for source URL pattern)
+  // Uses the public Unsplash source URL — no API key required
+  async function getAirportPhoto(iataCode, cityName) {
+    if(!iataCode&&!cityName) return null;
+    try {
+      // airport-data.com: free, no key, returns airport info + photo URL
+      const res=await fetch(`https://airport-data.com/api/ap_info.json?iata=${iataCode}`);
+      if(!res.ok) return null;
+      const data=await res.json();
+      if(data.status!==200) return null;
+      // Build Unsplash source URL using airport name for high-quality photo
+      const query=encodeURIComponent(`${data.name||cityName||iataCode} airport`);
+      return {
+        // Unsplash source API — returns a random relevant photo, no key needed
+        url:      `https://source.unsplash.com/800x500/?${query}`,
+        name:     data.name || null,
+        city:     data.location || cityName || null,
+        country:  data.country || null,
+        lat:      parseFloat(data.latitude)  || null,
+        lon:      parseFloat(data.longitude) || null,
+        source:   'unsplash'
+      };
+    } catch(_){
+      // Fallback: direct Unsplash source query
+      const query=encodeURIComponent(`${cityName||iataCode} airport`);
+      return { url:`https://source.unsplash.com/800x500/?${query}`, source:'unsplash' };
+    }
+  }
+
+  // ── FILE IMPORT ──────────────────────────────────────────────
+  let parsedFlights = [];
+
+  window.handleDrop = function(e) {
+    e.preventDefault();
+    document.getElementById('dropZone').style.borderColor='rgba(91,192,190,0.25)';
+    document.getElementById('dropZone').style.background='';
+    const file=e.dataTransfer.files[0];
+    if(file) handleFile(file);
+  };
+
+  window.handleFile = async function(file) {
+    if(!file) return;
+    const ext=file.name.split('.').pop().toLowerCase();
+    if(ext==='csv') {
+      const text=await file.text();
+      parseCSV(text);
+    } else if(ext==='xlsx'||ext==='xls') {
+      // Use SheetJS via CDN
+      if(!window.XLSX) {
+        await loadScript('https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js');
+      }
+      const buf=await file.arrayBuffer();
+      const wb=XLSX.read(buf,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{raw:false,dateNF:'yyyy-mm-dd'});
+      parseRows(rows);
+    } else {
+      toast('Please upload .xlsx, .xls, or .csv','err');
+    }
+  };
+
+  function loadScript(src) {
+    return new Promise(res=>{
+      const s=document.createElement('script'); s.src=src; s.onload=res; document.head.appendChild(s);
+    });
+  }
+
+  function parseCSV(text) {
+    const lines=text.trim().split('
+');
+    const headers=lines[0].split(',').map(h=>h.trim().replace(/^"|"$/g,''));
+    const rows=lines.slice(1).map(line=>{
+      const vals=line.split(',').map(v=>v.trim().replace(/^"|"$/g,''));
+      const obj={};
+      headers.forEach((h,i)=>obj[h]=vals[i]||'');
+      return obj;
+    }).filter(r=>Object.values(r).some(v=>v));
+    parseRows(rows);
+  }
+
+  function normalizeRow(row) {
+    // Flexible column name matching
+    const get=(...keys)=>{
+      for(const k of keys){
+        const found=Object.keys(row).find(rk=>rk.toLowerCase().includes(k.toLowerCase()));
+        if(found&&row[found]&&String(row[found]).trim()!=='-') return String(row[found]).trim();
+      }
+      return null;
+    };
+
+    const parseAirport=s=>{
+      if(!s) return {city:null,iata:null};
+      const m=s.match(/^(.+?)\s*\(([A-Z]{3})\)\s*$/);
+      return m?{city:m[1].trim(),iata:m[2]}:{city:s,iata:null};
+    };
+
+    const fn    = get('Flight Number','flight number','flight_number','flight','fn');
+    const fromRaw=get('From','from','origin','departure');
+    const toRaw  =get('To','to','destination','arrival');
+    const dateRaw=get('Date','date','departure date','flight date');
+    const timeRaw=get('Time','time','departure time');
+    const acRaw  =get('Aircraft Type','aircraft','aircraft type','plane');
+    const distRaw=get('Distance','miles','distance miles','dist');
+
+    const from=parseAirport(fromRaw);
+    const to  =parseAirport(toRaw);
+
+    // Parse date
+    let date=dateRaw;
+    if(dateRaw&&!dateRaw.match(/^\d{4}-\d{2}-\d{2}$/)){
+      try{const d=new Date(dateRaw);if(!isNaN(d))date=d.toISOString().split('T')[0];}catch(_){}
+    }
+
+    // Extract airline from flight number
+    let airline=null, airlineCode=null;
+    if(fn){
+      const m=fn.match(/^([A-Z]{1,2}[0-9]{0,1}|[A-Z0-9]{2})\s*\d+/i);
+      if(m){
+        airlineCode=m[1].toUpperCase();
+        airline=AIRLINE_NAMES[airlineCode]||airlineCode;
+      } else {
+        // Word airline e.g. "Spirit 899", "Frontier 2400"
+        const word=fn.split(/\s+/)[0];
+        const found=Object.entries(AIRLINE_NAMES).find(([,n])=>n.toLowerCase().startsWith(word.toLowerCase()));
+        if(found){airlineCode=found[0];airline=found[1];}
+        else airline=word;
+      }
+    }
+
+    // Compute distance if missing
+    let distMiles=distRaw?parseFloat(distRaw):null;
+    if((!distMiles||isNaN(distMiles))&&from.iata&&to.iata){
+      distMiles=getDistance(from.iata,to.iata);
+    }
+
+    return {
+      flight_number: fn,
+      airline_code:  airlineCode,
+      airline:       airline,
+      from:          from.iata,
+      from_city:     from.city,
+      to:            to.iata,
+      to_city:       to.city,
+      date:          date,
+      time:          timeRaw,
+      aircraft_type: acRaw,
+      distance_miles:distMiles,
+      _raw: row
+    };
+  }
+
+  function parseRows(rows) {
+    parsedFlights=rows.map(normalizeRow).filter(f=>f.from||f.to||f.flight_number);
+    renderPreview();
+  }
+
+  function renderPreview() {
+    if(!parsedFlights.length) return;
+    document.getElementById('importPreview').style.display='block';
+    document.getElementById('previewLabel').textContent=`// PREVIEW — ${parsedFlights.length} FLIGHTS FOUND`;
+    const tbody=document.getElementById('previewBody');
+    tbody.innerHTML=parsedFlights.map((f,i)=>`
+      <tr id="prev-${i}">
+        <td class="mono">${f.flight_number||'—'}<br><span style="color:var(--muted);font-size:10px">${f.airline||''}</span></td>
+        <td class="mono">${f.from||'?'}<br><span style="color:var(--muted);font-size:10px">${f.from_city||''}</span></td>
+        <td class="mono">${f.to||'?'}<br><span style="color:var(--muted);font-size:10px">${f.to_city||''}</span></td>
+        <td class="muted">${f.date||'—'}</td>
+        <td class="muted">${f.time||'—'}</td>
+        <td class="muted" style="max-width:140px">${f.aircraft_type||'<span style="color:var(--muted);opacity:0.5">to enrich</span>'}</td>
+        <td class="teal">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'<span style="color:var(--muted);opacity:0.5">calc</span>'}</td>
+        <td id="ps-${i}" style="font-size:10px;color:var(--muted)">—</td>
+      </tr>`).join('');
+    document.getElementById('dropZone').style.borderColor='rgba(63,185,80,0.4)';
+  }
+
+  window.importFlights = async function() {
+    if(!parsedFlights.length) return;
+    const doEnrich = document.getElementById('enrichToggle').checked && adbApiKey;
+    const btn=document.getElementById('importBtn');
+    btn.disabled=true; btn.textContent='IMPORTING…';
+    document.getElementById('importProgress').style.display='block';
+    const log=document.getElementById('importLog');
+    let done=0, errors=0;
+    const total=parsedFlights.length;
+
+    for(let i=0;i<total;i++){
+      const f={...parsedFlights[i]};
+      document.getElementById('importProgressLabel').textContent=`${i+1} / ${total}`;
+      document.getElementById('importProgressBar').style.width=`${Math.round((i/total)*100)}%`;
+      document.getElementById('ps-'+i).textContent='saving…';
+      document.getElementById('ps-'+i).style.color='var(--gold)';
+
+      // Enrich via FR24 if enabled
+      if(doEnrich && f.flight_number && f.date) {
+        document.getElementById('ps-'+i).textContent='enriching…';
+        const enriched=await enrichFlight(f.flight_number, f.date);
+        if(enriched){
+          if(!f.aircraft_type && enriched.aircraft_type) f.aircraft_type=enriched.aircraft_type;
+          if(enriched.tail_number) f.tail_number=enriched.tail_number;
+          if(!f.duration_mins && enriched.duration_mins) f.duration_mins=enriched.duration_mins;
+
+          // Get aircraft photo from planespotters
+          if(f.tail_number){
+            const photo=await getAircraftPhoto(f.tail_number);
+            if(photo) f.aircraft_photo=photo;
+          }
+          // Get airport photos for both endpoints
+          if(f.from && !f.from_airport_photo){
+            const ap=await getAirportPhoto(f.from, f.from_city);
+            if(ap) f.from_airport_photo=ap;
+          }
+          if(f.to && !f.to_airport_photo){
+            const ap=await getAirportPhoto(f.to, f.to_city);
+            if(ap) f.to_airport_photo=ap;
+          }
+        }
+        // Small delay to respect rate limits
+        await new Promise(r=>setTimeout(r,300));
+      }
+
+      // Recalculate distance if still missing
+      if(!f.distance_miles && f.from && f.to) {
+        f.distance_miles=getDistance(f.from,f.to);
+      }
+
+      // Save to Firestore
+      try {
+        await addDoc(collection(db,'flights'),{
+          flight_number:      f.flight_number||null,
+          airline_code:       f.airline_code||null,
+          airline:            f.airline||null,
+          from:               f.from||null,
+          from_city:          f.from_city||null,
+          to:                 f.to||null,
+          to_city:            f.to_city||null,
+          date:               f.date||null,
+          time:               f.time||null,
+          aircraft_type:      f.aircraft_type||null,
+          tail_number:        f.tail_number||null,
+          aircraft_photo:     f.aircraft_photo||null,
+          from_airport_photo: f.from_airport_photo||null,
+          to_airport_photo:   f.to_airport_photo||null,
+          dep_terminal:       f.dep_terminal||null,
+          dep_gate:           f.dep_gate||null,
+          dep_scheduled:      f.dep_scheduled||null,
+          dep_actual:         f.dep_actual||null,
+          arr_terminal:       f.arr_terminal||null,
+          arr_gate:           f.arr_gate||null,
+          arr_scheduled:      f.arr_scheduled||null,
+          arr_actual:         f.arr_actual||null,
+          flight_path:        f.flight_path||null,
+          adsb_track:         f.adsb_track||null,
+          fr24_id:            f.fr24_id||null,
+          runway_dep:         f.runway_dep||null,
+          runway_arr:         f.runway_arr||null,
+          duration_mins:      f.duration_mins||null,
+          distance_miles:     f.distance_miles||null,
+          addedAt:            serverTimestamp(),
+          addedBy:            currentUser.uid,
+          source:             'import'
+        });
+        done++;
+        document.getElementById('ps-'+i).textContent='✓ saved';
+        document.getElementById('ps-'+i).style.color='var(--green)';
+        document.getElementById('prev-'+i).style.background='rgba(63,185,80,0.04)';
+        const msg=document.createElement('div');
+        msg.textContent=`✓ ${f.flight_number||''} ${f.from}→${f.to} ${f.date||''}`;
+        msg.style.color='var(--green)';
+        log.appendChild(msg); log.scrollTop=log.scrollHeight;
+      } catch(e){
+        errors++;
+        document.getElementById('ps-'+i).textContent='✗ error';
+        document.getElementById('ps-'+i).style.color='var(--red)';
+      }
+    }
+
+    document.getElementById('importProgressBar').style.width='100%';
+    document.getElementById('importProgressBar').style.background='var(--green)';
+    document.getElementById('importProgressLabel').textContent=`${done} saved · ${errors} errors`;
+    btn.textContent=`✓ ${done} FLIGHTS IMPORTED`;
+    toast(`✓ ${done} flights imported to Firestore`,'ok');
+    parsedFlights=[];
+    loadFlightsTable();
+    loadAllCounts();
+  };
+
+  // ── SINGLE FLIGHT ────────────────────────────────────────────
+  window.addFlight = async function() {
+    const from=(document.getElementById('f-from').value||'').toUpperCase().trim();
+    const to  =(document.getElementById('f-to').value||'').toUpperCase().trim();
+    if(!from||!to){toast('FROM and TO are required','err');return;}
+    const dist=getDistance(from,to);
+    const data = {
+      flight_number: document.getElementById('f-fn').value.trim()||null,
+      from, to,
+      airline:       document.getElementById('f-airline').value.trim()||null,
+      from_city:     document.getElementById('f-fromCity').value.trim()||null,
+      to_city:       document.getElementById('f-toCity').value.trim()||null,
+      date:          document.getElementById('f-date').value.trim()||null,
+      cabin:         document.getElementById('f-cabin').value||null,
+      seat:          document.getElementById('f-seat').value.trim()||null,
+      aircraft_type: document.getElementById('f-aircraft').value.trim()||null,
+      tail_number:   document.getElementById('f-tail').value.toUpperCase().trim()||null,
+      duration_mins: parseInt(document.getElementById('f-duration').value)||null,
+      distance_miles:dist,
+      notes:         document.getElementById('f-notes').value.trim()||null,
+      addedAt:       serverTimestamp(), addedBy: currentUser.uid
+    };
+    try {
+      await addDoc(collection(db,'flights'),data);
+      toast('✓ Flight saved','ok');
+      clearForm('flight');
+      loadFlightsTable();
+    } catch(e){toast('✗ '+e.message,'err');}
+  };
+
+  window.enrichSingle = async function() {
+    const fn=document.getElementById('f-fn').value.trim();
+    const date=document.getElementById('f-date').value.trim();
+    if(!fn||!date){toast('Enter flight number and date first','err');return;}
+    if(!adbApiKey){toast('No FR24 token configured','err');return;}
+    toast('Enriching…');
+    const e=await enrichFlight(fn,date);
+    if(e){
+      if(e.aircraft_type) document.getElementById('f-aircraft').value=e.aircraft_type;
+      if(e.tail_number)   document.getElementById('f-tail').value=e.tail_number;
+      if(e.duration_mins) document.getElementById('f-duration').value=e.duration_mins;
+      toast('✓ Enriched from FR24','ok');
+    } else {
+      toast('No data found for this flight','err');
+    }
+  };
+
+  // ── FLIGHT LOG ───────────────────────────────────────────────
+  let allFlightDocs=[];
+
+  async function loadFlightsTable() {
+    const el=document.getElementById('flightsTable');
+    el.innerHTML='<div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div>';
+    try {
+      const snap=await getDocs(query(collection(db,'flights'),orderBy('date','desc')));
+      allFlightDocs=snap.docs.map(d=>({id:d.id,...d.data()}));
+      renderFlightLog(allFlightDocs);
+      updateFlightStats(allFlightDocs);
+    } catch(e){ el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  function updateFlightStats(docs) {
+    const el=document.getElementById('flightStats');
+    if(!el) return;
+    const totalMiles=docs.reduce((s,f)=>s+(f.distance_miles||0),0);
+    const airlines=[...new Set(docs.map(f=>f.airline).filter(Boolean))].length;
+    const withPhoto=docs.filter(f=>f.aircraft_photo).length;
+    el.innerHTML=`
+      <div class="stat-card"><div class="stat-card-num teal">${docs.length}</div><div class="stat-card-label">TOTAL FLIGHTS</div></div>
+      <div class="stat-card"><div class="stat-card-num teal">${Math.round(totalMiles).toLocaleString()}</div><div class="stat-card-label">MILES FLOWN</div></div>
+      <div class="stat-card"><div class="stat-card-num teal">${airlines}</div><div class="stat-card-label">AIRLINES</div></div>
+      <div class="stat-card"><div class="stat-card-num teal">${withPhoto}</div><div class="stat-card-label">AIRCRAFT PHOTOS</div></div>`;
+  }
+
+  function renderFlightLog(docs) {
+    const el=document.getElementById('flightsTable');
+    if(!docs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No flights logged yet — use the import above</div></div>';return;}
+    let html=`<div class="data-table-wrap"><table>
+      <thead><tr>
+        <th>FLIGHT</th><th>ROUTE</th><th>DATE</th><th>GATE</th>
+        <th>AIRCRAFT</th><th>TAIL</th><th>DIST (MI)</th><th>PHOTO</th><th></th>
+      </tr></thead><tbody>`;
+    docs.forEach(f=>{
+      const photo=f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:64px;height:40px;object-fit:cover;border-radius:4px;cursor:pointer" onclick="window.open('${f.aircraft_photo.url}','_blank')" title="${f.aircraft_photo.photographer||''}">`:'—';
+      const gate=f.dep_gate?`<span style="background:rgba(91,192,190,0.12);border:1px solid rgba(91,192,190,0.25);border-radius:3px;padding:1px 6px;font-size:9px;color:var(--teal)">G${f.dep_gate}</span> `:'';
+      const term=f.dep_terminal?`<span style="font-size:9px;color:var(--muted)">T${f.dep_terminal} </span>`:'';
+      const runway=f.runway_dep?`<span style="font-size:9px;color:var(--muted);margin-left:2px">RWY ${f.runway_dep}</span>`:'';
+      const hasAdsb=f.adsb_track&&f.adsb_track.length>0?'<span title="Real ADS-B track stored" style="color:var(--green);font-size:9px"> ● ADS-B</span>':'';
+      const hasPath=f.flight_path?'<span title="Flight path stored" style="color:var(--teal);font-size:10px">✈ path</span>':'';
+      const fromAP=f.from_airport_photo?.url?`<img src="${f.from_airport_photo.url}" style="width:36px;height:24px;object-fit:cover;border-radius:2px" title="${f.from_airport_photo.name||f.from}">`:f.from||'?';
+      const toAP=f.to_airport_photo?.url?`<img src="${f.to_airport_photo.url}" style="width:36px;height:24px;object-fit:cover;border-radius:2px" title="${f.to_airport_photo.name||f.to}">`:f.to||'?';
+      html+=`<tr>
+        <td class="mono">${f.flight_number||'—'}<br><span style="color:var(--muted);font-size:10px">${f.airline||''}</span></td>
+        <td>
+          <div style="display:flex;align-items:center;gap:6px">
+            ${fromAP}
+            <span class="mono" style="font-size:11px">${f.from||'?'}</span>
+            <span style="color:var(--teal)">→</span>
+            <span class="mono" style="font-size:11px">${f.to||'?'}</span>
+            ${toAP}
+          </div>
+          <div style="color:var(--muted);font-size:10px;margin-top:2px">${f.from_city||''} → ${f.to_city||''}</div>
+        </td>
+        <td class="muted">${f.date||'—'}<br><span style="font-size:10px">${f.dep_scheduled||f.time||''}</span></td>
+        <td style="font-size:10px;line-height:1.8">${term}${gate}${runway}${hasAdsb}</td>
+        <td class="muted" style="max-width:120px;font-size:11px">${f.aircraft_type||'—'}</td>
+        <td class="mono" style="font-size:11px;color:var(--teal)">${f.tail_number||'—'}</td>
+        <td class="teal">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>
+        <td>${photo}</td>
+        <td><div class="tbl-actions">
+          <button class="tbl-btn" onclick="enrichAndUpdate('${f.id}','${f.flight_number||''}','${f.date||''}')">ENRICH</button>
+          <button class="tbl-btn del" onclick="deleteEntry('flights','${f.id}','flightsTable',loadFlightsTable)">DEL</button>
+        </div></td>
+      </tr>`;
+    });
+    html+='</tbody></table></div>';
+    el.innerHTML=html;
+  }
+
+  window.filterFlights=function(q){
+    const filtered=allFlightDocs.filter(f=>
+      !q||[f.flight_number,f.from,f.to,f.airline,f.aircraft_type,f.tail_number,f.from_city,f.to_city]
+        .some(v=>v&&v.toLowerCase().includes(q.toLowerCase()))
+    );
+    renderFlightLog(filtered);
+  };
+  window.sortFlights=function(v){
+    const sorted=[...allFlightDocs];
+    if(v==='date-asc') sorted.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+    else if(v==='date-desc') sorted.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    else if(v==='airline') sorted.sort((a,b)=>(a.airline||'').localeCompare(b.airline||''));
+    else if(v==='miles') sorted.sort((a,b)=>(b.distance_miles||0)-(a.distance_miles||0));
+    renderFlightLog(sorted);
+  };
+
+  window.enrichAndUpdate=async function(docId,fn,date){
+    if(!adbApiKey){toast('No FR24 token configured','err');return;}
+    if(!fn||!date){toast('Flight number and date needed to enrich','err');return;}
+    toast('Enriching flight…');
+    const e=await enrichFlight(fn,date);
+    if(!e){toast('No data found','err');return;}
+    const updates={};
+    if(e.aircraft_type) updates.aircraft_type=e.aircraft_type;
+    if(e.tail_number)   updates.tail_number=e.tail_number;
+    if(e.duration_mins) updates.duration_mins=e.duration_mins;
+    if(e.dep_terminal)  updates.dep_terminal=e.dep_terminal;
+    if(e.dep_gate)      updates.dep_gate=e.dep_gate;
+    if(e.dep_scheduled) updates.dep_scheduled=e.dep_scheduled;
+    if(e.dep_actual)    updates.dep_actual=e.dep_actual;
+    if(e.arr_terminal)  updates.arr_terminal=e.arr_terminal;
+    if(e.arr_gate)      updates.arr_gate=e.arr_gate;
+    if(e.arr_scheduled) updates.arr_scheduled=e.arr_scheduled;
+    if(e.arr_actual)    updates.arr_actual=e.arr_actual;
+    if(e.flight_path)   updates.flight_path=e.flight_path;
+    if(e.adsb_track)    updates.adsb_track=e.adsb_track;
+    if(e.fr24_id)       updates.fr24_id=e.fr24_id;
+    if(e.runway_dep)    updates.runway_dep=e.runway_dep;
+    if(e.runway_arr)    updates.runway_arr=e.runway_arr;
+    if(e.distance_km)   updates.distance_km=e.distance_km;
+    if(e.tail_number){
+      const photo=await getAircraftPhoto(e.tail_number);
+      if(photo) updates.aircraft_photo=photo;
+    }
+    // Fetch airport photos
+    const fromCode=document.querySelector('[data-doc-id="'+docId+'"]')?.dataset?.from;
+    if(!fromCode){ // fetch from firestore record
+      try{
+        const {getDoc:gd}=await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+        const snap=await gd(doc(db,'flights',docId));
+        if(snap.exists()){
+          const fd=snap.data();
+          if(fd.from&&!fd.from_airport_photo){
+            const ap=await getAirportPhoto(fd.from,fd.from_city);
+            if(ap) updates.from_airport_photo=ap;
+          }
+          if(fd.to&&!fd.to_airport_photo){
+            const ap=await getAirportPhoto(fd.to,fd.to_city);
+            if(ap) updates.to_airport_photo=ap;
+          }
+        }
+      }catch(_){}
+    }
+    if(Object.keys(updates).length){
+      const {updateDoc} = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+      await updateDoc(doc(db,'flights',docId),updates);
+      toast('✓ Flight enriched','ok');
+      loadFlightsTable();
+    } else {
+      toast('Nothing new found','err');
+    }
+  };
 
   // ── CAFES ─────────────────────────────────────────────────────
   window.addCafe = async function() {
@@ -1251,12 +2126,195 @@
     }
   })();
 
+  // ── COUNTRIES ────────────────────────────────────────────────
+  let countryList = []; // local working copy
+
+  const STATUS_META = {
+    visited:   { label:'VISITED',   color:'var(--teal)',  bg:'rgba(91,192,190,0.1)',  border:'rgba(91,192,190,0.25)' },
+    transiting:{ label:'TRANSIT *', color:'var(--gold)',  bg:'rgba(245,158,11,0.1)',  border:'rgba(245,158,11,0.25)' },
+    wishlist:  { label:'WISHLIST',  color:'var(--muted)', bg:'rgba(255,255,255,0.04)', border:'var(--border)' },
+  };
+
+  async function loadCountries() {
+    const el = document.getElementById('countriesList');
+    el.innerHTML = '<div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div>';
+    try {
+      const snap = await getDoc(doc(db,'config','countries'));
+      if (snap.exists()) {
+        countryList = snap.data().visited || [];
+      } else {
+        countryList = [];
+        el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No countries yet — run bootstrap-countries.html first, or add them manually above.</div></div>';
+      }
+      renderCountries(countryList);
+      renderCountryStats();
+    } catch(e) {
+      el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;
+    }
+  }
+
+  function renderCountryStats() {
+    const el = document.getElementById('countryStats');
+    if (!el) return;
+    const v = countryList.filter(c=>c.status==='visited').length;
+    const t = countryList.filter(c=>c.status==='transiting').length;
+    const w = countryList.filter(c=>c.status==='wishlist').length;
+    el.innerHTML = `
+      <div class="stat-card"><div class="stat-card-num teal">${v}</div><div class="stat-card-label">VISITED</div></div>
+      <div class="stat-card"><div class="stat-card-num" style="color:var(--gold)">${t}</div><div class="stat-card-label">TRANSIT ONLY</div></div>
+      <div class="stat-card"><div class="stat-card-num" style="color:var(--muted)">${w}</div><div class="stat-card-label">WISHLIST</div></div>
+      <div class="stat-card"><div class="stat-card-num">${countryList.length}</div><div class="stat-card-label">TOTAL</div></div>`;
+  }
+
+  function renderCountries(list) {
+    const el = document.getElementById('countriesList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No countries match</div></div>';
+      return;
+    }
+    el.innerHTML = list.map((c,idx) => {
+      const m = STATUS_META[c.status] || STATUS_META.visited;
+      const globalIdx = countryList.indexOf(c);
+      return `
+        <div style="display:flex;align-items:center;gap:12px;padding:10px 14px;border-bottom:1px solid var(--border);transition:background 0.15s" onmouseover="this.style.background='rgba(91,192,190,0.03)'" onmouseout="this.style.background=''">
+          <!-- Flag -->
+          <img src="https://flagcdn.com/${c.id.toLowerCase().replace('_ei','').replace('cl_ei','cl')}.svg"
+            onerror="this.style.display='none'"
+            style="width:28px;height:19px;object-fit:cover;border-radius:2px;flex-shrink:0">
+
+          <!-- Name + emoji + notes -->
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:7px">
+              <span style="font-size:13px;color:var(--text)">${c.name}</span>
+              ${c.emoji ? `<span style="font-size:14px">${c.emoji}</span>` : ''}
+              <span style="font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--muted);background:var(--bg3);padding:1px 6px;border-radius:2px">${c.id}</span>
+            </div>
+            ${c.notes ? `<div style="font-size:11px;color:var(--muted);margin-top:2px;font-style:italic">${c.notes}</div>` : ''}
+          </div>
+
+          <!-- Status toggle -->
+          <div style="display:flex;gap:4px">
+            ${['visited','transiting','wishlist'].map(s => {
+              const sm = STATUS_META[s];
+              const active = c.status === s;
+              return `<button onclick="toggleStatus(${globalIdx},'${s}')"
+                style="font-size:9px;letter-spacing:1px;padding:3px 8px;border-radius:3px;cursor:pointer;
+                background:${active?sm.bg:'transparent'};
+                border:1px solid ${active?sm.border:'var(--border)'};
+                color:${active?sm.color:'var(--muted)'};
+                transition:all 0.15s">${sm.label}</button>`;
+            }).join('')}
+          </div>
+
+          <!-- Emoji quick-set -->
+          <div style="display:flex;gap:3px">
+            ${['❤️','😍','📸','🙉','😀',''].map(e =>
+              `<button onclick="setEmoji(${globalIdx},'${e}')"
+                title="${e||'clear'}"
+                style="font-size:13px;padding:2px 5px;background:${c.emoji===e&&e?'rgba(91,192,190,0.15)':'transparent'};
+                border:1px solid ${c.emoji===e&&e?'rgba(91,192,190,0.3)':'transparent'};
+                border-radius:3px;cursor:pointer">${e||'✕'}</button>`
+            ).join('')}
+          </div>
+
+          <!-- Edit notes inline -->
+          <input value="${c.notes||''}" placeholder="notes…"
+            style="background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;
+            color:var(--muted);font-family:var(--mono);font-size:10px;width:140px;outline:none"
+            oninput="setNotes(${globalIdx},this.value)"
+            onfocus="this.style.borderColor='rgba(91,192,190,0.4)'"
+            onblur="this.style.borderColor='var(--border)'">
+
+          <!-- Remove -->
+          <button onclick="removeCountry(${globalIdx})"
+            style="font-size:10px;padding:3px 8px;background:transparent;
+            border:1px solid var(--border);border-radius:3px;cursor:pointer;
+            color:var(--muted);transition:all 0.15s"
+            onmouseover="this.style.color='var(--red)';this.style.borderColor='rgba(248,81,73,0.3)'"
+            onmouseout="this.style.color='var(--muted)';this.style.borderColor='var(--border)'">
+            DEL
+          </button>
+        </div>`;
+    }).join('');
+  }
+
+  window.filterCountries = function(q) {
+    const statusFilter = document.getElementById('countryFilter')?.value || 'all';
+    let filtered = countryList;
+    if (statusFilter !== 'all') filtered = filtered.filter(c => c.status === statusFilter);
+    if (q) {
+      const ql = q.toLowerCase();
+      filtered = filtered.filter(c =>
+        c.name.toLowerCase().includes(ql) ||
+        c.id.toLowerCase().includes(ql) ||
+        (c.notes||'').toLowerCase().includes(ql)
+      );
+    }
+    renderCountries(filtered);
+  };
+
+  window.toggleStatus = function(idx, status) {
+    if (countryList[idx]) {
+      countryList[idx].status = status;
+      renderCountries(countryList);
+      renderCountryStats();
+    }
+  };
+  window.setEmoji = function(idx, emoji) {
+    if (countryList[idx]) {
+      countryList[idx].emoji = emoji;
+      renderCountries(countryList);
+    }
+  };
+  window.setNotes = function(idx, notes) {
+    if (countryList[idx]) countryList[idx].notes = notes;
+  };
+  window.removeCountry = function(idx) {
+    if (!confirm(`Remove ${countryList[idx]?.name}?`)) return;
+    countryList.splice(idx, 1);
+    renderCountries(countryList);
+    renderCountryStats();
+  };
+
+  window.addCountry = function() {
+    const name  = document.getElementById('cn-name').value.trim();
+    const id    = document.getElementById('cn-id').value.toUpperCase().trim();
+    const lat   = parseFloat(document.getElementById('cn-lat').value) || 0;
+    const lon   = parseFloat(document.getElementById('cn-lon').value) || 0;
+    const status= document.getElementById('cn-status').value;
+    const emoji = document.getElementById('cn-emoji').value.trim();
+    const notes = document.getElementById('cn-notes').value.trim();
+    if (!name || !id) { toast('Name and code are required','err'); return; }
+    if (countryList.find(c => c.id === id)) { toast(`${id} already in list`,'err'); return; }
+    countryList.push({ id, name, lat, lon, status, emoji, notes });
+    clearForm('country');
+    renderCountries(countryList);
+    renderCountryStats();
+    toast(`✓ ${name} added — hit Save to persist`,'ok');
+  };
+
+  window.saveCountries = async function() {
+    try {
+      await setDoc(doc(db,'config','countries'), {
+        visited:          countryList,
+        updated_at:       new Date().toISOString(),
+        updated_by:       currentUser.uid,
+        total:            countryList.length,
+        visited_count:    countryList.filter(c=>c.status==='visited').length,
+        transiting_count: countryList.filter(c=>c.status==='transiting').length,
+        wishlist_count:   countryList.filter(c=>c.status==='wishlist').length,
+      });
+      toast(`✓ ${countryList.length} countries saved to Firestore`,'ok');
+    } catch(e) { toast('✗ '+e.message,'err'); }
+  };
+
   window.loadFlightsTable = loadFlightsTable;
   window.loadCafesTable   = loadCafesTable;
   window.loadExpTable     = loadExpTable;
   window.loadTravelTable  = loadTravelTable;
   window.loadJournal      = loadJournal;
   window.loadUsers        = loadUsers;
+  window.loadCountries    = loadCountries;
 </script>
 </body>
 </html>
