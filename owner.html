@@ -1,0 +1,1262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Owner — Nomad Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #0d1117;
+      --bg2:     #161b22;
+      --bg3:     #1e2738;
+      --border:  rgba(255,255,255,0.07);
+      --teal:    #5bc0be;
+      --teal2:   rgba(91,192,190,0.12);
+      --muted:   rgba(230,237,243,0.45);
+      --text:    #e6edf3;
+      --gold:    #f59e0b;
+      --red:     #f85149;
+      --green:   #3fb950;
+      --mono:    'JetBrains Mono', monospace;
+      --serif:   'Lora', Georgia, serif;
+      --disp:    'Bebas Neue', sans-serif;
+      --sidebar: 220px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; overflow: hidden; }
+    body { font-family: var(--mono); background: var(--bg); color: var(--text); }
+
+    /* ── AUTH SCREEN ── */
+    #auth-screen {
+      position: fixed; inset: 0; z-index: 1000;
+      background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+      overflow: hidden;
+    }
+    #auth-screen.hidden { display: none; }
+
+    /* floating teal glow behind card */
+    .auth-glow {
+      position: absolute;
+      width: 500px; height: 500px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(91,192,190,0.06) 0%, transparent 70%);
+      pointer-events: none;
+      animation: glowDrift 8s ease-in-out infinite alternate;
+    }
+    @keyframes glowDrift {
+      from { transform: translate(-40px, -30px); }
+      to   { transform: translate(40px, 30px); }
+    }
+
+    /* stars */
+    .auth-star {
+      position: absolute; border-radius: 50%;
+      background: rgba(255,255,255,0.6);
+      animation: starFade linear infinite;
+      pointer-events: none;
+    }
+    @keyframes starFade {
+      0%,100% { opacity: 0; } 40%,60% { opacity: 1; }
+    }
+
+    /* card */
+    .auth-card {
+      position: relative; z-index: 1;
+      width: 360px;
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 44px 40px 36px;
+      display: flex; flex-direction: column; align-items: center;
+    }
+
+    /* teal top accent bar */
+    .auth-card::before {
+      content: '';
+      position: absolute; top: 0; left: 40px; right: 40px; height: 1px;
+      background: linear-gradient(to right, transparent, var(--teal), transparent);
+      border-radius: 1px;
+    }
+
+    .auth-icon {
+      width: 48px; height: 48px; border-radius: 12px;
+      background: rgba(91,192,190,0.1);
+      border: 1px solid rgba(91,192,190,0.2);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 24px;
+    }
+    .auth-icon svg { width: 22px; height: 22px; }
+
+    .auth-title {
+      font-family: var(--disp); font-size: 28px;
+      color: var(--text); letter-spacing: 2px;
+      margin-bottom: 6px; text-align: center;
+    }
+    .auth-sub {
+      font-size: 11px; letter-spacing: 1.5px;
+      color: var(--muted); margin-bottom: 32px;
+      text-align: center;
+    }
+    .auth-error {
+      width: 100%;
+      font-size: 11px; color: var(--red);
+      min-height: 16px; letter-spacing: 1px;
+      margin-bottom: 12px; text-align: center;
+    }
+    .btn-google {
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      width: 100%; padding: 13px 20px;
+      background: transparent;
+      border: 1px solid var(--border);
+      border-radius: 8px; color: var(--text);
+      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+      cursor: pointer;
+      transition: border-color 0.25s, background 0.25s;
+    }
+    .btn-google:hover {
+      border-color: rgba(91,192,190,0.5);
+      background: rgba(91,192,190,0.05);
+    }
+    .btn-google:disabled { opacity: 0.35; cursor: not-allowed; }
+    .btn-google svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+    .auth-back {
+      margin-top: 22px;
+      font-size: 10px; letter-spacing: 1.5px; color: var(--muted);
+    }
+    .auth-back a {
+      color: rgba(230,237,243,0.3); text-decoration: none;
+      transition: color 0.2s;
+    }
+    .auth-back a:hover { color: var(--teal); }
+
+        /* ── APP SHELL ── */
+    #app { display: none; height: 100vh; overflow: hidden; }
+    #app.visible { display: flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: var(--sidebar); flex-shrink: 0; height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .sidebar-header {
+      padding: 24px 20px 20px;
+      border-bottom: 1px solid var(--border);
+    }
+    .sidebar-logo {
+      font-family: var(--disp); font-size: 22px;
+      color: var(--teal); letter-spacing: 2px;
+    }
+    .sidebar-tagline {
+      font-size: 9px; letter-spacing: 2px; color: var(--muted); margin-top: 2px;
+    }
+    .sidebar-user {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .user-avatar {
+      width: 30px; height: 30px; border-radius: 50%;
+      background: var(--bg3); border: 1px solid var(--border);
+      overflow: hidden; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; color: var(--teal);
+    }
+    .user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .user-info { overflow: hidden; }
+    .user-name  { font-size: 11px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .user-role  { font-size: 9px; letter-spacing: 1.5px; color: var(--teal); margin-top: 1px; }
+
+    .sidebar-nav { flex: 1; overflow-y: auto; padding: 12px 0; }
+    .sidebar-nav::-webkit-scrollbar { display: none; }
+
+    .nav-section-label {
+      font-size: 9px; letter-spacing: 2px; color: var(--muted);
+      padding: 12px 20px 6px; text-transform: uppercase;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 20px; cursor: pointer;
+      font-size: 11px; letter-spacing: 1px; color: var(--muted);
+      transition: color 0.2s, background 0.2s;
+      border-left: 2px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover { color: var(--text); background: rgba(255,255,255,0.03); }
+    .nav-item.active { color: var(--teal); border-left-color: var(--teal); background: var(--teal2); }
+    .nav-item .nav-icon { width: 14px; height: 14px; flex-shrink: 0; opacity: 0.7; }
+    .nav-item.active .nav-icon { opacity: 1; }
+    .nav-item .nav-badge {
+      margin-left: auto; font-size: 9px; padding: 2px 6px; border-radius: 2px;
+      background: rgba(91,192,190,0.15); color: var(--teal); letter-spacing: 1px;
+    }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+    }
+    .btn-signout {
+      width: 100%; padding: 8px; background: transparent;
+      border: 1px solid var(--border); border-radius: 4px;
+      color: var(--muted); font-family: var(--mono); font-size: 10px;
+      letter-spacing: 1.5px; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-signout:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── MAIN CONTENT ── */
+    .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    .topbar {
+      height: 52px; flex-shrink: 0;
+      padding: 0 28px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      background: var(--bg);
+    }
+    .topbar-title {
+      font-family: var(--disp); font-size: 20px;
+      color: var(--text); letter-spacing: 2px;
+    }
+    .topbar-meta {
+      font-size: 10px; letter-spacing: 1px; color: var(--muted);
+    }
+    .topbar-meta span { color: var(--teal); }
+
+    .content-area {
+      flex: 1; overflow-y: auto; padding: 28px;
+      background: var(--bg);
+    }
+    .content-area::-webkit-scrollbar { width: 4px; }
+    .content-area::-webkit-scrollbar-thumb { background: rgba(91,192,190,0.2); border-radius: 2px; }
+
+    /* ── PANEL BASE ── */
+    .panel { display: none; }
+    .panel.active { display: block; }
+
+    .panel-header { margin-bottom: 28px; }
+    .panel-eyebrow { font-size: 10px; letter-spacing: 3px; color: var(--teal); margin-bottom: 8px; }
+    .panel-title { font-family: var(--disp); font-size: 40px; color: var(--text); line-height: 1; margin-bottom: 8px; }
+    .panel-sub { font-size: 12px; color: var(--muted); letter-spacing: 0.5px; }
+
+    /* ── STAT CARDS ── */
+    .stat-row { display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap; }
+    .stat-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 16px 20px; min-width: 140px; flex: 1;
+    }
+    .stat-card-num { font-family: var(--disp); font-size: 36px; color: var(--text); line-height: 1; }
+    .stat-card-num.teal { color: var(--teal); }
+    .stat-card-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 4px; }
+
+    /* ── FORM ELEMENTS ── */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px; }
+    .form-grid.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .form-grid.cols-1 { grid-template-columns: 1fr; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-label { font-size: 10px; letter-spacing: 2px; color: var(--muted); }
+    .form-input, .form-select, .form-textarea {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 9px 12px;
+      color: var(--text); font-family: var(--mono); font-size: 12px;
+      outline: none; transition: border-color 0.2s;
+      width: 100%;
+    }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      border-color: rgba(91,192,190,0.4);
+    }
+    .form-input::placeholder, .form-textarea::placeholder { color: var(--muted); }
+    .form-textarea { resize: vertical; min-height: 90px; line-height: 1.6; }
+    .form-select option { background: var(--bg2); }
+
+    /* ── BUTTONS ── */
+    .btn {
+      padding: 9px 20px; border-radius: 4px; cursor: pointer;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 1.5px;
+      transition: all 0.2s; border: none;
+    }
+    .btn-primary { background: var(--teal); color: var(--bg); }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost { background: transparent; border: 1px solid var(--border); color: var(--muted); }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+    .btn-danger { background: transparent; border: 1px solid rgba(248,81,73,0.3); color: var(--red); }
+    .btn-danger:hover { background: rgba(248,81,73,0.08); }
+    .btn-row { display: flex; gap: 10px; margin-top: 20px; }
+
+    /* ── TABLE ── */
+    .data-table-wrap { overflow-x: auto; border-radius: 10px; border: 1px solid var(--border); margin-bottom: 28px; }
+    table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    thead th { background: var(--bg2); color: var(--muted); font-size: 10px; letter-spacing: 2px; padding: 12px 16px; text-align: left; font-weight: 400; border-bottom: 1px solid var(--border); }
+    tbody tr { border-bottom: 1px solid var(--border); transition: background 0.2s; }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(91,192,190,0.04); }
+    tbody td { padding: 11px 16px; color: var(--text); vertical-align: middle; }
+    td.mono { font-family: var(--mono); font-size: 11px; }
+    td.muted { color: var(--muted); font-size: 11px; }
+    td.teal  { color: var(--teal); }
+    .tbl-actions { display: flex; gap: 8px; }
+    .tbl-btn {
+      font-size: 10px; padding: 3px 10px; border-radius: 3px;
+      cursor: pointer; font-family: var(--mono); letter-spacing: 1px;
+      border: 1px solid var(--border); background: transparent; color: var(--muted);
+      transition: all 0.15s;
+    }
+    .tbl-btn:hover { border-color: var(--teal); color: var(--teal); }
+    .tbl-btn.del:hover { border-color: var(--red); color: var(--red); }
+
+    /* ── CARD SECTION ── */
+    .section-card {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 22px 24px; margin-bottom: 20px;
+    }
+    .section-card-title {
+      font-size: 11px; letter-spacing: 2px; color: var(--teal);
+      margin-bottom: 18px; padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; bottom: 28px; right: 28px; z-index: 9999;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 12px 20px;
+      font-size: 12px; letter-spacing: 1px; color: var(--text);
+      opacity: 0; transform: translateY(8px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok  { border-color: rgba(63,185,80,0.4); color: var(--green); }
+    #toast.err { border-color: rgba(248,81,73,0.4); color: var(--red); }
+
+    /* ── ROLE BADGE ── */
+    .role-badge {
+      display: inline-block; font-size: 9px; letter-spacing: 1.5px;
+      padding: 3px 8px; border-radius: 3px;
+    }
+    .role-super { background: rgba(91,192,190,0.15); color: var(--teal); }
+    .role-editor { background: rgba(245,158,11,0.12); color: var(--gold); }
+    .role-viewer { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    /* ── JOURNAL ── */
+    .journal-entries { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
+    .journal-entry {
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 18px 20px; cursor: pointer;
+      transition: border-color 0.2s;
+    }
+    .journal-entry:hover { border-color: rgba(91,192,190,0.25); }
+    .journal-entry-date { font-size: 10px; letter-spacing: 2px; color: var(--teal); margin-bottom: 6px; }
+    .journal-entry-title { font-family: var(--serif); font-size: 15px; color: var(--text); font-weight: 600; margin-bottom: 4px; }
+    .journal-entry-preview { font-size: 12px; color: var(--muted); line-height: 1.6; }
+
+    /* ── LOADING ── */
+    .loading-row { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 11px; padding: 20px 0; }
+    .loading-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--teal); animation: ldot 1.2s ease-in-out infinite; }
+    .loading-dot:nth-child(2) { animation-delay: 0.2s; }
+    .loading-dot:nth-child(3) { animation-delay: 0.4s; }
+    @keyframes ldot { 0%,100%{opacity:0.3;transform:scale(0.8)} 50%{opacity:1;transform:scale(1)} }
+
+    /* ── EMPTY STATE ── */
+    .empty-state { text-align: center; padding: 48px 20px; color: var(--muted); }
+    .empty-state-icon { font-size: 32px; margin-bottom: 12px; opacity: 0.4; }
+    .empty-state-text { font-size: 12px; letter-spacing: 1px; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .sidebar { width: 56px; }
+      .sidebar-header, .sidebar-user, .nav-section-label, .sidebar-footer { padding: 12px 16px; }
+      .sidebar-logo, .sidebar-tagline, .user-info, .nav-item span, .nav-badge { display: none; }
+      .nav-item { padding: 12px; justify-content: center; }
+      .nav-item .nav-icon { width: 18px; height: 18px; }
+      .form-grid, .form-grid.cols-3 { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── AUTH SCREEN ── -->
+<div id="auth-screen">
+  <div class="auth-glow"></div>
+  <div id="authStars"></div>
+
+  <div class="auth-card">
+    <!-- lock icon -->
+    <div class="auth-icon">
+      <svg viewBox="0 0 22 22" fill="none">
+        <rect x="4" y="10" width="14" height="10" rx="3" stroke="#5bc0be" stroke-width="1.4"/>
+        <path d="M7 10V7a4 4 0 018 0v3" stroke="#5bc0be" stroke-width="1.4" stroke-linecap="round"/>
+        <circle cx="11" cy="15" r="1.5" fill="#5bc0be"/>
+      </svg>
+    </div>
+
+    <div class="auth-title">OWNER DASHBOARD</div>
+    <div class="auth-sub">// RESTRICTED ACCESS · AUTHORISED ONLY</div>
+
+    <div class="auth-error" id="auth-error"></div>
+
+    <button class="btn-google" id="googleBtn" onclick="signIn()">
+      <svg viewBox="0 0 18 18" fill="none">
+        <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+        <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
+        <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+        <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+      </svg>
+      SIGN IN WITH GOOGLE
+    </button>
+
+    <div class="auth-back"><a href="home.html">← back to portfolio</a></div>
+  </div>
+</div>
+
+<!-- ── APP SHELL ── -->
+<div id="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">NOMAD</div>
+      <div class="sidebar-tagline">// OWNER DASHBOARD</div>
+    </div>
+
+    <div class="sidebar-user">
+      <div class="user-avatar" id="userAvatar">AR</div>
+      <div class="user-info">
+        <div class="user-name" id="userName">Loading…</div>
+        <div class="user-role" id="userRole">—</div>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Overview</div>
+      <div class="nav-item active" onclick="showPanel('home')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><path d="M1 6l6-5 6 5v7H9V9H5v4H1V6z" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"/></svg>
+        <span>Dashboard</span>
+      </div>
+
+      <div class="nav-section-label">Content</div>
+      <div class="nav-item" onclick="showPanel('flights')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><path d="M2 9l2-2 3 1 5-5M9 3h2v2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span>Flights</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('cafes')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><path d="M2 5h8v5a2 2 0 01-2 2H4a2 2 0 01-2-2V5zM10 6h1a1 1 0 010 2h-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Cafes</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('experiences')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Experiences</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('content')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><path d="M2 3h10M2 6h7M2 9h5M9 8l3 3-1 1-3-3v-1h1z" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Page content</span>
+      </div>
+      <div class="nav-item" onclick="showPanel('travel')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="6" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 1C4.8 1 3 2.8 3 5c0 3 4 8 4 8s4-5 4-8c0-2.2-1.8-4-4-4z" stroke="currentColor" stroke-width="1.2"/></svg>
+        <span>Travel plans</span>
+      </div>
+
+      <div class="nav-section-label" id="privateSection">Private</div>
+      <div class="nav-item" id="journalNav" onclick="showPanel('journal')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><rect x="2" y="1" width="10" height="12" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M5 4h4M5 7h4M5 10h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Journal</span>
+        <span class="nav-badge">PRIVATE</span>
+      </div>
+      <div class="nav-item" id="usersNav" onclick="showPanel('users')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="5" cy="4" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.2 1.8-4 4-4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><circle cx="10" cy="6" r="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 11c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Users</span>
+      </div>
+    </nav>
+
+    <div class="sidebar-footer">
+      <button class="btn-signout" onclick="signOut()">SIGN OUT</button>
+    </div>
+  </aside>
+
+  <!-- Main area -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-title" id="topbarTitle">DASHBOARD</div>
+      <div class="topbar-meta">nomad-404 · <span id="topbarTime"></span></div>
+    </div>
+
+    <div class="content-area">
+
+      <!-- ── HOME PANEL ── -->
+      <div class="panel active" id="panel-home">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// OVERVIEW</div>
+          <div class="panel-title">WELCOME BACK.</div>
+          <div class="panel-sub" id="welcomeSub">Loading your data…</div>
+        </div>
+        <div class="stat-row" id="homeStats">
+          <div class="stat-card"><div class="stat-card-num teal" id="stat-flights">—</div><div class="stat-card-label">FLIGHTS LOGGED</div></div>
+          <div class="stat-card"><div class="stat-card-num teal" id="stat-cafes">—</div><div class="stat-card-label">CAFES LOGGED</div></div>
+          <div class="stat-card"><div class="stat-card-num teal" id="stat-exp">—</div><div class="stat-card-label">EXPERIENCES</div></div>
+          <div class="stat-card"><div class="stat-card-num teal" id="stat-journal">—</div><div class="stat-card-label">JOURNAL ENTRIES</div></div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// QUICK ACTIONS</div>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-ghost" onclick="showPanel('flights')">+ ADD FLIGHT</button>
+            <button class="btn btn-ghost" onclick="showPanel('cafes')">+ ADD CAFE</button>
+            <button class="btn btn-ghost" onclick="showPanel('journal')">+ JOURNAL ENTRY</button>
+            <button class="btn btn-ghost" onclick="showPanel('travel')">+ PLAN A TRIP</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── FLIGHTS PANEL ── -->
+      <div class="panel" id="panel-flights">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// CONTENT MANAGEMENT</div>
+          <div class="panel-title">FLIGHTS.</div>
+          <div class="panel-sub">Log and manage every flight in your inventory.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// ADD NEW FLIGHT</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">FROM (IATA)</label><input class="form-input" id="f-from" placeholder="DEL" maxlength="3" style="text-transform:uppercase"></div>
+            <div class="form-group"><label class="form-label">TO (IATA)</label><input class="form-input" id="f-to" placeholder="DXB" maxlength="3" style="text-transform:uppercase"></div>
+            <div class="form-group"><label class="form-label">AIRLINE</label><input class="form-input" id="f-airline" placeholder="Emirates"></div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">FROM CITY</label><input class="form-input" id="f-fromCity" placeholder="New Delhi"></div>
+            <div class="form-group"><label class="form-label">TO CITY</label><input class="form-input" id="f-toCity" placeholder="Dubai"></div>
+            <div class="form-group"><label class="form-label">DATE (YYYY-MM)</label><input class="form-input" id="f-date" placeholder="2024-03"></div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">MILES</label><input class="form-input" id="f-miles" placeholder="1200" type="number"></div>
+            <div class="form-group"><label class="form-label">FROM LAT, LON</label><input class="form-input" id="f-fromCoords" placeholder="28.5562, 77.1000"></div>
+            <div class="form-group"><label class="form-label">TO LAT, LON</label><input class="form-input" id="f-toCoords" placeholder="25.2532, 55.3657"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">NOTES</label><input class="form-input" id="f-notes" placeholder="Window seat, chai from home…"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addFlight()">SAVE FLIGHT</button>
+            <button class="btn btn-ghost" onclick="clearForm('flight')">CLEAR</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// FLIGHT LOG</div>
+          <div id="flightsTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading flights…</span></div></div>
+        </div>
+      </div>
+
+      <!-- ── CAFES PANEL ── -->
+      <div class="panel" id="panel-cafes">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// CONTENT MANAGEMENT</div>
+          <div class="panel-title">CAFES.</div>
+          <div class="panel-sub">Every cafe that left an impression.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// ADD NEW CAFE</div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">CAFE NAME</label><input class="form-input" id="c-name" placeholder="Onibus Coffee"></div>
+            <div class="form-group"><label class="form-label">TYPE</label><input class="form-input" id="c-type" placeholder="Specialty Coffee"></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">CITY</label><input class="form-input" id="c-city" placeholder="Tokyo"></div>
+            <div class="form-group"><label class="form-label">COUNTRY</label><input class="form-input" id="c-country" placeholder="Japan"></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">ORDERED</label><input class="form-input" id="c-ordered" placeholder="Single origin pour-over, no milk"></div>
+            <div class="form-group"><label class="form-label">RATING (1–5 stars)</label>
+              <select class="form-select" id="c-rating">
+                <option>★★★★★</option><option>★★★★☆</option><option>★★★☆☆</option><option>★★☆☆☆</option><option>★☆☆☆☆</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">THE VIBE</label><textarea class="form-textarea" id="c-vibe" placeholder="Minimalist timber interior, jazz at the right volume…"></textarea></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">THE FULL STORY</label><textarea class="form-textarea" id="c-story" placeholder="Write your story here…" style="min-height:120px"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addCafe()">SAVE CAFE</button>
+            <button class="btn btn-ghost" onclick="clearForm('cafe')">CLEAR</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// CAFE LOG</div>
+          <div id="cafesTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading cafes…</span></div></div>
+        </div>
+      </div>
+
+      <!-- ── EXPERIENCES PANEL ── -->
+      <div class="panel" id="panel-experiences">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// CONTENT MANAGEMENT</div>
+          <div class="panel-title">EXPERIENCES.</div>
+          <div class="panel-sub">Adventures, people, moments — all three tabs.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// ADD EXPERIENCE</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">TAB</label>
+              <select class="form-select" id="e-tab">
+                <option value="adventures">Adventures</option>
+                <option value="people">People</option>
+                <option value="moments">Moments</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">LOCATION</label><input class="form-input" id="e-loc" placeholder="DUBAI, UAE"></div>
+            <div class="form-group"><label class="form-label">FILM LABEL (short)</label><input class="form-input" id="e-label" placeholder="SKYDIVE" maxlength="12"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">TITLE</label><input class="form-input" id="e-title" placeholder="Jump out of a plane — twice."></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">STORY (HTML ok: &lt;p&gt;text&lt;/p&gt;)</label><textarea class="form-textarea" id="e-story" style="min-height:140px" placeholder="<p>Your story here…</p>"></textarea></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">IMAGE PATH (e.g. images/skydive.jpeg)</label><input class="form-input" id="e-img" placeholder="images/skydive.jpeg"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addExperience()">SAVE EXPERIENCE</button>
+            <button class="btn btn-ghost" onclick="clearForm('experience')">CLEAR</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// EXPERIENCE LOG</div>
+          <div id="expTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div></div>
+        </div>
+      </div>
+
+      <!-- ── CONTENT PANEL ── -->
+      <div class="panel" id="panel-content">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// LIVE EDITING</div>
+          <div class="panel-title">PAGE CONTENT.</div>
+          <div class="panel-sub">Edit the copy that appears on your public pages. Changes go live immediately.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// PROFILE PAGE — HERO</div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">HERO HEADLINE</label><textarea class="form-textarea" id="ct-heroHeadline" placeholder="I SAW THE PROBLEM. I BUILT THE SYSTEM. I MOVED THE MARKET."></textarea></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">HERO SUB</label><textarea class="form-textarea" id="ct-heroSub" placeholder="Started from zero…"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveContent('heroHeadline'); saveContent('heroSub')">SAVE HERO</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// NOMAD PAGE — ORIGIN QUOTE</div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">QUOTE TEXT</label><textarea class="form-textarea" id="ct-originQuote" style="min-height:100px" placeholder="Growing up, a household income of ₹1,200 a month…"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveContent('originQuote')">SAVE QUOTE</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── TRAVEL PLANS PANEL ── -->
+      <div class="panel" id="panel-travel">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// PLANNING</div>
+          <div class="panel-title">TRAVEL PLANS.</div>
+          <div class="panel-sub">Upcoming trips, wishlist countries, itinerary notes.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// ADD TRIP PLAN</div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">DESTINATION</label><input class="form-input" id="tp-dest" placeholder="Patagonia, Chile"></div>
+            <div class="form-group"><label class="form-label">STATUS</label>
+              <select class="form-select" id="tp-status">
+                <option value="wishlist">Wishlist</option>
+                <option value="planning">Planning</option>
+                <option value="booked">Booked</option>
+                <option value="done">Done</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">TARGET DATE</label><input class="form-input" id="tp-date" placeholder="2025-Q1"></div>
+            <div class="form-group"><label class="form-label">TRAVEL COMPANIONS</label><input class="form-input" id="tp-with" placeholder="Solo / With friends…"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">NOTES & ITINERARY</label><textarea class="form-textarea" id="tp-notes" style="min-height:100px" placeholder="Key things to do, where to stay, must-eat spots…"></textarea></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addTravelPlan()">SAVE PLAN</button>
+            <button class="btn btn-ghost" onclick="clearForm('travel')">CLEAR</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// TRIP LIST</div>
+          <div id="travelTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading plans…</span></div></div>
+        </div>
+      </div>
+
+      <!-- ── JOURNAL PANEL ── -->
+      <div class="panel" id="panel-journal">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// PRIVATE · SUPER-ADMIN ONLY</div>
+          <div class="panel-title">JOURNAL.</div>
+          <div class="panel-sub">Your private notes. Never exposed to editors or the public.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// NEW ENTRY</div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">TITLE</label><input class="form-input" id="j-title" placeholder="What's on your mind…"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">ENTRY</label><textarea class="form-textarea" id="j-body" style="min-height:180px" placeholder="Write freely…"></textarea></div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group"><label class="form-label">MOOD</label>
+              <select class="form-select" id="j-mood">
+                <option>✦ Reflective</option><option>⚡ Energised</option><option>✈ Wandering</option>
+                <option>⏸ Still</option><option>◎ Focused</option><option>☁ Uncertain</option>
+              </select>
+            </div>
+            <div class="form-group"><label class="form-label">LOCATION</label><input class="form-input" id="j-loc" placeholder="Somewhere on earth…"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addJournalEntry()">SAVE ENTRY</button>
+            <button class="btn btn-ghost" onclick="clearForm('journal')">CLEAR</button>
+          </div>
+        </div>
+        <div class="journal-entries" id="journalEntries">
+          <div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading journal…</span></div>
+        </div>
+      </div>
+
+      <!-- ── USERS PANEL ── -->
+      <div class="panel" id="panel-users">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// SUPER-ADMIN ONLY</div>
+          <div class="panel-title">USER MANAGEMENT.</div>
+          <div class="panel-sub">Add and manage who has access to this dashboard.</div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// ADD NEW USER</div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">DISPLAY NAME</label><input class="form-input" id="u-name" placeholder="Friend Name"></div>
+            <div class="form-group"><label class="form-label">GMAIL ADDRESS</label><input class="form-input" id="u-email" placeholder="friend@gmail.com" type="email"></div>
+            <div class="form-group"><label class="form-label">ROLE</label>
+              <select class="form-select" id="u-role">
+                <option value="editor">Editor</option>
+                <option value="viewer">Viewer</option>
+              </select>
+            </div>
+          </div>
+          <div style="font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7">
+            The user must sign in at least once via Google before you can add them here — their UID is created on first sign-in attempt. 
+            After they attempt access, their UID will appear in Firebase Auth console. Paste it below.
+          </div>
+          <div class="form-grid cols-1" style="margin-top:14px">
+            <div class="form-group"><label class="form-label">FIREBASE UID (from Auth console after first sign-in attempt)</label><input class="form-input" id="u-uid" placeholder="paste UID here"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="addUser()">ADD USER</button>
+          </div>
+        </div>
+        <div class="section-card">
+          <div class="section-card-title">// CURRENT USERS</div>
+          <div id="usersTable"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading users…</span></div></div>
+        </div>
+      </div>
+
+    </div><!-- end content-area -->
+  </div><!-- end main -->
+</div><!-- end app -->
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script type="module">
+  import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, GoogleAuthProvider }
+                              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, getDoc, setDoc, addDoc, deleteDoc,
+           collection, getDocs, query, orderBy, serverTimestamp }
+                              from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  // ── CONFIG ────────────────────────────────────────────────────
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+    authDomain:        "nomad-404.firebaseapp.com",
+    projectId:         "nomad-404",
+    storageBucket:     "nomad-404.firebasestorage.app",
+    messagingSenderId: "638331724572",
+    appId:             "1:638331724572:web:baa0d70108e920099150d9"
+  };
+
+  const app      = initializeApp(firebaseConfig);
+  const auth     = getAuth(app);
+  const db       = getFirestore(app);
+  const provider = new GoogleAuthProvider();
+
+  // ── STATE ─────────────────────────────────────────────────────
+  let currentUser = null;
+  let currentRole = null;
+
+  // ── CLOCK ─────────────────────────────────────────────────────
+  setInterval(() => {
+    const el = document.getElementById('topbarTime');
+    if (el) el.textContent = new Date().toLocaleTimeString();
+  }, 1000);
+
+  // ── AUTH STATE ────────────────────────────────────────────────
+  onAuthStateChanged(auth, async user => {
+    if (!user) { showAuth(); return; }
+
+    // Check admins collection
+    const adminDoc = await getDoc(doc(db, 'admins', user.uid)).catch(() => null);
+    if (!adminDoc || !adminDoc.exists()) {
+      document.getElementById('auth-error').textContent =
+        '✗ Access denied — your account is not in the admin list.';
+      document.getElementById('googleBtn').disabled = false;
+      document.getElementById('googleBtn').textContent = 'TRY A DIFFERENT ACCOUNT';
+      await fbSignOut(auth);
+      return;
+    }
+
+    currentUser = user;
+    currentRole = adminDoc.data().role;
+    showApp(adminDoc.data());
+  });
+
+  function showAuth() {
+    document.getElementById('auth-screen').classList.remove('hidden');
+    document.getElementById('app').classList.remove('visible');
+  }
+
+  function showApp(adminData) {
+    document.getElementById('auth-screen').classList.add('hidden');
+    document.getElementById('app').classList.add('visible');
+
+    // User info in sidebar
+    document.getElementById('userName').textContent  = adminData.name || currentUser.displayName || 'User';
+    document.getElementById('userRole').textContent  = adminData.role.toUpperCase();
+    const avatar = document.getElementById('userAvatar');
+    if (currentUser.photoURL) avatar.innerHTML = `<img src="${currentUser.photoURL}" alt="">`;
+    else avatar.textContent = (adminData.name||'U')[0].toUpperCase();
+
+    // Hide super-admin-only nav items if not super-admin
+    if (currentRole !== 'super-admin') {
+      document.getElementById('journalNav').style.display   = 'none';
+      document.getElementById('usersNav').style.display     = 'none';
+      document.getElementById('privateSection').style.display = 'none';
+    }
+
+    document.getElementById('welcomeSub').textContent =
+      `Signed in as ${currentUser.email} · Role: ${currentRole}`;
+
+    loadAllCounts();
+  }
+
+  // ── SIGN IN / OUT ─────────────────────────────────────────────
+  window.signIn = async function() {
+    const btn = document.getElementById('googleBtn');
+    btn.disabled = true;
+    document.getElementById('auth-error').textContent = '';
+    try {
+      await signInWithPopup(auth, provider);
+    } catch (e) {
+      document.getElementById('auth-error').textContent = `✗ ${e.message}`;
+      btn.disabled = false;
+    }
+  };
+
+  window.signOut = async function() {
+    await fbSignOut(auth);
+    currentUser = null; currentRole = null;
+    showAuth();
+  };
+
+  // ── PANEL NAVIGATION ──────────────────────────────────────────
+  window.showPanel = function(name) {
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    document.getElementById('panel-' + name).classList.add('active');
+    document.querySelectorAll(`.nav-item[onclick="showPanel('${name}')"]`)
+      .forEach(n => n.classList.add('active'));
+    const titles = {
+      home:'DASHBOARD', flights:'FLIGHTS', cafes:'CAFES',
+      experiences:'EXPERIENCES', content:'PAGE CONTENT',
+      travel:'TRAVEL PLANS', journal:'JOURNAL', users:'USERS'
+    };
+    document.getElementById('topbarTitle').textContent = titles[name] || name.toUpperCase();
+
+    // Lazy-load data when panel first opens
+    if (name === 'flights')     loadFlightsTable();
+    if (name === 'cafes')       loadCafesTable();
+    if (name === 'experiences') loadExpTable();
+    if (name === 'travel')      loadTravelTable();
+    if (name === 'journal')     loadJournal();
+    if (name === 'users')       loadUsers();
+    if (name === 'content')     loadContent();
+  };
+
+  // ── TOAST ─────────────────────────────────────────────────────
+  window.toast = function(msg, type = 'ok') {
+    const t = document.getElementById('toast');
+    t.textContent = msg; t.className = 'show ' + type;
+    setTimeout(() => t.className = '', 3000);
+  };
+
+  // ── COUNTS FOR HOME ───────────────────────────────────────────
+  async function loadAllCounts() {
+    const cols = ['flights','cafes','experiences'];
+    if (currentRole === 'super-admin') cols.push('journal');
+    for (const c of cols) {
+      try {
+        const snap = await getDocs(collection(db, c));
+        const el = document.getElementById('stat-' + (c === 'experiences' ? 'exp' : c));
+        if (el) el.textContent = snap.size;
+      } catch(_) {}
+    }
+  }
+
+  // ── CLEAR FORMS ───────────────────────────────────────────────
+  window.clearForm = function(type) {
+    const maps = {
+      flight:     ['f-from','f-to','f-airline','f-fromCity','f-toCity','f-date','f-miles','f-fromCoords','f-toCoords','f-notes'],
+      cafe:       ['c-name','c-type','c-city','c-country','c-ordered','c-vibe','c-story'],
+      experience: ['e-loc','e-label','e-title','e-story','e-img'],
+      travel:     ['tp-dest','tp-date','tp-with','tp-notes'],
+      journal:    ['j-title','j-body','j-loc']
+    };
+    (maps[type]||[]).forEach(id => {
+      const el = document.getElementById(id);
+      if (el) el.value = '';
+    });
+  };
+
+  // ── FLIGHTS ───────────────────────────────────────────────────
+  window.addFlight = async function() {
+    const fromCoords = (document.getElementById('f-fromCoords').value||'').split(',').map(s=>parseFloat(s.trim()));
+    const toCoords   = (document.getElementById('f-toCoords').value||'').split(',').map(s=>parseFloat(s.trim()));
+    const data = {
+      from:      (document.getElementById('f-from').value||'').toUpperCase().trim(),
+      to:        (document.getElementById('f-to').value||'').toUpperCase().trim(),
+      airline:   document.getElementById('f-airline').value.trim(),
+      from_city: document.getElementById('f-fromCity').value.trim(),
+      to_city:   document.getElementById('f-toCity').value.trim(),
+      date:      document.getElementById('f-date').value.trim(),
+      miles:     parseInt(document.getElementById('f-miles').value)||0,
+      from_lat:  fromCoords[0]||0, from_lon: fromCoords[1]||0,
+      to_lat:    toCoords[0]||0,   to_lon:   toCoords[1]||0,
+      notes:     document.getElementById('f-notes').value.trim(),
+      addedAt:   serverTimestamp(), addedBy: currentUser.uid
+    };
+    if (!data.from || !data.to) { toast('FROM and TO are required', 'err'); return; }
+    try {
+      await addDoc(collection(db, 'flights'), data);
+      toast('✓ Flight saved', 'ok');
+      clearForm('flight');
+      loadFlightsTable();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  async function loadFlightsTable() {
+    const el = document.getElementById('flightsTable');
+    try {
+      const snap = await getDocs(query(collection(db,'flights'), orderBy('date','desc')));
+      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No flights logged yet</div></div>'; return; }
+      let html = `<div class="data-table-wrap"><table><thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>MILES</th><th>NOTES</th><th></th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const f = d.data();
+        html += `<tr>
+          <td class="mono">${f.from} → ${f.to}<br><span style="color:var(--muted);font-size:10px">${f.from_city||''} → ${f.to_city||''}</span></td>
+          <td class="muted">${f.airline||'—'}</td>
+          <td class="muted">${f.date||'—'}</td>
+          <td class="teal">${(f.miles||0).toLocaleString()}</td>
+          <td class="muted" style="font-style:italic;max-width:180px">${f.notes||'—'}</td>
+          <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('flights','${d.id}','flightsTable', loadFlightsTable)">DEL</button></div></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── CAFES ─────────────────────────────────────────────────────
+  window.addCafe = async function() {
+    const data = {
+      name:    document.getElementById('c-name').value.trim(),
+      type:    document.getElementById('c-type').value.trim(),
+      city:    document.getElementById('c-city').value.trim(),
+      country: document.getElementById('c-country').value.trim(),
+      ordered: document.getElementById('c-ordered').value.trim(),
+      rating:  document.getElementById('c-rating').value,
+      vibe:    document.getElementById('c-vibe').value.trim(),
+      story:   document.getElementById('c-story').value.trim(),
+      img:     null,
+      addedAt: serverTimestamp(), addedBy: currentUser.uid
+    };
+    if (!data.name) { toast('Cafe name is required', 'err'); return; }
+    try {
+      await addDoc(collection(db,'cafes'), data);
+      toast('✓ Cafe saved', 'ok');
+      clearForm('cafe');
+      loadCafesTable();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  async function loadCafesTable() {
+    const el = document.getElementById('cafesTable');
+    try {
+      const snap = await getDocs(collection(db,'cafes'));
+      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No cafes logged yet</div></div>'; return; }
+      let html = `<div class="data-table-wrap"><table><thead><tr><th>NAME</th><th>CITY</th><th>TYPE</th><th>RATING</th><th></th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const c = d.data();
+        html += `<tr>
+          <td>${c.name}</td><td class="muted">${c.city}, ${c.country}</td>
+          <td class="muted">${c.type||'—'}</td><td>${c.rating||'—'}</td>
+          <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('cafes','${d.id}','cafesTable', loadCafesTable)">DEL</button></div></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── EXPERIENCES ───────────────────────────────────────────────
+  window.addExperience = async function() {
+    const data = {
+      tab:   document.getElementById('e-tab').value,
+      loc:   document.getElementById('e-loc').value.trim(),
+      label: document.getElementById('e-label').value.trim().toUpperCase(),
+      title: document.getElementById('e-title').value.trim(),
+      story: document.getElementById('e-story').value.trim(),
+      img:   document.getElementById('e-img').value.trim() || null,
+      addedAt: serverTimestamp(), addedBy: currentUser.uid
+    };
+    if (!data.title) { toast('Title is required', 'err'); return; }
+    try {
+      await addDoc(collection(db,'experiences'), data);
+      toast('✓ Experience saved', 'ok');
+      clearForm('experience');
+      loadExpTable();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  async function loadExpTable() {
+    const el = document.getElementById('expTable');
+    try {
+      const snap = await getDocs(collection(db,'experiences'));
+      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No experiences logged yet</div></div>'; return; }
+      let html = `<div class="data-table-wrap"><table><thead><tr><th>TAB</th><th>TITLE</th><th>LOCATION</th><th></th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const e = d.data();
+        html += `<tr>
+          <td class="mono" style="text-transform:uppercase">${e.tab}</td>
+          <td>${e.title}</td><td class="muted">${e.loc||'—'}</td>
+          <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('experiences','${d.id}','expTable', loadExpTable)">DEL</button></div></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── TRAVEL PLANS ──────────────────────────────────────────────
+  window.addTravelPlan = async function() {
+    const data = {
+      destination: document.getElementById('tp-dest').value.trim(),
+      status:      document.getElementById('tp-status').value,
+      date:        document.getElementById('tp-date').value.trim(),
+      with:        document.getElementById('tp-with').value.trim(),
+      notes:       document.getElementById('tp-notes').value.trim(),
+      addedAt: serverTimestamp(), addedBy: currentUser.uid
+    };
+    if (!data.destination) { toast('Destination is required', 'err'); return; }
+    try {
+      await addDoc(collection(db,'travel_plans'), data);
+      toast('✓ Plan saved', 'ok');
+      clearForm('travel');
+      loadTravelTable();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  const STATUS_COLORS = { wishlist:'var(--muted)', planning:'var(--gold)', booked:'var(--teal)', done:'var(--green)' };
+
+  async function loadTravelTable() {
+    const el = document.getElementById('travelTable');
+    try {
+      const snap = await getDocs(collection(db,'travel_plans'));
+      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No trips planned yet</div></div>'; return; }
+      let html = `<div class="data-table-wrap"><table><thead><tr><th>DESTINATION</th><th>STATUS</th><th>DATE</th><th>WITH</th><th></th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const t = d.data();
+        const col = STATUS_COLORS[t.status] || 'var(--muted)';
+        html += `<tr>
+          <td>${t.destination}</td>
+          <td><span style="color:${col};font-size:10px;letter-spacing:1px">${(t.status||'').toUpperCase()}</span></td>
+          <td class="muted">${t.date||'—'}</td>
+          <td class="muted">${t.with||'—'}</td>
+          <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('travel_plans','${d.id}','travelTable', loadTravelTable)">DEL</button></div></td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── JOURNAL ───────────────────────────────────────────────────
+  window.addJournalEntry = async function() {
+    if (currentRole !== 'super-admin') { toast('✗ Journal is private', 'err'); return; }
+    const data = {
+      title:   document.getElementById('j-title').value.trim(),
+      body:    document.getElementById('j-body').value.trim(),
+      mood:    document.getElementById('j-mood').value,
+      loc:     document.getElementById('j-loc').value.trim(),
+      date:    new Date().toISOString(),
+      addedAt: serverTimestamp()
+    };
+    if (!data.title) { toast('Title is required', 'err'); return; }
+    try {
+      await addDoc(collection(db,'journal'), data);
+      toast('✓ Entry saved', 'ok');
+      clearForm('journal');
+      loadJournal();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  async function loadJournal() {
+    if (currentRole !== 'super-admin') return;
+    const el = document.getElementById('journalEntries');
+    try {
+      const snap = await getDocs(query(collection(db,'journal'), orderBy('addedAt','desc')));
+      if (snap.empty) { el.innerHTML = '<div class="empty-state"><div class="empty-state-text">No entries yet — write something</div></div>'; return; }
+      el.innerHTML = '';
+      snap.forEach(d => {
+        const j = d.data();
+        const dateStr = j.date ? new Date(j.date).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+        const div = document.createElement('div');
+        div.className = 'journal-entry';
+        div.innerHTML = `
+          <div class="journal-entry-date">${dateStr} · ${j.mood||''} ${j.loc ? '· '+j.loc : ''}</div>
+          <div class="journal-entry-title">${j.title}</div>
+          <div class="journal-entry-preview">${(j.body||'').substring(0,120)}${j.body&&j.body.length>120?'…':''}</div>
+          <div style="margin-top:10px"><button class="tbl-btn del" onclick="deleteEntry('journal','${d.id}','journalEntries', loadJournal)">DELETE</button></div>`;
+        el.appendChild(div);
+      });
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── CONTENT ───────────────────────────────────────────────────
+  async function loadContent() {
+    const fields = ['heroHeadline','heroSub','originQuote'];
+    for (const f of fields) {
+      try {
+        const d = await getDoc(doc(db,'content',f));
+        if (d.exists()) {
+          const el = document.getElementById('ct-'+f);
+          if (el) el.value = d.data().value || '';
+        }
+      } catch(_) {}
+    }
+  }
+
+  window.saveContent = async function(field) {
+    const el = document.getElementById('ct-'+field);
+    if (!el) return;
+    try {
+      await setDoc(doc(db,'content',field), { value: el.value.trim(), updatedAt: serverTimestamp(), updatedBy: currentUser.uid });
+      toast(`✓ ${field} saved`, 'ok');
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  // ── USERS ─────────────────────────────────────────────────────
+  window.addUser = async function() {
+    if (currentRole !== 'super-admin') { toast('✗ Super-admin only', 'err'); return; }
+    const uid   = document.getElementById('u-uid').value.trim();
+    const name  = document.getElementById('u-name').value.trim();
+    const email = document.getElementById('u-email').value.trim();
+    const role  = document.getElementById('u-role').value;
+    if (!uid || !email) { toast('UID and email are required', 'err'); return; }
+    try {
+      await setDoc(doc(db,'admins',uid), {
+        email, name, role,
+        addedAt: new Date().toISOString(),
+        addedBy: currentUser.uid,
+        photoURL: null
+      });
+      toast(`✓ ${name||email} added as ${role}`, 'ok');
+      document.getElementById('u-uid').value = '';
+      document.getElementById('u-name').value = '';
+      document.getElementById('u-email').value = '';
+      loadUsers();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  async function loadUsers() {
+    if (currentRole !== 'super-admin') return;
+    const el = document.getElementById('usersTable');
+    try {
+      const snap = await getDocs(collection(db,'admins'));
+      let html = `<div class="data-table-wrap"><table><thead><tr><th>NAME</th><th>EMAIL</th><th>ROLE</th><th>ADDED</th><th></th></tr></thead><tbody>`;
+      snap.forEach(d => {
+        const u = d.data();
+        const roleClass = u.role === 'super-admin' ? 'role-super' : u.role === 'editor' ? 'role-editor' : 'role-viewer';
+        const date = u.addedAt ? new Date(u.addedAt).toLocaleDateString('en-GB') : '—';
+        const isSelf = d.id === currentUser.uid;
+        html += `<tr>
+          <td>${u.name||'—'}</td>
+          <td class="muted">${u.email}</td>
+          <td><span class="role-badge ${roleClass}">${u.role}</span></td>
+          <td class="muted">${date}</td>
+          <td>${isSelf ? '<span style="font-size:10px;color:var(--muted)">YOU</span>' : `<button class="tbl-btn del" onclick="deleteEntry('admins','${d.id}','usersTable', loadUsers)">REMOVE</button>`}</td>
+        </tr>`;
+      });
+      html += '</tbody></table></div>';
+      el.innerHTML = html;
+    } catch(e) { el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`; }
+  }
+
+  // ── DELETE ────────────────────────────────────────────────────
+  window.deleteEntry = async function(collectionName, docId, tableId, reloadFn) {
+    if (!confirm('Delete this entry? This cannot be undone.')) return;
+    try {
+      await deleteDoc(doc(db, collectionName, docId));
+      toast('✓ Deleted', 'ok');
+      reloadFn();
+    } catch(e) { toast('✗ ' + e.message, 'err'); }
+  };
+
+  // Make reload fns globally available (needed for inline onclick in table rows)
+  // ── AUTH STARS ──────────────────────────────────────────────
+  (function spawnStars(){
+    const container = document.getElementById('authStars');
+    if (!container) return;
+    Object.assign(container.style, {position:'absolute',inset:0,overflow:'hidden',pointerEvents:'none'});
+    for (let i = 0; i < 55; i++) {
+      const s = document.createElement('div');
+      s.className = 'auth-star';
+      const size = Math.random() * 1.8 + 0.4;
+      s.style.cssText = [
+        `width:${size}px`, `height:${size}px`,
+        `left:${Math.random()*100}%`,
+        `top:${Math.random()*100}%`,
+        `animation-duration:${5+Math.random()*10}s`,
+        `animation-delay:${Math.random()*8}s`,
+        `opacity:0`
+      ].join(';');
+      container.appendChild(s);
+    }
+  })();
+
+  window.loadFlightsTable = loadFlightsTable;
+  window.loadCafesTable   = loadCafesTable;
+  window.loadExpTable     = loadExpTable;
+  window.loadTravelTable  = loadTravelTable;
+  window.loadJournal      = loadJournal;
+  window.loadUsers        = loadUsers;
+</script>
+</body>
+</html>
