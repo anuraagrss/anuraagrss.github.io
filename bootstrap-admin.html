@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Bootstrap — Nomad Admin</title>
+  <style>
+    body { font-family: monospace; background: #0d1117; color: #e6edf3; padding: 40px; max-width: 600px; margin: 0 auto; }
+    h2   { color: #5bc0be; letter-spacing: 2px; font-size: 16px; margin-bottom: 24px; }
+    .log { line-height: 2; font-size: 13px; }
+    .ok  { color: #3fb950; }
+    .err { color: #f85149; }
+    .dim { color: rgba(230,237,243,0.4); }
+    button {
+      margin-top: 24px; padding: 12px 28px;
+      background: #5bc0be; color: #0d1117; border: none;
+      font-family: monospace; font-size: 13px; letter-spacing: 1px;
+      cursor: pointer; border-radius: 4px;
+    }
+    button:disabled { opacity: 0.4; cursor: not-allowed; }
+  </style>
+</head>
+<body>
+  <h2>// NOMAD ADMIN — FIRST-RUN BOOTSTRAP</h2>
+  <div class="log" id="log"></div>
+  <button id="btn" onclick="run()">SIGN IN WITH GOOGLE &amp; BOOTSTRAP</button>
+
+  <script type="module">
+    import { initializeApp }          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+    import { getAuth, signInWithPopup, GoogleAuthProvider }
+                                      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+    import { getFirestore, doc, setDoc, getDoc }
+                                      from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+      authDomain:        "nomad-404.firebaseapp.com",
+      projectId:         "nomad-404",
+      storageBucket:     "nomad-404.firebasestorage.app",
+      messagingSenderId: "638331724572",
+      appId:             "1:638331724572:web:baa0d70108e920099150d9",
+      measurementId:     "G-B8K4GPZSK7"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    function log(msg, cls = '') {
+      const div = document.getElementById('log');
+      div.innerHTML += `<div class="${cls}">${msg}</div>`;
+    }
+
+    window.run = async function() {
+      const btn = document.getElementById('btn');
+      btn.disabled = true;
+
+      try {
+        log('→ Opening Google sign-in popup…', 'dim');
+        const provider = new GoogleAuthProvider();
+        const result   = await signInWithPopup(auth, provider);
+        const user     = result.user;
+
+        log(`✓ Signed in as: ${user.email}`, 'ok');
+        log(`✓ UID: ${user.uid}`, 'ok');
+
+        // Check if already bootstrapped
+        const existing = await getDoc(doc(db, 'admins', user.uid));
+        if (existing.exists()) {
+          log(`⚠ Already bootstrapped as: ${existing.data().role}`, 'ok');
+          log('→ No changes made. You are already in the admins collection.', 'dim');
+          btn.textContent = 'ALREADY DONE';
+          return;
+        }
+
+        // Write super-admin doc
+        await setDoc(doc(db, 'admins', user.uid), {
+          email:     user.email,
+          name:      user.displayName || 'Anuraag',
+          role:      'super-admin',
+          addedAt:   new Date().toISOString(),
+          addedBy:   'bootstrap',
+          photoURL:  user.photoURL || null
+        });
+
+        log(`✓ Created admins/${user.uid} with role: super-admin`, 'ok');
+        log('', '');
+        log('═══════════════════════════════════════', 'dim');
+        log('  Bootstrap complete. Delete this file.  ', 'ok');
+        log('  You can now sign in via the terminal.  ', 'ok');
+        log('═══════════════════════════════════════', 'dim');
+        btn.textContent = '✓ DONE — DELETE THIS FILE';
+
+      } catch (err) {
+        log(`✗ Error: ${err.message}`, 'err');
+        btn.disabled = false;
+        btn.textContent = 'RETRY';
+      }
+    };
+  </script>
+</body>
+</html>
