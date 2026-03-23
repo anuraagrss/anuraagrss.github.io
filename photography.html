@@ -48,9 +48,9 @@
     }
     /* Invisible overlay on every photo container */
     .photo-shield {
-      position: absolute; inset: 0; z-index: 5;
+      position: absolute; inset: 0; z-index: 4;
       background: transparent;
-      pointer-events: all; /* captures right-click / long press */
+      pointer-events: all;
     }
 
     /* ── INTRO — Red Safelight ── */
@@ -324,6 +324,12 @@
       opacity: 0.45; mix-blend-mode: screen;
     }
 
+    /* Frame number — top right of photo */
+    .photo-frame-no {
+      position: absolute; top: 14px; right: 14px; z-index: 6;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.25); pointer-events: none;
+    }
     /* Watermark — invisible on dark, visible if lightened */
     .spread-watermark {
       position: absolute; bottom: 14px; right: 14px; z-index: 4;
@@ -334,22 +340,33 @@
     /* Photo shield */
     .spread-photo .photo-shield { z-index: 10; }
 
-    /* Fullscreen button — bottom left of photo */
+    /* Fullscreen button — always visible, centered bottom of photo */
     .btn-fullscreen {
-      position: absolute; bottom: 14px; left: 14px; z-index: 11;
-      width: 36px; height: 36px;
-      background: rgba(10,6,4,0.7); border: 1px solid rgba(246,241,233,0.15);
+      position: absolute; bottom: 20px; left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 20px;
+      background: rgba(10,6,4,0.75);
+      border: 1px solid rgba(246,241,233,0.25);
       border-radius: 3px; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      transition: background 0.2s, border-color 0.2s;
+      font-family: var(--mono); font-size: 10px;
+      letter-spacing: 2.5px; color: rgba(246,241,233,0.7);
+      transition: background 0.2s, border-color 0.2s, color 0.2s;
       pointer-events: all !important;
+      backdrop-filter: blur(4px);
+      opacity: 0; transition: opacity 0.3s ease;
     }
-    .btn-fullscreen:hover { background: rgba(200,145,58,0.25); border-color: var(--gold); }
-    .btn-fullscreen svg { width: 16px; height: 16px; opacity: 0.7; }
+    .spread-photo:hover .btn-fullscreen { opacity: 1; }
+    .btn-fullscreen:hover {
+      background: rgba(200,145,58,0.25);
+      border-color: var(--gold); color: var(--gold);
+    }
+    .btn-fullscreen svg { width: 13px; height: 13px; flex-shrink: 0; }
 
     /* Develop status badge */
     .develop-badge {
-      position: absolute; top: 14px; left: 14px; z-index: 12;
+      position: absolute; bottom: 12px; right: 14px; z-index: 12;
       font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
       color: rgba(139,26,26,0.8);
       display: flex; align-items: center; gap: 5px;
@@ -619,7 +636,7 @@
   <img id="viewer-img" src="" alt="" draggable="false">
   <div id="viewer-watermark">© ANURAAG RAVULAPARTHI · anuraag.me</div>
   <div id="viewer-hint">PRESS ESC OR CLICK TO EXIT</div>
-  <div id="viewer-caption" id="viewer-caption"></div>
+  <div id="viewer-caption"></div>
 </div>
 
 <script type="module">
@@ -817,10 +834,12 @@ function buildPhoto(photo, title, frameNo) {
       <div class="spread-watermark">© ANURAAG RAVULAPARTHI</div>
       <div class="photo-shield" oncontextmenu="return false;"></div>
       <div class="develop-badge" id="badge-${frameNo}">DEVELOPING</div>
+      <div class="photo-frame-no">${frameNo}</div>
       <button class="btn-fullscreen" title="View fullscreen">
         <svg viewBox="0 0 16 16" fill="none">
           <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
+        VIEW FULLSCREEN
       </button>
     </div>`;
 }
@@ -830,7 +849,7 @@ function buildJournal(photo, elKey, elConf, frameNo, side) {
   return `
     <div class="spread-journal el-${elKey}">
       <div class="journal-inner">
-        <div class="journal-frame-no">FRAME ${frameNo}</div>
+        <div class="journal-frame-no">FRAME ${frameNo} &nbsp;·&nbsp; WHAT NATURE SAID</div>
         <div class="journal-element-tag">// ${elConf.label}</div>
         <div class="journal-title">${photo.title || 'Untitled'}</div>
         <div class="journal-what-said">// WHAT NATURE SAID</div>
