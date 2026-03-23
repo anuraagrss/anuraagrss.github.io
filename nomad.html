@@ -1207,6 +1207,49 @@
       .fleet-card:first-child { grid-row: span 1; }
     }
 
+    /* ── BOARDING PASS STACK PEEK ── */
+    .bp-stack-peek {
+      position: relative; height: 80px; cursor: pointer;
+      margin: 0 auto;
+    }
+    .bp-peek-card {
+      position: absolute; left: 0; right: 0;
+      height: 64px; border-radius: 4px;
+      border: 1px solid var(--paper3);
+      background: #FEFCF8;
+      box-shadow: 2px 3px 10px rgba(28,17,9,0.08);
+      transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
+    }
+    /* Three cards peek out beneath the top one */
+    .bp-peek-3 { bottom: 0; transform: rotate(-2.8deg) translateY(8px); background:#F5EFE6; }
+    .bp-peek-2 { bottom: 0; transform: rotate( 1.4deg) translateY(4px); background:#FAF6EF; }
+    .bp-peek-1 { bottom: 0; transform: rotate(-0.5deg); }
+    /* Hover — fan them out */
+    .bp-stack-peek:hover .bp-peek-3 { transform: rotate(-5deg) translateY(14px); }
+    .bp-stack-peek:hover .bp-peek-2 { transform: rotate( 3deg) translateY(8px); }
+    .bp-stack-peek:hover .bp-peek-1 { transform: rotate(-1deg) translateY(-3px); }
+    /* Top card face */
+    .bp-peek-face {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+      border-top: 3px solid transparent;
+      border-image: linear-gradient(to right, var(--teal), var(--gold)) 1;
+    }
+    .bp-peek-label {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+      color: var(--ink2);
+    }
+    .bp-peek-hint {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--muted);
+    }
+    .bp-peek-arrow {
+      font-size: 14px; color: var(--teal);
+      transition: transform 0.3s;
+    }
+    .bp-peek-arrow.open { transform: rotate(180deg); }
+
     /* ── EXPAND BUTTON ── */
     .expand-btn {
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
@@ -1437,11 +1480,19 @@
     <!-- BOARDING PASSES — latest 4, rest hidden -->
     <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
     <div class="bp-stack" id="boardingGrid"></div>
-    <div id="bpMoreWrap" style="text-align:center;margin-bottom:48px;display:none">
-      <button class="expand-btn" id="bpMoreBtn" onclick="expandBoardingPasses()">
-        <span id="bpMoreLabel">VIEW ALL BOARDING PASSES</span>
-        <span class="expand-btn-arrow">▾</span>
-      </button>
+    <!-- Stacked peek of remaining boarding passes -->
+    <div id="bpMoreWrap" style="margin-bottom:48px;display:none" onclick="expandBoardingPasses()" title="Click to see all boarding passes">
+      <div class="bp-stack-peek" id="bpStackPeek">
+        <div class="bp-peek-card bp-peek-3"></div>
+        <div class="bp-peek-card bp-peek-2"></div>
+        <div class="bp-peek-card bp-peek-1">
+          <div class="bp-peek-face">
+            <div class="bp-peek-label" id="bpMoreLabel">+ 112 MORE BOARDING PASSES</div>
+            <div class="bp-peek-hint">CLICK THE STACK TO EXPAND</div>
+            <div class="bp-peek-arrow" id="bpPeekArrow">▾</div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- FULL FLIGHT LOG — hidden by default -->
@@ -1666,9 +1717,14 @@ async function loadAllData() {
       experiencesData = results[3].value.docs.map(d => ({id:d.id,...d.data()}));
     }
 
-    // Log any failures
+    // Log any failures with detail
+    const colNames = ['countries','flights','cafes','experiences'];
     results.forEach((r,i)=>{
-      if(r.status==='rejected') console.warn('Collection',i,'failed:',r.reason?.message);
+      if(r.status==='rejected') {
+        console.error(`✗ ${colNames[i]} failed:`, r.reason?.code, r.reason?.message);
+      } else {
+        console.log(`✓ ${colNames[i]}: ${r.value.docs.length} docs`);
+      }
     });
 
     dataLoaded = true;
@@ -1839,11 +1895,12 @@ function initGlobe() {
   const pulseMat=new THREE.MeshBasicMaterial({color:0xD4792A,transparent:true,opacity:0.25});
   const pulseGeo=new THREE.SphereGeometry(0.032,10,10);
 
-  const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,countriesData.length);
+  const dotCount = Math.max(1, countriesData.length); // InstancedMesh needs at least 1
+  const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,dotCount);
   const dotData=[];
   const dummy=new THREE.Object3D();
   countriesData.forEach((c,i)=>{
-    const pos=latLonToVec(c.lat,c.lon);
+    const pos=latLonToVec(c.lat||0,c.lon||0);
     dummy.position.copy(pos); dummy.updateMatrix();
     dotMesh.setMatrixAt(i,dummy.matrix);
     dotData.push({name:c.name,id:c.id,pos,status:c.status});
@@ -2135,7 +2192,9 @@ function buildFlights() {
     const wrap = document.getElementById('bpMoreWrap');
     const btn  = document.getElementById('bpMoreLabel');
     if(wrap){ wrap.style.display='block'; }
-    if(btn)  btn.textContent=`VIEW ALL ${flightsData.length} BOARDING PASSES`;
+    const hidden = flightsData.length - INITIAL_BP;
+    const lbl = document.getElementById('bpMoreLabel');
+    if(lbl)  lbl.textContent=`+ ${hidden} MORE BOARDING PASSES`;
   }
 
   // Full flight log table
@@ -2161,13 +2220,19 @@ window.expandBoardingPasses = function() {
   bpExpanded = !bpExpanded;
   document.querySelectorAll('.bp-hidden').forEach(el=>{
     el.style.display = bpExpanded ? '' : 'none';
+    if(bpExpanded) el.classList.remove('bp-hidden-state');
   });
   const label = document.getElementById('bpMoreLabel');
-  const arrow = document.querySelector('#bpMoreBtn .expand-btn-arrow');
+  const arrow = document.getElementById('bpPeekArrow');
+  const peek  = document.getElementById('bpStackPeek');
+  const hidden = flightsData.length - 4;
   if(label) label.textContent = bpExpanded
-    ? 'SHOW LESS'
-    : `VIEW ALL ${flightsData.length} BOARDING PASSES`;
+    ? '▴  SHOW LESS'
+    : `+ ${hidden} MORE BOARDING PASSES`;
   if(arrow) arrow.classList.toggle('open', bpExpanded);
+  // When expanded hide the peek stack itself (passes are now visible above it)
+  if(peek) peek.style.opacity = bpExpanded ? '0' : '1';
+  if(peek) peek.style.pointerEvents = bpExpanded ? 'none' : 'auto';
 };
 
 let logExpanded = false;
@@ -2184,25 +2249,96 @@ window.toggleFlightLog = function() {
 // ── AIRCRAFT FLEET ────────────────────────────────────────────────
 // Permanent Unsplash CDN URLs — no-branding cockpit/exterior shots
 const AIRCRAFT_META = {
-  'Boeing 777':    { nickname:'Triple Seven', photo:'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=900&q=80&fit=crop', story:`The workhorse of long haul. Two engines that could carry a small town. I've crossed oceans in these — Delhi to London, Dubai to everywhere. The window seat at 38,000 feet over the Himalayas is reason enough.` },
-  'Boeing 777-300ER': { nickname:'Triple Seven ER', photo:'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=900&q=80&fit=crop', story:`Extended range. Emirates' favourite. When you board one and find a shower suite at the front, you remember not all flying is the same.` },
-  'Boeing 737':    { nickname:'The Bus', photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop', story:`The world's most flown aircraft. Cramped, reliable, everywhere. I have a complicated relationship with the 737 — it has taken me to places the bigger jets never could.` },
-  'Boeing 737-800': { nickname:'The Bus', photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop', story:`Short hop king. Two hours in a middle seat still gets you somewhere new. The 737-800 has no pretensions and I respect that.` },
-  'Airbus A380':   { nickname:'Superjumbo', photo:'https://images.unsplash.com/photo-1569427572956-a7e41a9e1f46?w=900&q=80&fit=crop', story:`The largest passenger aircraft ever built. Two full decks, a staircase, a bar at the back. Flying an A380 feels less like transport and more like a building that happens to be airborne.` },
-  'Airbus A320':   { nickname:'The Narrowbody', photo:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&q=80&fit=crop', story:`Reliable, ubiquitous, honest. The A320 family moves the world's short-haul passengers. Boarded more of these than I can count.` },
-  'Airbus A320neo': { nickname:'New Engine Option', photo:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&q=80&fit=crop', story:`Quieter engines. Better fuel burn. Same cramped middle seat. But the ride is noticeably smoother and the quiet on descent is something else.` },
-  'Airbus A330':   { nickname:'The Medium Hauler', photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop', story:`Wide body for medium distances. Air France across the Atlantic. Those lie-flat seats in business class where I wrote half my India journal.` },
-  'Airbus A330-200': { nickname:'The Medium Hauler', photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop', story:`Eight hours is manageable in these. The 330 is the 777's slightly smaller sibling and has a warmth to its cabin that the bigger jets sometimes lack.` },
-  'Airbus A350':   { nickname:'Xtra Wide Body', photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop', story:`The newest widebody and it shows. Composite structure, higher cabin pressure, better humidity. You land feeling like you actually slept. A technological marvel.` },
-  'Airbus A350-900': { nickname:'Xtra Wide Body', photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop', story:`Composite. Pressurised higher. Less dry. You land feeling like you didn't just cross an ocean. My favourite aircraft to travel in.` },
-  'Boeing 787':    { nickname:'Dreamliner', photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop', story:`Carbon fibre fuselage. Dimmable windows instead of shades. Higher cabin altitude. The 787 was built for passengers not just routes — and you feel it.` },
-  'Boeing 787-9':  { nickname:'Dreamliner', photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop', story:`The stretched version. Slightly more range, slightly more seats, same brilliant windows. Singapore to Tokyo in one of these — the Pacific looked unreal through those large oval panes.` },
-  'ATR 72':        { nickname:'The Turboprop', photo:'https://images.unsplash.com/photo-1572979926960-c5b685fc1fc7?w=900&q=80&fit=crop', story:`Propeller. Loud. Low altitude. You can see everything — every field, every road, every village. The ATR is how you remember that flying is extraordinary, not routine.` },
-  'Bombardier CRJ': { nickname:'The Regional Jet', photo:'https://images.unsplash.com/photo-1523633589114-88eaf4b4f1a8?w=900&q=80&fit=crop', story:`Overhead bins you can't use. Engines in the tail. A window seat that looks out at a blank fuselage. But it connects the dots that the big jets can't.` },
-  'Embraer E175':  { nickname:'E-Jet', photo:'https://images.unsplash.com/photo-1565195266978-1c4b05f7b88b?w=900&q=80&fit=crop', story:`2-2 seating. No middle seat. The E175 is how regional flying should feel — no one sat next to a stranger, everyone has a window or an aisle.` },
-  'Airbus A321':   { nickname:'Stretched Narrowbody', photo:'https://images.unsplash.com/photo-1548407260-da850faa41e3?w=900&q=80&fit=crop', story:`The long thin cousin. Longer than the A320, used on routes that need the capacity. JetBlue and American have given the 321 a second life on transatlantic routes.` },
-  'Boeing 767':    { nickname:'The Warhorse', photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop', story:`Old school wide body. The 767 has been flying since 1982 and it shows — but there's a solidity to older aircraft that the composites don't quite replicate.` },
-  'Boeing 757':    { nickname:'The Thin Long Hauler', photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop', story:`Narrow body, long range. Used to cross the Atlantic in these on certain routes. Steep climb angle, noisy, powerful. There's an aggression to the 757 that I like.` },
+  'Boeing 777': {
+    nickname:'Triple Seven',
+    photo:'https://images.unsplash.com/photo-1587019158091-1a103c5dd17f?w=900&q=80&fit=crop',
+    story:`Two massive GE90 engines — the largest turbofans ever built, wider than a 737 fuselage. The 777 can carry 400 passengers non-stop for 8,000 miles. That distinctive raked wingtip, the six-wheel main landing gear bogies. When you hear that low engine rumble on pushback, you know you're going somewhere far.`
+  },
+  'Boeing 777-300ER': {
+    nickname:'Triple Seven ER',
+    photo:'https://images.unsplash.com/photo-1587019158091-1a103c5dd17f?w=900&q=80&fit=crop',
+    story:`The ER — Extended Range — is the backbone of ultra-long-haul. 13,000 km non-stop without breaking a sweat. Fly-by-wire, six-wheel main bogies, raked wingtip that cuts fuel burn by 1.5%. If you've flown Emirates, Qatar, or Singapore long-haul, this is likely what carried you.`
+  },
+  'Airbus A380': {
+    nickname:'The Superjumbo',
+    photo:'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&q=80&fit=crop',
+    story:`The only double-deck, four-engine commercial aircraft ever mass-produced. 853 passengers in full economy. A bar on the upper deck, a staircase, showers in first class. The A380 is so large it needs special reinforced stands at most airports. You don't board it — you enter it.`
+  },
+  'Airbus A350': {
+    nickname:'Xtra Wide Body',
+    photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop',
+    story:`53% composite materials — the most of any commercial aircraft at launch. The curved wingtips curve upward 3.5 metres. Cabin pressure at 6,000 feet instead of 8,000, higher humidity. You land after 14 hours feeling genuinely rested. The A350 is the first aircraft I've noticed caring about its passengers as much as its range.`
+  },
+  'Airbus A350-900': {
+    nickname:'Xtra Wide Body',
+    photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop',
+    story:`The base variant of Airbus's masterpiece. 15,000 km range. Carbon-fibre reinforced polymer from nose to tail. Those distinctive curved wingtips. Qatar Airways and Singapore Airlines fly these on their longest routes — and you feel the engineering on every long night flight.`
+  },
+  'Boeing 787': {
+    nickname:'Dreamliner',
+    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop',
+    story:`No metal window shades — electronically dimmable glass windows, 65% larger than the 767. Carbon fibre fuselage means it can hold higher humidity without corroding. The cabin feels more spacious than its capacity suggests. Boeing's most innovative aircraft and arguably their most passenger-friendly.`
+  },
+  'Boeing 787-9': {
+    nickname:'Dreamliner',
+    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop',
+    story:`Stretched 6 metres over the base 787-8. The sweet spot of the Dreamliner family — more seats, more range, same revolutionary passenger experience. Those swept raked wingtips are unmistakable on approach. Singapore to Tokyo in one, the South Pacific looking oceanic and endless through that electrochromic glass.`
+  },
+  'Airbus A330': {
+    nickname:'The Medium Hauler',
+    photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop',
+    story:`Two engines, wide body, 13,000 km range. The A330 has an analogue warmth the newer jets lack — slightly lower cabin, a hum you can feel in the floor on cruise. Shares its fuselage cross-section with the A340. The variant that crosses the Atlantic in the middle of the night with you sleeping three across.`
+  },
+  'Airbus A330-200': {
+    nickname:'The Medium Hauler',
+    photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop',
+    story:`The shorter-range, higher-capacity member of the A330 family. Distinctive for its blended winglets — upswept and downswept simultaneously. 253 passengers, 13,400 km range. Workhorse of transatlantic routes for Air France, Delta, and Gulf carriers. Reliable in a way that quietly earns your trust.`
+  },
+  'Airbus A320': {
+    nickname:'The Narrowbody',
+    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
+    story:`The aircraft that introduced fly-by-wire sidestick controls to commercial aviation. No mechanical linkage from cockpit to control surfaces — pure electrical signal. Wingtip fences instead of winglets. 180 seats, 6,100 km range. The most ordered commercial aircraft family in history. Everywhere you want to go for under 4 hours.`
+  },
+  'Airbus A320neo': {
+    nickname:'New Engine Option',
+    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
+    story:`The neo suffix means New Engine Option — CFM LEAP or Pratt Whitney geared turbofan, 20% better fuel burn than the ceo. Sharklet wingtip devices instead of the old fences. The cabin is quieter on cruise. Same cramped middle seat, fundamentally better machine underneath. Flying IndiGo or Indigo anywhere in India, this is your aircraft.`
+  },
+  'Airbus A321': {
+    nickname:'The Stretched Narrowbody',
+    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
+    story:`7 metres longer than the A320, 220 seats. The XLR variant has enough range for transatlantic. You can spot the A321 by its additional over-wing emergency exits — four doors instead of two. JetBlue uses these for transatlantic routes in a proper Mint business class. The narrowbody that refuses to accept it has limits.`
+  },
+  'Boeing 737': {
+    nickname:'The Bus',
+    photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop',
+    story:`First flew in 1967. Still the most produced commercial aircraft in history — over 10,000 delivered. You can identify it by the flat-bottomed engine nacelles — the engines sit so low they had to be oval-shaped to clear the ground. The aircraft that democratised air travel. I have a complicated relationship with the 737. It goes everywhere. That's the point.`
+  },
+  'Boeing 737-800': {
+    nickname:'The Bus',
+    photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop',
+    story:`The workhorse of the Next Generation 737 family. 162-189 seats, blended winglets, CFM56 engines. Ryanair's entire fleet is 737-800s. Southwest's backbone. IndiGo used to fly them before the neos. The overhead bin is too small, the legroom is insufficient, and it has taken me to more places than any other aircraft.`
+  },
+  'ATR 72': {
+    nickname:'The Turboprop',
+    photo:'https://images.unsplash.com/photo-1572979926960-c5b685fc1fc7?w=900&q=80&fit=crop',
+    story:`Two Pratt & Whitney Canada turboprop engines turning six-bladed propellers. Flies at 450 km/h, 7,600 metres altitude — low enough to see everything. The cabin vibrates with the propellers, the windows are smaller, you can hear the countryside passing below. The ATR 72 goes to the airports jets cannot. It's the most honest flying there is.`
+  },
+  'Bombardier CRJ': {
+    nickname:'The Regional Jet',
+    photo:'https://images.unsplash.com/photo-1523633589114-88eaf4b4f1a8?w=900&q=80&fit=crop',
+    story:`Rear-mounted engines, T-tail, no overhead bin space for carry-ons. The CRJ series fills the gap between turboprops and narrowbodies. Single-class cabin, 2-2 seating, low windows. What it lacks in comfort it compensates in access — CRJs go to cities with runways too short for an A320. The aircraft that gets you to the interesting places.`
+  },
+  'Embraer E175': {
+    nickname:'The E-Jet',
+    photo:'https://images.unsplash.com/photo-1565195266978-1c4b05f7b88b?w=900&q=80&fit=crop',
+    story:`2-2 seating across the entire cabin — no middle seat, ever. Slightly curved ceiling over every row. Overwing engines on a clean swept wing. The E175 is what regional aviation should look like: genuinely comfortable at 80 seats. Delta Connection and United Express use these where the CRJ goes to die. Boarding one feels deliberate, not grudging.`
+  },
+  'Boeing 767': {
+    nickname:'The Warhorse',
+    photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop',
+    story:`First flew 1981. The aircraft that made twin-engine transoceanic flight commercially viable. Two engines, wide body, 2-3-2 seating. Distinctive flat-bottomed fuselage. Still flying — FedEx operates hundreds as freighters. Some airlines keep them for their range-efficiency. Old school in the best sense: over-engineered, under-appreciated, absolutely reliable.`
+  },
 };
 
 // Normalise aircraft type string to a key
@@ -2495,6 +2631,11 @@ window.lbStep=function(dir){
 // ── CAFES ─────────────────────────────────────────────────────────
 function buildCafes() {
   const grid=document.getElementById('cafeGrid');
+  if(!grid) return;
+  if(!cafesData.length) {
+    grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">No cafes yet — add from the dashboard.</div>';
+    return;
+  }
   cafesData.forEach(c=>{
     const card=document.createElement('div'); card.className='cafe-receipt';
     card.innerHTML=`
@@ -2525,6 +2666,11 @@ function buildCafes() {
 // ── STAMPS / COUNTRIES ────────────────────────────────────────────
 function buildStamps() {
   const grid=document.getElementById('stampsGrid');
+  if(!grid) return;
+  if(!countriesData.length) {
+    grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">Countries data loading — check Firestore rules are published.</div>';
+    return;
+  }
   const rots=[-2.5,-1.5,-0.5,0.5,1.5,2.5];
   countriesData.forEach((c,i)=>{
     const stamp=document.createElement('div');
