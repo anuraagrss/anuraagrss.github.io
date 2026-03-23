@@ -1138,6 +1138,87 @@
     .t-cur{width:7px;height:13px;border-radius:1px;background:#5bc0be;animation:blink 1s step-end infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
+    /* ── FLEET GRID (aircraft heroes) ── */
+    .fleet-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px; margin-bottom: 48px;
+    }
+    .fleet-card {
+      position: relative; overflow: hidden;
+      border-radius: 3px; min-height: 220px;
+      background: var(--ink); cursor: default;
+    }
+    .fleet-card:first-child { grid-row: span 2; min-height: 100%; }
+    .fleet-photo {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
+      filter: brightness(0.6) saturate(0.85) sepia(8%);
+    }
+    .fleet-card:hover .fleet-photo {
+      transform: scale(1.04);
+      filter: brightness(0.42) saturate(0.75);
+    }
+    .fleet-vignette {
+      position: absolute; inset: 0;
+      background: linear-gradient(to top, rgba(28,17,9,0.94) 0%, rgba(28,17,9,0.35) 50%, transparent 80%);
+      transition: background 0.4s;
+    }
+    .fleet-card:hover .fleet-vignette {
+      background: linear-gradient(to top, rgba(28,17,9,0.97) 0%, rgba(28,17,9,0.6) 55%, rgba(28,17,9,0.1) 100%);
+    }
+    .fleet-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 18px 20px 16px;
+    }
+    .fleet-iata {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+      color: var(--amber); margin-bottom: 4px; opacity: 0.8;
+    }
+    .fleet-model {
+      font-family: var(--disp); font-size: clamp(28px,3.5vw,44px);
+      color: rgba(246,241,233,0.95); line-height: 1; letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+    .fleet-card:first-child .fleet-model { font-size: clamp(38px,5vw,60px); }
+    .fleet-nickname {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.4); margin-bottom: 8px;
+    }
+    .fleet-count {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+      color: var(--gold);
+    }
+    .fleet-count::before { content: ''; width: 14px; height: 1px; background: var(--gold); }
+    /* Story — slides up on hover */
+    .fleet-story {
+      font-size: 11px; line-height: 1.7; color: rgba(246,241,233,0.6);
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
+      opacity: 0; margin-top: 0;
+    }
+    .fleet-card:hover .fleet-story { max-height: 140px; opacity: 1; margin-top: 8px; }
+    .fleet-card:first-child:hover .fleet-story { max-height: 200px; }
+    @media(max-width:768px){
+      .fleet-grid { grid-template-columns: 1fr 1fr; }
+      .fleet-card:first-child { grid-row: span 1; }
+    }
+
+    /* ── EXPAND BUTTON ── */
+    .expand-btn {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      color: var(--muted); background: transparent;
+      border: 1px solid var(--faint); padding: 8px 20px; border-radius: 2px;
+      cursor: pointer; transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+    }
+    .expand-btn:hover { color: var(--teal); border-color: var(--teal); }
+    .expand-btn-arrow { transition: transform 0.3s; display: inline-block; font-size: 11px; }
+    .expand-btn-arrow.open { transform: rotate(180deg); }
+
     /* Loading skeleton */
     .skel { background:linear-gradient(90deg,var(--paper2) 25%,var(--paper3) 50%,var(--paper2) 75%); background-size:200% 100%; animation:skelShimmer 1.5s infinite; border-radius:3px; }
     @keyframes skelShimmer { to{background-position:-200% 0} }
@@ -1348,14 +1429,35 @@
       <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
     </div>
     <div class="flight-stats" id="flightStats"></div>
-    <div class="section-eyebrow" style="margin-bottom:20px">// BOARDING PASSES — CLICK TO EXPAND</div>
+
+    <!-- AIRCRAFT FLEET -->
+    <div class="section-eyebrow" style="margin-bottom:20px">// AIRCRAFT FLOWN</div>
+    <div class="fleet-grid" id="fleetGrid"></div>
+
+    <!-- BOARDING PASSES — latest 4, rest hidden -->
+    <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
     <div class="bp-stack" id="boardingGrid"></div>
-    <div class="section-eyebrow" style="margin:48px 0 16px">// FULL FLIGHT LOG</div>
-    <div class="flight-log-wrap">
-      <table>
-        <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
-        <tbody id="flightLog"></tbody>
-      </table>
+    <div id="bpMoreWrap" style="text-align:center;margin-bottom:48px;display:none">
+      <button class="expand-btn" id="bpMoreBtn" onclick="expandBoardingPasses()">
+        <span id="bpMoreLabel">VIEW ALL BOARDING PASSES</span>
+        <span class="expand-btn-arrow">▾</span>
+      </button>
+    </div>
+
+    <!-- FULL FLIGHT LOG — hidden by default -->
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="section-eyebrow" style="margin:0">// FULL FLIGHT LOG</div>
+      <button class="expand-btn" id="logToggleBtn" onclick="toggleFlightLog()">
+        EXPAND LOG <span class="expand-btn-arrow" id="logArrow">▾</span>
+      </button>
+    </div>
+    <div id="flightLogWrap" style="display:none">
+      <div class="flight-log-wrap">
+        <table>
+          <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
+          <tbody id="flightLog"></tbody>
+        </table>
+      </div>
     </div>
   </section>
 
@@ -1912,13 +2014,17 @@ function buildFlights() {
     statsEl.appendChild(el);
   });
 
-  // ── BOARDING PASS DECK ──
+  buildFleet();
+
+  // ── BOARDING PASSES — show only latest 4, rest hidden ──────────
   const grid=document.getElementById('boardingGrid');
   if(!grid) return;
+  const INITIAL_BP = 4;
 
   flightsData.forEach((f,idx)=>{
     const card=document.createElement('div');
     card.className='bp-card';
+    if(idx >= INITIAL_BP) { card.classList.add('bp-hidden'); card.style.display='none'; }
 
     const miles=f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—';
     const km=f.distance_miles?Math.round(f.distance_miles*1.60934).toLocaleString():'—';
@@ -2016,17 +2122,21 @@ function buildFlights() {
             <div class="bp-route-mini-dot"></div>
           </div>
           ${f.notes?`<div class="bp-notes">"${f.notes}"</div>`:''}
-          ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft photo" loading="lazy">`:''}
+          ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft" loading="lazy">`:''}
         </div>
       </div>`;
 
-    // Toggle expand
-    card.addEventListener('click',()=>{
-      card.classList.toggle('open');
-    });
-
+    card.addEventListener('click',()=>{ card.classList.toggle('open'); });
     grid.appendChild(card);
   });
+
+  // Show "View All" button if more than 4 flights
+  if(flightsData.length > INITIAL_BP) {
+    const wrap = document.getElementById('bpMoreWrap');
+    const btn  = document.getElementById('bpMoreLabel');
+    if(wrap){ wrap.style.display='block'; }
+    if(btn)  btn.textContent=`VIEW ALL ${flightsData.length} BOARDING PASSES`;
+  }
 
   // Full flight log table
   const tbody=document.getElementById('flightLog');
@@ -2044,6 +2154,130 @@ function buildFlights() {
     tbody.appendChild(tr);
   });
 }
+
+// ── EXPAND / COLLAPSE CONTROLS ────────────────────────────────────
+let bpExpanded = false;
+window.expandBoardingPasses = function() {
+  bpExpanded = !bpExpanded;
+  document.querySelectorAll('.bp-hidden').forEach(el=>{
+    el.style.display = bpExpanded ? '' : 'none';
+  });
+  const label = document.getElementById('bpMoreLabel');
+  const arrow = document.querySelector('#bpMoreBtn .expand-btn-arrow');
+  if(label) label.textContent = bpExpanded
+    ? 'SHOW LESS'
+    : `VIEW ALL ${flightsData.length} BOARDING PASSES`;
+  if(arrow) arrow.classList.toggle('open', bpExpanded);
+};
+
+let logExpanded = false;
+window.toggleFlightLog = function() {
+  logExpanded = !logExpanded;
+  const wrap  = document.getElementById('flightLogWrap');
+  const arrow = document.getElementById('logArrow');
+  const btn   = document.getElementById('logToggleBtn');
+  if(wrap)  wrap.style.display = logExpanded ? 'block' : 'none';
+  if(arrow) arrow.classList.toggle('open', logExpanded);
+  if(btn)   btn.querySelector('span:first-child').textContent = logExpanded ? 'COLLAPSE LOG ' : 'EXPAND LOG ';
+};
+
+// ── AIRCRAFT FLEET ────────────────────────────────────────────────
+// Permanent Unsplash CDN URLs — no-branding cockpit/exterior shots
+const AIRCRAFT_META = {
+  'Boeing 777':    { nickname:'Triple Seven', photo:'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=900&q=80&fit=crop', story:`The workhorse of long haul. Two engines that could carry a small town. I've crossed oceans in these — Delhi to London, Dubai to everywhere. The window seat at 38,000 feet over the Himalayas is reason enough.` },
+  'Boeing 777-300ER': { nickname:'Triple Seven ER', photo:'https://images.unsplash.com/photo-1556388158-158ea5ccacbd?w=900&q=80&fit=crop', story:`Extended range. Emirates' favourite. When you board one and find a shower suite at the front, you remember not all flying is the same.` },
+  'Boeing 737':    { nickname:'The Bus', photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop', story:`The world's most flown aircraft. Cramped, reliable, everywhere. I have a complicated relationship with the 737 — it has taken me to places the bigger jets never could.` },
+  'Boeing 737-800': { nickname:'The Bus', photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop', story:`Short hop king. Two hours in a middle seat still gets you somewhere new. The 737-800 has no pretensions and I respect that.` },
+  'Airbus A380':   { nickname:'Superjumbo', photo:'https://images.unsplash.com/photo-1569427572956-a7e41a9e1f46?w=900&q=80&fit=crop', story:`The largest passenger aircraft ever built. Two full decks, a staircase, a bar at the back. Flying an A380 feels less like transport and more like a building that happens to be airborne.` },
+  'Airbus A320':   { nickname:'The Narrowbody', photo:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&q=80&fit=crop', story:`Reliable, ubiquitous, honest. The A320 family moves the world's short-haul passengers. Boarded more of these than I can count.` },
+  'Airbus A320neo': { nickname:'New Engine Option', photo:'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=900&q=80&fit=crop', story:`Quieter engines. Better fuel burn. Same cramped middle seat. But the ride is noticeably smoother and the quiet on descent is something else.` },
+  'Airbus A330':   { nickname:'The Medium Hauler', photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop', story:`Wide body for medium distances. Air France across the Atlantic. Those lie-flat seats in business class where I wrote half my India journal.` },
+  'Airbus A330-200': { nickname:'The Medium Hauler', photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop', story:`Eight hours is manageable in these. The 330 is the 777's slightly smaller sibling and has a warmth to its cabin that the bigger jets sometimes lack.` },
+  'Airbus A350':   { nickname:'Xtra Wide Body', photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop', story:`The newest widebody and it shows. Composite structure, higher cabin pressure, better humidity. You land feeling like you actually slept. A technological marvel.` },
+  'Airbus A350-900': { nickname:'Xtra Wide Body', photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop', story:`Composite. Pressurised higher. Less dry. You land feeling like you didn't just cross an ocean. My favourite aircraft to travel in.` },
+  'Boeing 787':    { nickname:'Dreamliner', photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop', story:`Carbon fibre fuselage. Dimmable windows instead of shades. Higher cabin altitude. The 787 was built for passengers not just routes — and you feel it.` },
+  'Boeing 787-9':  { nickname:'Dreamliner', photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop', story:`The stretched version. Slightly more range, slightly more seats, same brilliant windows. Singapore to Tokyo in one of these — the Pacific looked unreal through those large oval panes.` },
+  'ATR 72':        { nickname:'The Turboprop', photo:'https://images.unsplash.com/photo-1572979926960-c5b685fc1fc7?w=900&q=80&fit=crop', story:`Propeller. Loud. Low altitude. You can see everything — every field, every road, every village. The ATR is how you remember that flying is extraordinary, not routine.` },
+  'Bombardier CRJ': { nickname:'The Regional Jet', photo:'https://images.unsplash.com/photo-1523633589114-88eaf4b4f1a8?w=900&q=80&fit=crop', story:`Overhead bins you can't use. Engines in the tail. A window seat that looks out at a blank fuselage. But it connects the dots that the big jets can't.` },
+  'Embraer E175':  { nickname:'E-Jet', photo:'https://images.unsplash.com/photo-1565195266978-1c4b05f7b88b?w=900&q=80&fit=crop', story:`2-2 seating. No middle seat. The E175 is how regional flying should feel — no one sat next to a stranger, everyone has a window or an aisle.` },
+  'Airbus A321':   { nickname:'Stretched Narrowbody', photo:'https://images.unsplash.com/photo-1548407260-da850faa41e3?w=900&q=80&fit=crop', story:`The long thin cousin. Longer than the A320, used on routes that need the capacity. JetBlue and American have given the 321 a second life on transatlantic routes.` },
+  'Boeing 767':    { nickname:'The Warhorse', photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop', story:`Old school wide body. The 767 has been flying since 1982 and it shows — but there's a solidity to older aircraft that the composites don't quite replicate.` },
+  'Boeing 757':    { nickname:'The Thin Long Hauler', photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop', story:`Narrow body, long range. Used to cross the Atlantic in these on certain routes. Steep climb angle, noisy, powerful. There's an aggression to the 757 that I like.` },
+};
+
+// Normalise aircraft type string to a key
+function normaliseAircraft(type) {
+  if(!type) return null;
+  const t = type.trim();
+  // Try exact match first
+  if(AIRCRAFT_META[t]) return t;
+  // Try prefix matches
+  for(const key of Object.keys(AIRCRAFT_META)) {
+    if(t.startsWith(key) || key.startsWith(t)) return key;
+    // fuzzy: "B777" → "Boeing 777"
+    const stripped = t.replace(/[-\s]/g,'').toUpperCase();
+    const keyStripped = key.replace(/[-\s]/g,'').toUpperCase();
+    if(stripped.includes(keyStripped) || keyStripped.includes(stripped)) return key;
+  }
+  return null;
+}
+
+function buildFleet() {
+  const grid = document.getElementById('fleetGrid');
+  if(!grid) return;
+
+  // Count unique aircraft types from flight data
+  const counts = {};
+  flightsData.forEach(f => {
+    if(!f.aircraft_type) return;
+    const key = normaliseAircraft(f.aircraft_type);
+    if(key) counts[key] = (counts[key]||0) + 1;
+  });
+
+  // Sort by flight count desc, take top 6
+  const ranked = Object.entries(counts)
+    .sort((a,b) => b[1]-a[1])
+    .slice(0, 6);
+
+  if(!ranked.length) {
+    // No aircraft data yet — show placeholder from meta list
+    Object.entries(AIRCRAFT_META).slice(0,6).forEach(([key,meta]) => {
+      renderFleetCard(grid, key, meta, 0);
+    });
+    return;
+  }
+
+  ranked.forEach(([key, count]) => {
+    const meta = AIRCRAFT_META[key];
+    if(meta) renderFleetCard(grid, key, meta, count);
+  });
+
+  // If fewer than 6 matched, fill with next most common
+  const used = new Set(ranked.map(([k])=>k));
+  if(ranked.length < 6) {
+    Object.entries(AIRCRAFT_META)
+      .filter(([k]) => !used.has(k))
+      .slice(0, 6 - ranked.length)
+      .forEach(([k, meta]) => renderFleetCard(grid, k, meta, 0));
+  }
+}
+
+function renderFleetCard(grid, model, meta, count) {
+  const card = document.createElement('div');
+  card.className = 'fleet-card';
+  card.innerHTML = `
+    <div class="fleet-photo" style="background-image:url('${meta.photo}')"></div>
+    <div class="fleet-vignette"></div>
+    <div class="fleet-content">
+      <div class="fleet-iata">${model.toUpperCase()}</div>
+      <div class="fleet-model">${model.split(' ').pop()}</div>
+      <div class="fleet-nickname">"${meta.nickname}"</div>
+      ${count>0?`<div class="fleet-count">${count} FLIGHT${count!==1?'S':''}</div>`:''}
+      <div class="fleet-story">${meta.story}</div>
+    </div>`;
+  grid.appendChild(card);
+}
+
 
 // ── AIRPORTS ─────────────────────────────────────────────────────
 // Airport metadata — enriched stories for key hubs
