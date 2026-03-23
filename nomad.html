@@ -678,6 +678,224 @@
     .bp-stub-miles { font-family:var(--disp); font-size:16px; color:var(--teal); }
     .bp-stub-mi { font-family:var(--mono); font-size:7px; color:var(--muted); letter-spacing:1px; }
 
+    /* ── AIRPORTS SECTION ── */
+    .airports-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
+    .airport-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 3px; margin-top: 8px;
+    }
+    /* First card spans 2 rows tall */
+    .airport-card:first-child { grid-row: span 2; }
+
+    .airport-card {
+      position: relative; overflow: hidden;
+      border-radius: 3px; cursor: pointer;
+      min-height: 260px;
+      background: var(--ink);
+    }
+    .airport-card:first-child { min-height: 100%; }
+
+    /* Hero photo */
+    .airport-photo {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
+      filter: brightness(0.65) saturate(0.9);
+    }
+    .airport-card:hover .airport-photo {
+      transform: scale(1.05);
+      filter: brightness(0.45) saturate(0.8);
+    }
+
+    /* Dark vignette gradient */
+    .airport-vignette {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to top,
+        rgba(12,6,2,0.92) 0%,
+        rgba(12,6,2,0.4)  45%,
+        transparent       75%
+      );
+      transition: background 0.4s;
+    }
+    .airport-card:hover .airport-vignette {
+      background: linear-gradient(
+        to top,
+        rgba(12,6,2,0.96) 0%,
+        rgba(12,6,2,0.7)  55%,
+        rgba(12,6,2,0.2)  100%
+      );
+    }
+
+    /* Content layer */
+    .airport-content {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; justify-content: flex-end;
+      padding: 22px 22px 20px;
+    }
+    .airport-code {
+      font-family: var(--disp); font-size: 54px;
+      color: rgba(246,241,233,0.95); line-height: 1; letter-spacing: 2px;
+      margin-bottom: 2px;
+    }
+    .airport-card:first-child .airport-code { font-size: 72px; }
+    .airport-name {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.45); margin-bottom: 8px;
+    }
+    .airport-visits {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+      color: var(--gold); margin-bottom: 10px;
+    }
+    .airport-visits::before { content:''; width:16px; height:1px; background:var(--gold); }
+
+    /* Story — hidden, slides up on hover */
+    .airport-story-text {
+      font-size: 12px; line-height: 1.7;
+      color: rgba(246,241,233,0.7);
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+      opacity: 0;
+    }
+    .airport-card:hover .airport-story-text {
+      max-height: 180px;
+      opacity: 1;
+    }
+    .airport-card:first-child .airport-story-text { max-height: 0; }
+    .airport-card:first-child:hover .airport-story-text { max-height: 240px; }
+
+    /* Read more hint */
+    .airport-hint {
+      position: absolute; top: 16px; right: 16px;
+      font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.25); transition: color 0.3s;
+    }
+    .airport-card:hover .airport-hint { color: rgba(246,241,233,0.5); }
+
+    /* Photo credit */
+    .airport-credit {
+      position: absolute; bottom: 10px; right: 14px;
+      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
+      color: rgba(246,241,233,0.2);
+    }
+
+    @media(max-width:768px){
+      .airport-grid { grid-template-columns: 1fr 1fr; }
+      .airport-card:first-child { grid-row: span 1; }
+    }
+
+    /* ── BOARDING PASS DECK ── */
+    .bp-deck-wrap {
+      position: relative; margin-bottom: 56px;
+    }
+    .bp-stack {
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+    }
+    /* Individual pass */
+    .bp-card {
+      background: #FEFCF8;
+      border: 1px solid var(--paper3);
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 2px 3px 14px rgba(28,17,9,0.09);
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.25s;
+      user-select: none;
+    }
+    .bp-card:hover { transform: translateY(-3px) rotate(0.3deg); box-shadow: 5px 8px 28px rgba(28,17,9,0.15); }
+    .bp-card.open  { box-shadow: 6px 10px 36px rgba(28,17,9,0.18); z-index: 5; }
+
+    /* Airline colour bar */
+    .bp-bar { height: 4px; width: 100%; background: linear-gradient(to right, var(--teal), var(--gold)); }
+
+    /* Main face */
+    .bp-face { padding: 16px 16px 0; }
+    .bp-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+    .bp-flight-no { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--teal); }
+    .bp-date-badge {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+      color: var(--muted); background: var(--paper2);
+      padding: 2px 8px; border-radius: 2px;
+    }
+
+    /* Giant route */
+    .bp-route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+    .bp-iata-big { font-family: var(--disp); font-size: 48px; color: var(--ink); line-height: 1; letter-spacing: 1px; }
+    .bp-route-mid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
+    .bp-route-line { width: 100%; height: 1px; background: repeating-linear-gradient(to right, var(--paper3) 0, var(--paper3) 5px, transparent 5px, transparent 10px); position: relative; }
+    .bp-route-plane { font-size: 14px; color: var(--amber); }
+    .bp-cities-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
+    .bp-city-name { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: var(--muted); }
+
+    /* Meta strip */
+    .bp-meta-strip {
+      display: flex; gap: 0; border-top: 1px dashed var(--paper3);
+      margin: 0 -16px;
+    }
+    .bp-meta-cell {
+      flex: 1; padding: 8px 12px; border-right: 1px dashed var(--paper3);
+      text-align: center;
+    }
+    .bp-meta-cell:last-child { border-right: none; }
+    .bp-meta-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); display: block; margin-bottom: 2px; }
+    .bp-meta-val   { font-family: var(--mono); font-size: 11px; color: var(--ink2); }
+    .bp-meta-val.teal { color: var(--teal); }
+
+    /* Expand toggle */
+    .bp-toggle {
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      padding: 8px; background: var(--paper2);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--muted);
+      border-top: 1px solid var(--faint);
+    }
+    .bp-toggle-arrow { transition: transform 0.3s; display: inline-block; }
+    .bp-card.open .bp-toggle-arrow { transform: rotate(180deg); }
+
+    /* Expanded detail */
+    .bp-detail {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+      background: var(--paper);
+    }
+    .bp-card.open .bp-detail { max-height: 400px; }
+    .bp-detail-inner { padding: 16px 16px 18px; }
+    .bp-detail-title {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: var(--teal); margin-bottom: 12px; padding-bottom: 8px;
+      border-bottom: 1px solid var(--faint);
+    }
+    .bp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .bp-detail-item { display: flex; flex-direction: column; gap: 2px; }
+    .bp-detail-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); }
+    .bp-detail-value { font-size: 12px; color: var(--ink2); }
+    .bp-detail-value.mono { font-family: var(--mono); font-size: 11px; }
+
+    /* Route map mini (SVG inline) */
+    .bp-route-mini {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px dashed var(--paper3);
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 10px; color: var(--muted);
+    }
+    .bp-route-mini-line {
+      flex: 1; height: 2px; position: relative;
+      background: repeating-linear-gradient(to right,var(--teal) 0,var(--teal) 4px,transparent 4px,transparent 8px);
+    }
+    .bp-route-mini-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+    .bp-notes {
+      margin-top: 10px; font-size: 12px; font-style: italic;
+      color: var(--muted); line-height: 1.5;
+    }
+
+    /* Perforated tear between face and stub */
+    .bp-perf {
+      border: none; border-top: 2px dashed var(--paper3);
+      margin: 0;
+    }
+
     /* Flight log table */
     .flight-log-wrap { overflow-x:auto; border-radius:4px; border:1px solid var(--faint); }
     table { width:100%; border-collapse:collapse; font-size:13px; }
@@ -1003,7 +1221,7 @@
           <div class="hero-stat-label">Flights</div>
         </div>
         <div class="hero-stat">
-          <div class="hero-stat-num"><span id="statMiles">—</span><span class="accent">K</span></div>
+          <div class="hero-stat-num" id="statMilesTotal">—</div>
           <div class="hero-stat-label">Miles in the air</div>
         </div>
       </div>
@@ -1130,15 +1348,25 @@
       <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
     </div>
     <div class="flight-stats" id="flightStats"></div>
-    <div class="section-eyebrow" style="margin-bottom:20px">// BOARDING PASSES</div>
-    <div class="boarding-grid" id="boardingGrid"></div>
-    <div class="section-eyebrow" style="margin:40px 0 16px">// FULL FLIGHT LOG</div>
+    <div class="section-eyebrow" style="margin-bottom:20px">// BOARDING PASSES — CLICK TO EXPAND</div>
+    <div class="bp-stack" id="boardingGrid"></div>
+    <div class="section-eyebrow" style="margin:48px 0 16px">// FULL FLIGHT LOG</div>
     <div class="flight-log-wrap">
       <table>
         <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
         <tbody id="flightLog"></tbody>
       </table>
     </div>
+  </section>
+
+  <!-- ── AIRPORTS ── -->
+  <section class="airports-section">
+    <div class="section-header">
+      <div class="section-eyebrow">// FAVOURITE AIRPORTS</div>
+      <div class="section-title">AIRPORTS.</div>
+      <div class="section-poem-line">Some cities you enter through their airports. The airport is already the story.</div>
+    </div>
+    <div class="airport-grid" id="airportGrid"></div>
   </section>
 
   <!-- ── CAFES ── -->
@@ -1273,10 +1501,10 @@ let globeMode='countries', globeGlobe=null, globeFlightLines=[], globeCamera=nul
 
 // ── INTRO ─────────────────────────────────────────────────────────
 const introSeq=[
-  {el:'il1',d:300},{el:'il2',d:900},{el:'ir1',d:1400},
-  {el:'il3',d:1600},{el:'ir2',d:2300},
-  {el:'il4',d:2700},{el:'il5',d:3300},{el:'ir3',d:3900},
-  {el:'il6',d:4200},{el:'il7',d:5000}
+  {el:'il1',d:800},{el:'il2',d:1800},{el:'ir1',d:2600},
+  {el:'il3',d:3000},{el:'ir2',d:4000},
+  {el:'il4',d:4500},{el:'il5',d:5400},{el:'ir3',d:6200},
+  {el:'il6',d:6800},{el:'il7',d:7800}
 ];
 let introDone=false;
 
@@ -1284,13 +1512,16 @@ function dismissIntro() {
   if(introDone) return;
   introDone = true;
   const intro = document.getElementById('intro');
-  // Tear effect
   intro.classList.add('tearing');
+  // Start loading data immediately in background
+  loadAllData();
+  // Show page after 1s hold (tear animation + settle)
   setTimeout(() => {
     intro.classList.add('gone');
     document.getElementById('page').classList.add('vis');
-    loadAllData();
-  }, 550);
+    // Globe needs a painted frame to get real dimensions
+    requestAnimationFrame(() => requestAnimationFrame(() => initGlobeWhenReady()));
+  }, 1000);
 }
 
 introSeq.forEach(({el,d}) => {
@@ -1299,39 +1530,70 @@ introSeq.forEach(({el,d}) => {
     if(n) n.classList.add('vis');
   }, d);
 });
-setTimeout(dismissIntro, 6200);
+setTimeout(dismissIntro, 9000);
 document.getElementById('intro').addEventListener('click', dismissIntro);
 document.getElementById('introSkip').addEventListener('click', e => { e.stopPropagation(); dismissIntro(); });
 
 // ── LOAD ALL FROM FIRESTORE ───────────────────────────────────────
+let dataLoaded = false;
+let globeInitPending = false;
+
 async function loadAllData() {
   try {
-    // Parallel load all collections
-    const [countriesSnap, flightsSnap, cafesSnap, expSnap] = await Promise.all([
+    // Load each collection independently so one failure doesn't break all
+    const results = await Promise.allSettled([
       getDocs(collection(db,'countries')),
-      getDocs(query(collection(db,'flights'), orderBy('date','desc'))),
+      getDocs(collection(db,'flights')),   // no orderBy — avoids index requirement
       getDocs(collection(db,'cafes')),
       getDocs(collection(db,'experiences')),
     ]);
 
-    countriesData = countriesSnap.docs.map(d => ({id:d.id, ...d.data()}))
-      .filter(c => c.status !== 'wishlist');
-    flightsData   = flightsSnap.docs.map(d => ({id:d.id, ...d.data()}));
-    cafesData     = cafesSnap.docs.map(d => ({id:d.id, ...d.data()}));
-    experiencesData = expSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    if(results[0].status==='fulfilled') {
+      countriesData = results[0].value.docs.map(d => ({id:d.id,...d.data()}))
+        .filter(c => c.status !== 'wishlist');
+    }
+    if(results[1].status==='fulfilled') {
+      flightsData = results[1].value.docs.map(d => ({id:d.id,...d.data()}));
+      // Sort client-side by date desc
+      flightsData.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+    }
+    if(results[2].status==='fulfilled') {
+      cafesData = results[2].value.docs.map(d => ({id:d.id,...d.data()}));
+    }
+    if(results[3].status==='fulfilled') {
+      experiencesData = results[3].value.docs.map(d => ({id:d.id,...d.data()}));
+    }
 
+    // Log any failures
+    results.forEach((r,i)=>{
+      if(r.status==='rejected') console.warn('Collection',i,'failed:',r.reason?.message);
+    });
+
+    dataLoaded = true;
     updateStats();
-    initGlobe();
     revealOriginText();
     buildFlights();
+    buildAirports();
     buildReels();
     buildCafes();
     buildStamps();
     setupClosingPoem();
+    // If globe was waiting for data, init it now
+    if(globeInitPending) { globeInitPending=false; initGlobeWhenReady(); }
   } catch(e) {
-    console.error('Firestore load failed:', e);
-    // Graceful fallback — show empty states
+    console.error('loadAllData failed:', e);
   }
+}
+
+function initGlobeWhenReady() {
+  if(!dataLoaded) { globeInitPending=true; return; } // wait for data
+  const wrap = document.getElementById('globeWrap');
+  if(!wrap || wrap.clientWidth === 0) {
+    // Not painted yet — retry next frame
+    requestAnimationFrame(initGlobeWhenReady);
+    return;
+  }
+  initGlobe();
 }
 
 // ── STATS ─────────────────────────────────────────────────────────
@@ -1355,13 +1617,23 @@ function updateStats() {
   animateCount(document.getElementById('statCountries'), nc);
   animateCount(document.getElementById('statFlights'), nf);
   animateCount(document.getElementById('statMiles'), Math.round(totalMiles/1000));
-  document.getElementById('visitCount').innerHTML = `<span>${nc}</span> countries`;
-  document.getElementById('globeStampText').textContent = `${nc} COUNTRIES VISITED · EST. 2016`;
-  document.getElementById('fCountries').innerHTML = `${nc}<span>+</span>`;
-  document.getElementById('fFlights').innerHTML = `${nf}`;
-  document.getElementById('fMiles').innerHTML = `${Math.round(totalMiles/1000)}<span>K</span>`;
-  document.getElementById('fAirlines').innerHTML = `${airlines}`;
-  document.getElementById('closingCount').textContent = nc;
+  const vcEl = document.getElementById('visitCount');
+  if(vcEl) vcEl.innerHTML = `<span>${nc}</span> countries`;
+  const gsEl = document.getElementById('globeStampText');
+  if(gsEl) gsEl.textContent = `${nc} COUNTRIES VISITED · EST. 2016`;
+  const fcEl = document.getElementById('fCountries');
+  if(fcEl) fcEl.innerHTML = `${nc}<span>+</span>`;
+  const ffEl = document.getElementById('fFlights');
+  if(ffEl) ffEl.textContent = nf;
+  const fmEl = document.getElementById('fMiles');
+  if(fmEl) fmEl.innerHTML = `${Math.round(totalMiles/1000)}<span>K+</span>`;
+  const faEl = document.getElementById('fAirlines');
+  if(faEl) faEl.textContent = airlines;
+  const ccEl = document.getElementById('closingCount');
+  if(ccEl) ccEl.textContent = nc;
+  // Hero total miles
+  const hmEl = document.getElementById('statMilesTotal');
+  if(hmEl) hmEl.innerHTML = `${Math.round(totalMiles/1000)}<span class="accent">K</span>`;
 }
 
 // ── GLOBE ─────────────────────────────────────────────────────────
@@ -1619,64 +1891,265 @@ function revealOriginText() {
 function buildFlights() {
   const totalMiles = flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
   const airlines   = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))];
-  const airports   = [...new Set([...flightsData.map(f=>f.from), ...flightsData.map(f=>f.to)].filter(Boolean))];
+  const airports   = [...new Set([...flightsData.map(f=>f.from),...flightsData.map(f=>f.to)].filter(Boolean))];
   const topAirline = airlines.reduce((best,a)=>{
-    const c=flightsData.filter(f=>f.airline===a).length;
-    return c>(best.count||0)?{name:a,count:c}:best;
+    const cnt=flightsData.filter(f=>f.airline===a).length;
+    return cnt>(best.count||0)?{name:a,count:cnt}:best;
   },{});
 
   // Stats blocks
-  const statsEl = document.getElementById('flightStats');
-  [
-    {num:flightsData.length,label:'TOTAL FLIGHTS'},
-    {num:Math.round(totalMiles/1000).toLocaleString()+'K',label:'MILES FLOWN'},
-    {num:airlines.length,label:'AIRLINES'},
-    {num:airports.length,label:'AIRPORTS'},
-    {num:topAirline.name||'Emirates',label:'MOST FLOWN'},
-  ].forEach((b,i)=>{
+  const statsEl=document.getElementById('flightStats');
+  if(statsEl) [
+    {num:flightsData.length,     label:'TOTAL FLIGHTS'},
+    {num:Math.round(totalMiles).toLocaleString()+' MI', label:'TOTAL MILES'},
+    {num:Math.round(totalMiles*1.60934).toLocaleString()+' KM', label:'TOTAL KM'},
+    {num:airlines.length,        label:'AIRLINES'},
+    {num:airports.length,        label:'AIRPORTS'},
+    {num:topAirline.name||'—',   label:'MOST FLOWN'},
+  ].forEach(b=>{
     const el=document.createElement('div'); el.className='fs-block';
     el.innerHTML=`<div class="fs-num">${b.num}</div><div class="fs-label">${b.label}</div>`;
     statsEl.appendChild(el);
   });
 
-  // Boarding passes — show last 6 flights
-  const grid = document.getElementById('boardingGrid');
-  flightsData.slice(0,6).forEach(f=>{
-    const el=document.createElement('div'); el.className='boarding-pass';
-    el.innerHTML=`
-      <div class="bp-main">
-        <div class="bp-airline-bar"></div>
-        <div class="bp-route">
-          <div class="bp-iata">${f.from||'???'}</div>
-          <div class="bp-arrow">→</div>
-          <div class="bp-iata">${f.to||'???'}</div>
+  // ── BOARDING PASS DECK ──
+  const grid=document.getElementById('boardingGrid');
+  if(!grid) return;
+
+  flightsData.forEach((f,idx)=>{
+    const card=document.createElement('div');
+    card.className='bp-card';
+
+    const miles=f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—';
+    const km=f.distance_miles?Math.round(f.distance_miles*1.60934).toLocaleString():'—';
+
+    card.innerHTML=`
+      <div class="bp-bar"></div>
+      <div class="bp-face">
+        <div class="bp-header">
+          <div class="bp-flight-no">${f.flight_number||'—'}</div>
+          <div class="bp-date-badge">${f.date||'—'}</div>
         </div>
-        <div class="bp-cities">${f.from_city||''} → ${f.to_city||''}</div>
-        <div class="bp-meta">
-          <div class="bp-meta-item"><span class="bp-meta-label">CARRIER</span><span class="bp-meta-val">${f.airline||'—'}</span></div>
-          <div class="bp-meta-item"><span class="bp-meta-label">AIRCRAFT</span><span class="bp-meta-val">${f.aircraft_type||'—'}</span></div>
-          <div class="bp-meta-item"><span class="bp-meta-label">FLIGHT</span><span class="bp-meta-val">${f.flight_number||'—'}</span></div>
+        <div class="bp-route-row">
+          <div>
+            <div class="bp-iata-big">${f.from||'???'}</div>
+            <div class="bp-city-name" style="text-align:left">${f.from_city||''}</div>
+          </div>
+          <div class="bp-route-mid">
+            <div class="bp-route-plane">✈</div>
+            <div class="bp-route-line"></div>
+          </div>
+          <div>
+            <div class="bp-iata-big" style="text-align:right">${f.to||'???'}</div>
+            <div class="bp-city-name" style="text-align:right">${f.to_city||''}</div>
+          </div>
+        </div>
+        <div class="bp-meta-strip">
+          <div class="bp-meta-cell">
+            <span class="bp-meta-label">CARRIER</span>
+            <span class="bp-meta-val">${f.airline||'—'}</span>
+          </div>
+          <div class="bp-meta-cell">
+            <span class="bp-meta-label">TIME</span>
+            <span class="bp-meta-val">${f.time||'—'}</span>
+          </div>
+          <div class="bp-meta-cell">
+            <span class="bp-meta-label">MILES</span>
+            <span class="bp-meta-val teal">${miles}</span>
+          </div>
         </div>
       </div>
-      <div class="bp-stub">
-        <div class="bp-stub-date">${f.date||'—'}</div>
-        <div class="bp-stub-miles">${f.distance_miles?Math.round(f.distance_miles/1000):'—'}</div>
-        <div class="bp-stub-mi">K MI</div>
+      <hr class="bp-perf">
+      <div class="bp-toggle">
+        FLIGHT DETAILS <span class="bp-toggle-arrow">▾</span>
+      </div>
+      <div class="bp-detail">
+        <div class="bp-detail-inner">
+          <div class="bp-detail-title">// FULL FLIGHT DATA</div>
+          <div class="bp-detail-grid">
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">AIRCRAFT TYPE</span>
+              <span class="bp-detail-value">${f.aircraft_type||'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">TAIL NUMBER</span>
+              <span class="bp-detail-value mono">${f.tail_number||'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">DURATION</span>
+              <span class="bp-detail-value">${f.duration_mins?Math.floor(f.duration_mins/60)+'h '+f.duration_mins%60+'m':'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">DISTANCE</span>
+              <span class="bp-detail-value">${miles} mi · ${km} km</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">DEP TERMINAL</span>
+              <span class="bp-detail-value">${f.dep_terminal?'T'+f.dep_terminal:'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">DEP GATE</span>
+              <span class="bp-detail-value">${f.dep_gate?'G'+f.dep_gate:'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">SCHEDULED</span>
+              <span class="bp-detail-value">${f.dep_scheduled||f.time||'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">ACTUAL</span>
+              <span class="bp-detail-value">${f.dep_actual||'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">ARR TERMINAL</span>
+              <span class="bp-detail-value">${f.arr_terminal?'T'+f.arr_terminal:'—'}</span>
+            </div>
+            <div class="bp-detail-item">
+              <span class="bp-detail-label">RUNWAY DEP</span>
+              <span class="bp-detail-value mono">${f.runway_dep||'—'}</span>
+            </div>
+          </div>
+          <div class="bp-route-mini">
+            <div class="bp-route-mini-dot"></div>
+            <div class="bp-route-mini-line"></div>
+            <span style="color:var(--ink);font-size:11px">${f.from||'?'} → ${f.to||'?'}</span>
+            <div class="bp-route-mini-line"></div>
+            <div class="bp-route-mini-dot"></div>
+          </div>
+          ${f.notes?`<div class="bp-notes">"${f.notes}"</div>`:''}
+          ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft photo" loading="lazy">`:''}
+        </div>
       </div>`;
-    grid.appendChild(el);
+
+    // Toggle expand
+    card.addEventListener('click',()=>{
+      card.classList.toggle('open');
+    });
+
+    grid.appendChild(card);
   });
 
   // Full flight log table
-  const tbody = document.getElementById('flightLog');
+  const tbody=document.getElementById('flightLog');
+  if(!tbody) return;
   flightsData.forEach(f=>{
     const tr=document.createElement('tr');
     tr.innerHTML=`
-      <td class="route">${f.from||'?'} → ${f.to||'?'}<br><span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city||''} → ${f.to_city||''}</span></td>
+      <td class="route">${f.from||'?'} → ${f.to||'?'}<br>
+        <span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city||''} → ${f.to_city||''}</span>
+      </td>
       <td class="airline">${f.airline||'—'}</td>
       <td class="date">${f.date||'—'}</td>
       <td class="aircraft">${f.aircraft_type||'—'}</td>
       <td class="miles">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>`;
     tbody.appendChild(tr);
+  });
+}
+
+// ── AIRPORTS ─────────────────────────────────────────────────────
+// Airport metadata — enriched stories for key hubs
+// Permanent Unsplash CDN URLs — no API key needed, never expire
+const AIRPORT_META = {
+  DXB:{
+    name:'Dubai International', city:'Dubai', country:'UAE',
+    photo:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=80&fit=crop',
+    story:'If airports had personalities, DXB would be that impossibly well-dressed friend who somehow makes a 3am layover feel like a luxury event. I've spent more nights here than in some cities I call visited. Terminal 3 at 2am — the whole world is passing through, and somehow it still feels like mine.'
+  },
+  HND:{
+    name:'Haneda Airport', city:'Tokyo', country:'Japan',
+    photo:'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=900&q=80&fit=crop',
+    story:'Haneda is what airports dream of being. Clean enough to eat off the floor. Staff who bow when you board. A ramen shop at gate 52 that made me miss my connection on purpose, or at least that's my story. Tokyo starts the moment you land.'
+  },
+  SIN:{
+    name:'Changi Airport', city:'Singapore', country:'Singapore',
+    photo:'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=80&fit=crop',
+    story:'Changi has a waterfall. A seven-story indoor waterfall. I've seen it four times and it still stops me cold. The kind of airport that makes you wish your layover was longer.'
+  },
+  DEL:{
+    name:'Indira Gandhi International', city:'New Delhi', country:'India',
+    photo:'https://images.unsplash.com/photo-1597075687490-8f673c6c17f6?w=900&q=80&fit=crop',
+    story:'Terminal 3 is the airport I grew up through. Every time I land here I remember being seventeen, watching planes take off from a rooftop in my town, wondering where they were going. Now I'm on them.'
+  },
+  LHR:{
+    name:'London Heathrow', city:'London', country:'UK',
+    photo:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=80&fit=crop',
+    story:'Heathrow is the airport equivalent of a commuter train — efficient, slightly tired, everyone has somewhere else to be. But Terminal 5 at dawn, coffee in hand, there's a quiet dignity to it.'
+  },
+  JFK:{
+    name:'JFK International', city:'New York', country:'USA',
+    photo:'https://images.unsplash.com/photo-1483450388369-9ed95738483c?w=900&q=80&fit=crop',
+    story:'JFK is barely functional and somehow still iconic. The chaos, the accents, the taxi line that tests your patience — and then you're in Manhattan 45 minutes later and you forget all of it.'
+  },
+  CDG:{
+    name:'Charles de Gaulle', city:'Paris', country:'France',
+    photo:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=80&fit=crop',
+    story:'CDG at 6am. The smell of coffee and croissants drifts past baggage claim. Terminal 2E in the early morning light feels like the opening shot of a French film. Which is exactly what Paris deserves.'
+  },
+  GRU:{
+    name:'Guarulhos International', city:'São Paulo', country:'Brazil',
+    photo:'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=900&q=80&fit=crop',
+    story:'The gateway to South America. I've arrived here more disoriented than anywhere else — and left more alive. Something about Brazil resets you.'
+  },
+  ORD:{
+    name:"O'Hare International", city:'Chicago', country:'USA',
+    photo:'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=900&q=80&fit=crop',
+    story:'The great American hub. I've had long layovers here more times than I can count. The deep-dish pizza in Terminal F is not a myth.'
+  },
+  AUH:{
+    name:'Zayed International', city:'Abu Dhabi', country:'UAE',
+    photo:'https://images.unsplash.com/photo-1548407260-da850faa41e3?w=900&q=80&fit=crop',
+    story:'The quieter, more composed sibling of DXB across the water. Zayed International opened with ambitions to outshine everyone. The architecture alone is worth the connection.'
+  },
+  DOH:{
+    name:'Hamad International', city:'Doha', country:'Qatar',
+    photo:'https://images.unsplash.com/photo-1569427572956-a7e41a9e1f46?w=900&q=80&fit=crop',
+    story:'Hamad is the world's best airport for good reason. The lamp bear. The indoor gardens. The sleeping pods. If you have to be stuck somewhere, let it be here.'
+  },
+  IAH:{
+    name:'George Bush Intercontinental', city:'Houston', country:'USA',
+    photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop',
+    story:'Houston's gateway to the world. The international terminal at night when everything is quiet — there's something about the Texas scale of it that gets you.'
+  },
+};
+
+function buildAirports() {
+  const visitCounts = {};
+  flightsData.forEach(f => {
+    if(f.from) visitCounts[f.from] = (visitCounts[f.from]||0) + 1;
+    if(f.to)   visitCounts[f.to]   = (visitCounts[f.to]  ||0) + 1;
+  });
+
+  // Top airports that have metadata, sorted by visit count
+  const topAirports = Object.entries(visitCounts)
+    .filter(([code]) => AIRPORT_META[code])
+    .sort((a,b) => b[1]-a[1])
+    .slice(0,6);
+
+  const grid = document.getElementById('airportGrid');
+  if(!grid) return;
+
+  // Fallback if no matches yet
+  const toRender = topAirports.length
+    ? topAirports
+    : Object.entries(AIRPORT_META).slice(0,6).map(([code,meta]) => [code,0]);
+
+  toRender.forEach(([code, visits]) => {
+    const meta = AIRPORT_META[code];
+    if(!meta) return;
+    const card = document.createElement('div');
+    card.className = 'airport-card';
+
+    card.innerHTML = `
+      <div class="airport-photo" style="background-image:url('${meta.photo}')"></div>
+      <div class="airport-vignette"></div>
+      <div class="airport-hint">HOVER TO READ</div>
+      <div class="airport-content">
+        <div class="airport-code">${code}</div>
+        <div class="airport-name">${meta.name} · ${meta.city}</div>
+        ${visits>0?`<div class="airport-visits">${visits} VISIT${visits!==1?'S':''}</div>`:''}
+        <div class="airport-story-text">${meta.story}</div>
+      </div>
+      <div class="airport-credit">Photo via Unsplash</div>`;
+    grid.appendChild(card);
   });
 }
 
