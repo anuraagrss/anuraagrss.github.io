@@ -8,416 +8,904 @@
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <style>
+    /* ── TOKENS ── */
     :root {
-      --paper:  #F5F1EB;
-      --paper2: #EDE8E0;
-      --paper3: #E4DDD3;
-      --ink:    #1a1410;
-      --ink2:   #3d2e22;
-      --muted:  #7a6a5a;
-      --faint:  rgba(26,20,16,0.1);
-      --teal:   #3a9e9c;
-      --teal2:  rgba(58,158,156,0.12);
-      --gold:   #c8963e;
-      --serif:  'Lora', Georgia, serif;
-      --mono:   'JetBrains Mono', monospace;
-      --disp:   'Bebas Neue', sans-serif;
+      --paper:   #F6F1E9;
+      --paper2:  #EDE7DC;
+      --paper3:  #E3DBCD;
+      --ink:     #1C1109;
+      --ink2:    #3D2B1A;
+      --muted:   #7A6A54;
+      --faint:   rgba(28,17,9,0.09);
+      --teal:    #2E8B7A;
+      --teal2:   rgba(46,139,122,0.1);
+      --gold:    #C8913A;
+      --gold2:   rgba(200,145,58,0.12);
+      --amber:   #D4792A;
+      --serif:   'Lora', Georgia, serif;
+      --mono:    'JetBrains Mono', monospace;
+      --disp:    'Bebas Neue', sans-serif;
+      --dark:    #0C0804;
+      --dark2:   #161008;
     }
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { background: var(--paper); color: var(--ink); font-family: var(--serif); overflow-x: hidden; }
 
-    /* ── INTRO ── */
+    /* ═══════════════════════════════
+       PHASE 1 — INTRO
+    ═══════════════════════════════ */
     #intro {
       position: fixed; inset: 0; z-index: 2000;
-      background: var(--ink);
+      background: var(--dark);
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
-      transition: opacity 0.9s ease, visibility 0.9s ease;
+      transition: opacity 1s ease, visibility 1s ease;
     }
     #intro.gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+    /* Projector grain */
     .intro-grain {
-      position: absolute; inset: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: 0.35;
+      position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+      animation: grainShift 0.12s steps(1) infinite;
     }
+    @keyframes grainShift {
+      0%  { transform: translate(0,0); }
+      25% { transform: translate(-1%,-1%); }
+      50% { transform: translate(1%,0); }
+      75% { transform: translate(0,1%); }
+    }
+
+    /* Postcard texture ghost behind intro lines */
+    .intro-postcard-bg {
+      position: absolute; inset: 0; z-index: 0;
+      background:
+        repeating-linear-gradient(0deg, transparent, transparent 27px, rgba(245,241,235,0.018) 27px, rgba(245,241,235,0.018) 28px),
+        repeating-linear-gradient(90deg, transparent, transparent 27px, rgba(245,241,235,0.015) 27px, rgba(245,241,235,0.015) 28px);
+      opacity: 0; animation: paperReveal 2s ease 1.2s forwards;
+    }
+    @keyframes paperReveal { to { opacity: 1; } }
+
+    /* Urdu ghost text */
+    .intro-urdu {
+      position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+      font-size: clamp(48px, 9vw, 100px); color: rgba(200,145,58,0.04);
+      letter-spacing: 6px; white-space: nowrap; z-index: 0;
+      pointer-events: none; user-select: none;
+      font-family: 'Georgia', serif;
+      opacity: 0; animation: urduReveal 3s ease 0.5s forwards;
+    }
+    @keyframes urduReveal { to { opacity: 1; } }
+
+    /* Projector light beam */
+    .intro-beam {
+      position: absolute; top: 0; left: 50%; transform: translateX(-50%);
+      width: 2px; height: 0; background: rgba(200,145,58,0.15);
+      box-shadow: 0 0 80px 40px rgba(200,145,58,0.06);
+      animation: beamGrow 1.5s ease 0.2s forwards;
+      pointer-events: none;
+    }
+    @keyframes beamGrow { to { height: 100%; } }
+
     .intro-lines {
       position: relative; z-index: 1;
       display: flex; flex-direction: column; align-items: center;
-      max-width: 720px; padding: 0 32px; text-align: center;
+      max-width: 680px; padding: 0 32px; text-align: center; gap: 0;
     }
-    .il { font-family: var(--serif); font-style: italic; color: rgba(245,241,235,0); line-height: 1.6; transition: color 0.8s ease; }
-    .il.vis { color: rgba(245,241,235,0.88); }
-    .il.sm  { font-size: clamp(14px,2vw,18px); margin-bottom: 8px; }
-    .il.lg  { font-size: clamp(22px,4vw,42px); font-weight: 600; margin-bottom: 24px; }
-    .il.tag { font-style: normal; font-family: var(--mono); font-size: clamp(11px,1.4vw,14px); letter-spacing: 3px; color: rgba(58,158,156,0); transition: color 0.8s ease; }
-    .il.tag.vis { color: rgba(58,158,156,0.8); }
-    .ir { width: 0; height: 1px; background: rgba(200,150,62,0.4); margin: 18px auto; transition: width 1.2s ease; }
+    .il {
+      font-family: var(--serif); font-style: italic;
+      color: rgba(246,241,233,0); line-height: 1.65;
+      transition: color 0.9s ease;
+    }
+    .il.vis { color: rgba(246,241,233,0.88); }
+    .il.sm  { font-size: clamp(14px,2vw,19px); margin-bottom: 7px; }
+    .il.lg  {
+      font-size: clamp(22px,4.5vw,46px); font-weight: 600; margin-bottom: 22px;
+      color: rgba(246,241,233,0);
+      transition: color 1s ease;
+    }
+    .il.lg.vis { color: rgba(246,241,233,0.96); }
+    .il.tag {
+      font-style: normal; font-family: var(--mono);
+      font-size: clamp(10px,1.3vw,13px); letter-spacing: 3px;
+      color: rgba(200,145,58,0); transition: color 0.9s ease; margin-top: 4px;
+    }
+    .il.tag.vis { color: rgba(200,145,58,0.85); }
+
+    /* The final line — proof of aliveness */
+    .il.proof {
+      font-family: var(--disp); font-style: normal;
+      font-size: clamp(28px,5vw,58px); letter-spacing: 3px;
+      color: rgba(200,145,58,0); transition: color 1.2s ease;
+      margin-top: 8px; line-height: 1;
+    }
+    .il.proof.vis { color: rgba(200,145,58,0.95); }
+
+    .ir {
+      width: 0; height: 1px;
+      background: linear-gradient(to right, transparent, rgba(200,145,58,0.5), transparent);
+      margin: 14px auto; transition: width 1.4s ease;
+    }
     .ir.vis { width: 80px; }
+
+    /* Envelope tear transition */
+    .intro-tear {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 0; overflow: hidden; z-index: 2;
+      transition: height 0.6s cubic-bezier(0.4,0,0.2,1);
+    }
+    #intro.tearing .intro-tear { height: 100%; }
+    .tear-paper {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 100%; background: var(--paper);
+      clip-path: polygon(0 4%, 5% 0%, 10% 5%, 15% 1%, 20% 6%, 25% 2%, 30% 7%, 35% 0%, 40% 5%, 45% 1%, 50% 6%, 55% 2%, 60% 5%, 65% 0%, 70% 4%, 75% 1%, 80% 5%, 85% 2%, 90% 6%, 95% 1%, 100% 4%, 100% 100%, 0 100%);
+    }
+
     .intro-skip {
-      position: absolute; bottom: 36px; right: 40px; z-index: 1;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
-      color: rgba(245,241,235,0.3); border: 1px solid rgba(245,241,235,0.12);
-      padding: 7px 16px; border-radius: 3px; cursor: pointer;
+      position: absolute; bottom: 28px; right: 32px; z-index: 3;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.25); border: 1px solid rgba(246,241,233,0.1);
+      padding: 6px 14px; border-radius: 2px; cursor: pointer;
       transition: color 0.2s, border-color 0.2s;
     }
-    .intro-skip:hover { color: rgba(245,241,235,0.7); border-color: rgba(245,241,235,0.3); }
+    .intro-skip:hover { color: rgba(246,241,233,0.6); border-color: rgba(246,241,233,0.25); }
 
-    /* ── PAGE ── */
-    #page { opacity: 0; transition: opacity 0.8s ease; }
+    /* ═══════════════════════════════
+       PAGE SHELL
+    ═══════════════════════════════ */
+    #page { opacity: 0; transition: opacity 0.9s ease; }
     #page.vis { opacity: 1; }
 
     /* ── TOP NAV ── */
     .top-nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 500;
-      padding: 14px 48px;
+      padding: 13px 48px;
       display: flex; align-items: center; justify-content: space-between;
-      background: rgba(245,241,235,0);
-      transition: background 0.4s, border-color 0.4s;
+      background: transparent;
+      transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
       border-bottom: 1px solid transparent;
     }
-    .top-nav.scrolled { background: rgba(245,241,235,0.92); backdrop-filter: blur(10px); border-color: var(--faint); }
+    .top-nav.scrolled {
+      background: rgba(246,241,233,0.93);
+      backdrop-filter: blur(10px);
+      border-color: var(--faint);
+      box-shadow: 0 1px 24px rgba(28,17,9,0.06);
+    }
     .nav-logo { font-family: var(--mono); font-size: 12px; letter-spacing: 2px; color: var(--teal); text-decoration: none; }
-    .nav-back  { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); text-decoration: none; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+    .nav-back  {
+      font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
+      color: var(--muted); text-decoration: none;
+      display: flex; align-items: center; gap: 6px; transition: color 0.2s;
+    }
     .nav-back:hover { color: var(--teal); }
 
-    /* ── HERO ── */
+    /* ═══════════════════════════════
+       PHASE 2 — HERO
+    ═══════════════════════════════ */
     .hero {
-      padding: 120px 48px 56px;
-      max-width: 1100px; margin: 0 auto;
-      display: flex; align-items: flex-end; justify-content: space-between;
-      gap: 24px; flex-wrap: wrap;
+      padding: 130px 56px 72px;
+      max-width: 1120px; margin: 0 auto;
+      position: relative;
     }
-    .hero-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: var(--teal); margin-bottom: 12px; }
-    .hero-title { font-family: var(--disp); font-size: clamp(56px,9vw,110px); line-height: 0.9; letter-spacing: 1px; color: var(--ink); }
-    .hero-sub { font-size: 16px; font-style: italic; color: var(--muted); margin-top: 18px; max-width: 480px; line-height: 1.65; }
-    .hero-stats { display: flex; gap: 36px; align-items: flex-end; flex-wrap: wrap; }
-    .stat-num { font-family: var(--disp); font-size: clamp(40px,5vw,60px); color: var(--ink); line-height: 1; }
-    .stat-num span { color: var(--teal); }
-    .stat-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 4px; }
-
-    /* ── GLOBE SECTION ── */
-    .globe-section { padding: 0 48px 72px; max-width: 1100px; margin: 0 auto; }
-    .section-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--muted); margin-bottom: 16px; }
-
-    /* Toggle */
-    .globe-toggle {
-      display: flex; gap: 4px; margin-bottom: 16px;
+    /* Urdu watermark behind hero */
+    .hero-urdu-bg {
+      position: absolute; top: 50%; right: -40px; transform: translateY(-50%);
+      font-size: clamp(80px,14vw,160px);
+      color: rgba(200,145,58,0.04);
+      pointer-events: none; user-select: none;
+      font-family: Georgia, serif; letter-spacing: 4px; line-height: 1.3;
+      text-align: right; white-space: nowrap;
     }
+    .hero-content { position: relative; z-index: 1; }
+    .hero-eyebrow {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 4px;
+      color: var(--teal); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: ''; display: inline-block; width: 28px; height: 1px;
+      background: var(--teal);
+    }
+    .hero-title {
+      font-family: var(--disp);
+      font-size: clamp(72px, 13vw, 156px);
+      line-height: 0.88; letter-spacing: 2px;
+      color: var(--ink); margin-bottom: 28px;
+    }
+    .hero-title .proof-word {
+      color: var(--amber);
+      position: relative; display: inline-block;
+    }
+    /* Ink underline on ALIVE */
+    .hero-title .proof-word::after {
+      content: ''; position: absolute; bottom: 4px; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(to right, var(--amber), var(--gold));
+      border-radius: 2px;
+    }
+    .hero-sub {
+      font-size: clamp(15px,1.8vw,19px); font-style: italic;
+      color: var(--muted); max-width: 520px; line-height: 1.75;
+      margin-bottom: 40px;
+    }
+
+    /* Stats — typewriter counting */
+    .hero-stats { display: flex; gap: 48px; flex-wrap: wrap; align-items: flex-end; }
+    .hero-stat { display: flex; flex-direction: column; gap: 4px; }
+    .hero-stat-num {
+      font-family: var(--disp); font-size: clamp(44px,6vw,72px);
+      color: var(--ink); line-height: 1; letter-spacing: 1px;
+    }
+    .hero-stat-num .accent { color: var(--amber); }
+    .hero-stat-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px;
+      color: var(--muted); text-transform: uppercase;
+    }
+
+    /* Thumbtack avatar */
+    .hero-avatar-wrap {
+      position: absolute; top: 100px; right: 56px;
+      display: flex; flex-direction: column; align-items: center;
+      z-index: 2;
+    }
+    .thumbtack {
+      width: 14px; height: 14px; background: var(--amber);
+      border-radius: 50%; margin-bottom: -4px; position: relative; z-index: 1;
+      box-shadow: 0 2px 8px rgba(200,145,58,0.4);
+    }
+    .thumbtack::after {
+      content: ''; position: absolute; bottom: -8px; left: 50%;
+      transform: translateX(-50%);
+      width: 2px; height: 8px; background: rgba(28,17,9,0.3);
+      border-radius: 1px;
+    }
+    .hero-avatar {
+      width: clamp(120px,16vw,180px); height: clamp(120px,16vw,180px);
+      object-fit: cover; border-radius: 2px;
+      border: 3px solid var(--paper);
+      box-shadow: 4px 6px 24px rgba(28,17,9,0.18), -1px -1px 0 rgba(28,17,9,0.08);
+      transform: rotate(1.5deg);
+      filter: sepia(12%);
+    }
+    .avatar-caption {
+      margin-top: 8px; font-family: var(--mono); font-size: 9px;
+      letter-spacing: 1.5px; color: var(--muted);
+      transform: rotate(1.5deg);
+    }
+
+    /* ═══════════════════════════════
+       PHASE 3 — GLOBE
+    ═══════════════════════════════ */
+    .globe-section {
+      padding: 0 0 80px;
+    }
+    .globe-outer {
+      background: var(--dark);
+      padding: 48px 56px 40px;
+      position: relative;
+      /* Torn paper top edge */
+    }
+    .globe-outer::before {
+      content: '';
+      position: absolute; top: -18px; left: 0; right: 0; height: 22px;
+      background: var(--dark);
+      clip-path: polygon(0 100%,2% 20%,4% 80%,6% 10%,8% 70%,10% 15%,12% 75%,14% 5%,16% 65%,18% 20%,20% 80%,22% 10%,24% 70%,26% 25%,28% 85%,30% 5%,32% 60%,34% 15%,36% 75%,38% 0%,40% 65%,42% 20%,44% 80%,46% 10%,48% 70%,50% 15%,52% 75%,54% 5%,56% 65%,58% 25%,60% 80%,62% 10%,64% 70%,66% 15%,68% 75%,70% 5%,72% 60%,74% 20%,76% 80%,78% 10%,80% 70%,82% 25%,84% 85%,86% 5%,88% 60%,90% 15%,92% 75%,94% 0%,96% 65%,98% 25%,100% 80%,100% 100%);
+    }
+    .globe-outer::after {
+      content: '';
+      position: absolute; bottom: -18px; left: 0; right: 0; height: 22px;
+      background: var(--dark);
+      clip-path: polygon(0 0,2% 80%,4% 20%,6% 90%,8% 30%,10% 85%,12% 25%,14% 95%,16% 35%,18% 80%,20% 20%,22% 90%,24% 30%,26% 75%,28% 15%,30% 95%,32% 40%,34% 85%,36% 25%,38% 100%,40% 35%,42% 80%,44% 20%,46% 90%,48% 30%,50% 85%,52% 25%,54% 95%,56% 35%,58% 75%,60% 20%,62% 90%,64% 30%,66% 85%,68% 25%,70% 95%,72% 40%,74% 80%,76% 20%,78% 90%,80% 30%,82% 75%,84% 15%,86% 95%,88% 40%,90% 85%,92% 25%,94% 100%,96% 35%,98% 75%,100% 20%,100% 0);
+    }
+
+    .globe-inner { max-width: 1120px; margin: 0 auto; }
+
+    .globe-stamp-row {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
+    }
+    .globe-stamp {
+      display: inline-flex; align-items: center; gap: 8px;
+      border: 2px solid rgba(46,139,122,0.4);
+      padding: 5px 14px; border-radius: 2px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      color: rgba(46,139,122,0.8);
+      position: relative;
+    }
+    .globe-stamp::before {
+      content: ''; position: absolute; inset: 2px;
+      border: 1px solid rgba(46,139,122,0.2);
+      pointer-events: none;
+    }
+    .globe-toggle { display: flex; gap: 4px; }
     .gtog {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px;
-      padding: 6px 16px; border-radius: 3px; cursor: pointer;
-      border: 1px solid var(--faint); background: transparent; color: var(--muted);
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      padding: 5px 14px; border-radius: 2px; cursor: pointer;
+      border: 1px solid rgba(255,255,255,0.15);
+      background: transparent; color: rgba(255,255,255,0.35);
       transition: all 0.2s;
     }
-    .gtog.active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+    .gtog.active { background: var(--teal); color: #fff; border-color: var(--teal); }
 
     .globe-wrap {
       position: relative; width: 100%;
-      height: 68vh; min-height: 420px;
-      border-radius: 20px; overflow: hidden;
-      background: #040a14;
-      border: 1px solid rgba(26,20,16,0.08);
+      height: 65vh; min-height: 400px;
+      border-radius: 12px; overflow: hidden;
+      background: #030608;
+      border: 1px solid rgba(255,255,255,0.05);
       cursor: grab;
     }
     .globe-wrap:active { cursor: grabbing; }
     #globeCanvas { display: block; width: 100%; height: 100%; }
     .globe-hint {
-      position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
+      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: rgba(255,255,255,0.35);
-      background: rgba(0,0,0,0.4); padding: 6px 16px; border-radius: 20px;
-      pointer-events: none; transition: opacity 0.4s;
+      color: rgba(255,255,255,0.28);
+      background: rgba(0,0,0,0.45); padding: 5px 14px; border-radius: 20px;
+      pointer-events: none; transition: opacity 0.5s;
     }
     .globe-tooltip {
       position: absolute; pointer-events: none;
-      background: rgba(4,10,20,0.9); border: 1px solid rgba(58,158,156,0.35);
-      color: rgba(245,241,235,0.9); padding: 8px 14px; border-radius: 6px;
+      background: rgba(3,6,8,0.92); border: 1px solid rgba(46,139,122,0.3);
+      color: rgba(246,241,233,0.9); padding: 7px 13px; border-radius: 4px;
       font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
-      opacity: 0; transition: opacity 0.2s; white-space: nowrap; z-index: 10;
+      opacity: 0; transition: opacity 0.15s; white-space: nowrap; z-index: 10;
     }
     .globe-counter {
-      position: absolute; top: 18px; right: 18px;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
-      color: rgba(255,255,255,0.4);
+      position: absolute; top: 16px; right: 16px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
+      color: rgba(255,255,255,0.35);
     }
-    .globe-counter span { color: #5bc0be; font-family: var(--disp); font-size: 20px; }
+    .globe-counter span { color: var(--teal); font-family: var(--disp); font-size: 22px; vertical-align: middle; }
     .globe-legend {
-      position: absolute; bottom: 20px; right: 20px;
+      position: absolute; bottom: 18px; right: 18px;
       display: flex; flex-direction: column; gap: 5px;
     }
-    .leg-item { display: flex; align-items: center; gap: 6px; font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: rgba(255,255,255,0.4); }
-    .leg-dot  { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-    .globe-caption { margin-top: 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); text-align: right; }
+    .leg-item {
+      display: flex; align-items: center; gap: 6px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
+      color: rgba(255,255,255,0.35);
+    }
+    .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+    .globe-caption {
+      margin-top: 14px; font-family: var(--mono); font-size: 11px;
+      letter-spacing: 1px; color: rgba(255,255,255,0.3); text-align: right;
+    }
     .globe-caption span { color: var(--teal); }
 
-    /* ── ORIGIN QUOTE ── */
-    .origin-quote { max-width: 760px; margin: 0 auto 72px; padding: 0 48px 0 32px; border-left: 3px solid var(--gold); }
-    .origin-quote blockquote { font-size: clamp(17px,2.2vw,24px); font-style: italic; line-height: 1.7; color: var(--ink2); }
-    .origin-quote cite { display: block; margin-top: 14px; font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--muted); font-style: normal; }
-
-    /* ── FACTS STRIP ── */
-    .facts-strip { background: var(--ink); padding: 56px 48px; display: flex; justify-content: center; gap: 72px; flex-wrap: wrap; margin-bottom: 80px; }
-    .fact-item { text-align: center; }
-    .fact-num  { font-family: var(--disp); font-size: clamp(40px,5vw,64px); color: var(--paper); line-height: 1; }
-    .fact-num span { color: var(--teal); }
-    .fact-desc { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: rgba(245,241,235,0.35); margin-top: 6px; text-transform: uppercase; }
-
-    /* ── FLIGHTS SECTION ── */
-    .flights-section { max-width: 1100px; margin: 0 auto 100px; padding: 0 48px; }
-    .section-header { margin-bottom: 40px; }
-    .section-eyebrow { font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: var(--teal); margin-bottom: 10px; }
-    .section-title { font-family: var(--disp); font-size: clamp(36px,5vw,64px); color: var(--ink); line-height: 1; margin-bottom: 8px; }
-    .section-sub { font-size: 14px; font-style: italic; color: var(--muted); }
-
-    /* Flight stats bar */
-    .flight-stats {
-      display: grid; grid-template-columns: repeat(auto-fit,minmax(140px,1fr));
-      gap: 2px; margin-bottom: 48px;
+    /* ═══════════════════════════════
+       PHASE 4 — ORIGIN
+    ═══════════════════════════════ */
+    .origin-section {
+      padding: 80px 0; position: relative; overflow: hidden;
     }
-    .fs-block {
-      background: var(--paper2); padding: 24px 20px; text-align: center;
-      border: 1px solid var(--faint);
+    .origin-inner {
+      max-width: 1120px; margin: 0 auto; padding: 0 56px;
     }
-    .fs-block:first-child { border-radius: 10px 0 0 10px; }
-    .fs-block:last-child  { border-radius: 0 10px 10px 0; }
-    .fs-num   { font-family: var(--disp); font-size: clamp(32px,4vw,48px); color: var(--ink); line-height: 1; }
-    .fs-num span { color: var(--teal); }
-    .fs-label { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-top: 6px; }
-
-    /* Flight log table */
-    .flight-log-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--faint); margin-bottom: 64px; }
-    table { width: 100%; border-collapse: collapse; font-size: 13px; }
-    thead th {
-      background: var(--ink); color: rgba(245,241,235,0.6);
+    /* Postcard element */
+    .origin-postcard {
+      background: #FDFAF4;
+      border: 1px solid var(--paper3);
+      border-radius: 3px;
+      padding: 40px 48px 36px 52px;
+      position: relative;
+      box-shadow: 4px 6px 32px rgba(28,17,9,0.1), 0 1px 0 rgba(28,17,9,0.06);
+      max-width: 760px;
+      transform: rotate(-0.4deg);
+    }
+    /* Red left margin line */
+    .origin-postcard::before {
+      content: '';
+      position: absolute; left: 36px; top: 0; bottom: 0;
+      width: 1px; background: rgba(212,121,42,0.3);
+    }
+    /* Ruled lines */
+    .origin-postcard::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 31px,
+        rgba(28,17,9,0.05) 31px,
+        rgba(28,17,9,0.05) 32px
+      );
+      border-radius: 3px; pointer-events: none;
+    }
+    .postcard-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; position: relative; z-index: 1;
+    }
+    .postcard-to {
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      padding: 14px 18px; text-align: left; font-weight: 400;
+      color: var(--muted);
     }
-    tbody tr { border-bottom: 1px solid var(--faint); transition: background 0.2s; }
-    tbody tr:last-child { border-bottom: none; }
-    tbody tr:hover { background: var(--teal2); }
-    tbody td { padding: 13px 18px; color: var(--ink2); vertical-align: middle; }
-    td.route { font-family: var(--mono); font-size: 12px; color: var(--ink); letter-spacing: 0.5px; }
-    td.airline { color: var(--muted); font-size: 12px; }
-    td.date { font-family: var(--mono); font-size: 11px; color: var(--muted); }
-    td.miles { font-family: var(--mono); font-size: 11px; color: var(--teal); }
-    td.notes { font-style: italic; color: var(--muted); font-size: 12px; max-width: 220px; }
+    .postcard-stamp-img {
+      width: 54px; height: 64px;
+      background: var(--paper2);
+      border: 1px solid var(--paper3);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; gap: 3px;
+      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
+      color: var(--muted); text-align: center;
+      border-radius: 2px;
+    }
+    .postcard-stamp-img .stamp-globe {
+      font-size: 18px; opacity: 0.5;
+    }
+    .postmark {
+      position: absolute; right: 56px; top: 52px;
+      width: 68px; height: 68px; border-radius: 50%;
+      border: 2px solid rgba(200,145,58,0.3);
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; text-align: center;
+      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
+      color: rgba(200,145,58,0.45); line-height: 1.4;
+      transform: rotate(12deg); z-index: 1;
+    }
+    .postmark::before {
+      content: ''; position: absolute; inset: 3px;
+      border-radius: 50%; border: 1px solid rgba(200,145,58,0.2);
+    }
+    .origin-text {
+      font-size: clamp(16px,2vw,21px); font-style: italic;
+      line-height: 1.8; color: var(--ink2);
+      position: relative; z-index: 1;
+    }
+    .origin-text .reveal-word {
+      display: inline;
+      opacity: 0; transition: opacity 0.4s ease;
+    }
+    .origin-text .reveal-word.vis { opacity: 1; }
+    .origin-cite {
+      margin-top: 24px; font-family: var(--mono); font-size: 10px;
+      letter-spacing: 2px; color: var(--muted);
+      position: relative; z-index: 1; font-style: normal;
+    }
 
-    /* Airport stories */
-    .airport-grid {
-      display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 20px;
+    /* ═══════════════════════════════
+       FACTS STRIP
+    ═══════════════════════════════ */
+    .facts-strip {
+      background: var(--ink); padding: 56px;
+      display: flex; justify-content: center; gap: 72px;
+      flex-wrap: wrap; margin: 0;
     }
-    .airport-card {
-      background: var(--paper2); border: 1px solid var(--faint); border-radius: 12px;
-      padding: 24px; transition: transform 0.25s, box-shadow 0.25s;
-      cursor: pointer;
-    }
-    .airport-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(26,20,16,0.1); }
-    .airport-code { font-family: var(--disp); font-size: 48px; color: var(--teal); line-height: 1; margin-bottom: 4px; }
-    .airport-name { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); margin-bottom: 16px; }
-    .airport-visits { display: inline-block; font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--teal); background: var(--teal2); padding: 3px 10px; border-radius: 20px; margin-bottom: 14px; }
-    .airport-vibe { font-size: 13px; font-style: italic; color: var(--ink2); line-height: 1.6; margin-bottom: 12px; }
-    .airport-story { font-size: 13px; line-height: 1.75; color: var(--muted); display: none; }
-    .airport-card.open .airport-story { display: block; }
-    .airport-expand { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--teal); background: none; border: none; padding: 0; cursor: pointer; transition: gap 0.2s; display: flex; align-items: center; gap: 6px; margin-top: 12px; }
+    .fact-item { text-align: center; }
+    .fact-num { font-family: var(--disp); font-size: clamp(44px,5.5vw,68px); color: var(--paper); line-height: 1; }
+    .fact-num span { color: var(--teal); }
+    .fact-desc { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: rgba(246,241,233,0.3); margin-top: 6px; }
 
-    /* ── EXPERIENCES ── */
-    .experiences { max-width: 1100px; margin: 0 auto 100px; padding: 0 48px; }
-    /* ── TABS — dramatic selector ── */
+    /* ═══════════════════════════════
+       PHASE 5 — EXPERIENCES (Film wall)
+    ═══════════════════════════════ */
+    .experiences {
+      max-width: 1120px; margin: 0 auto 96px; padding: 80px 56px 0;
+    }
+    .section-header { margin-bottom: 40px; }
+    .section-eyebrow {
+      font-family: var(--mono); font-size: 10px; letter-spacing: 4px;
+      color: var(--teal); margin-bottom: 10px;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .section-eyebrow::before { content:''; width:20px; height:1px; background:var(--teal); }
+    .section-title {
+      font-family: var(--disp); font-size: clamp(40px,6vw,72px);
+      color: var(--ink); line-height: 0.95; margin-bottom: 10px;
+    }
+    .section-poem-line {
+      font-size: 14px; font-style: italic; color: var(--muted); line-height: 1.6;
+    }
+
+    /* Tab switcher — ink fill */
     .exp-tabs {
       display: flex; gap: 0; margin-bottom: 36px;
-      position: relative;
-    }
-    .exp-tabs::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 1px; background: var(--faint);
+      position: relative; border-bottom: 1px solid var(--faint);
     }
     .exp-tab {
-      position: relative; padding: 14px 32px;
+      position: relative; padding: 13px 28px;
       font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
-      color: var(--muted); cursor: pointer;
-      background: none; border: none;
-      transition: color 0.35s ease;
-      overflow: hidden;
-      z-index: 1;
+      color: var(--muted); cursor: pointer; background: none; border: none;
+      transition: color 0.3s; overflow: hidden; z-index: 1;
     }
-    /* Ink fill on hover */
     .exp-tab::before {
       content: ''; position: absolute; inset: 0;
       background: var(--ink);
       transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
-      z-index: -1;
+      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); z-index: -1;
     }
-    .exp-tab:hover::before { transform: translateY(60%); }
+    .exp-tab:hover::before { transform: translateY(55%); }
     .exp-tab:hover { color: var(--paper); }
-
-    /* Active state — full ink fill + teal underline */
     .exp-tab.active { color: var(--paper); }
     .exp-tab.active::before { transform: translateY(0); }
     .exp-tab::after {
       content: ''; position: absolute; bottom: 0; left: 0; right: 0;
       height: 2px; background: var(--teal);
-      transform: scaleX(0);
-      transition: transform 0.35s ease;
-      z-index: 2;
+      transform: scaleX(0); transition: transform 0.35s ease; z-index: 2;
     }
     .exp-tab.active::after { transform: scaleX(1); }
+    .exp-tab .tab-icon { display: inline-block; margin-right: 7px; font-size: 12px; }
 
-    /* Icon hints per tab */
-    .exp-tab .tab-icon {
-      display: inline-block; margin-right: 8px; font-size: 13px;
-      opacity: 0.6; transition: opacity 0.3s, transform 0.3s;
-    }
-    .exp-tab.active .tab-icon, .exp-tab:hover .tab-icon {
-      opacity: 1; transform: scale(1.15);
+    /* Tab poem line */
+    .tab-poem {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+      color: var(--teal); margin-bottom: 20px; font-style: italic;
     }
 
-    /* Reel transition */
-    .reel-wrap {
-      display: none; flex-direction: column;
-      opacity: 0; transform: translateY(12px);
-      transition: opacity 0.4s ease, transform 0.4s ease;
-    }
-    .reel-wrap.active {
-      display: flex;
-      animation: reelIn 0.4s ease forwards;
-    }
-    @keyframes reelIn {
-      from { opacity: 0; transform: translateY(12px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
+    /* Reel */
+    .reel-wrap { display: none; flex-direction: column; }
+    .reel-wrap.active { display: flex; animation: reelIn 0.4s ease forwards; }
+    @keyframes reelIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
 
-    /* Tab context label */
-    .tab-context {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 16px; padding: 0 2px;
-    }
-    .tab-context-label {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--teal);
-    }
-    .tab-context-hint {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: var(--muted);
-    }
-
-    /* Film reel */
+    /* Film strip with tilted photos */
     .sprocket-row { display: flex; background: var(--ink); padding: 5px 0; }
     .sprocket { flex: 0 0 60px; display: flex; align-items: center; justify-content: center; }
     .sprocket-hole { width: 22px; height: 14px; border-radius: 3px; background: var(--paper2); opacity: 0.15; }
     .film-track-outer {
       background: var(--ink); overflow-x: auto; overflow-y: visible;
       scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab;
+      padding: 16px 24px;
     }
     .film-track-outer:active { cursor: grabbing; }
     .film-track-outer::-webkit-scrollbar { display: none; }
-    .film-track { display: flex; gap: 0; width: max-content; padding: 12px 24px; }
-    .film-frame { width: 200px; flex-shrink: 0; cursor: pointer; position: relative; transition: transform 0.25s; }
-    .film-frame:hover { transform: scale(1.04); z-index: 2; }
-    .film-img-wrap { width: 100%; height: 150px; overflow: hidden; border: 2px solid rgba(255,255,255,0.04); position: relative; }
-    .film-img-wrap img { width: 100%; height: 100%; object-fit: cover; transition: filter 0.3s; display: block; }
-    .film-frame:hover .film-img-wrap img { filter: brightness(1.1); }
-    .film-grain { position: absolute; inset: 0; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E"); mix-blend-mode: overlay; opacity: 0.4; }
-    .film-overlay { position: absolute; inset: 0; background: linear-gradient(to top,rgba(0,0,0,0.6) 0%,transparent 55%); }
-    .film-loc { position: absolute; bottom: 7px; left: 9px; font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: rgba(255,255,255,0.7); }
-    .film-num { position: absolute; top: 6px; right: 8px; font-family: var(--mono); font-size: 8px; color: rgba(255,255,255,0.2); }
-    .film-caption { background: var(--ink); padding: 7px 8px 8px; font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: rgba(245,241,235,0.4); text-align: center; border-top: 1px solid rgba(255,255,255,0.04); }
-    .film-frame.active .film-caption { color: rgba(58,158,156,0.9); }
-    .film-frame.active .film-img-wrap { border-color: rgba(58,158,156,0.4); }
-    .film-placeholder { background: rgba(255,255,255,0.03); border: 1px dashed rgba(255,255,255,0.08); }
-    .film-ph-icon { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.2); text-align: center; line-height: 2; }
+    .film-track { display: flex; gap: 20px; width: max-content; align-items: flex-end; }
 
-    /* Lightbox */
-    .lightbox { position: fixed; inset: 0; z-index: 3000; background: rgba(26,20,16,0.0); display: flex; align-items: flex-end; pointer-events: none; transition: background 0.4s; }
-    .lightbox.open { background: rgba(26,20,16,0.85); pointer-events: auto; }
-    .lb-panel { width: 100%; max-height: 85vh; background: var(--paper); border-radius: 20px 20px 0 0; overflow: hidden; transform: translateY(100%); transition: transform 0.45s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; }
-    .lightbox.open .lb-panel { transform: translateY(0); }
-    .lb-inner { display: grid; grid-template-columns: 1fr 1fr; height: 100%; overflow: hidden; }
-    .lb-img-col { position: relative; overflow: hidden; min-height: 50vh; }
-    .lb-img-col img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .lb-img-overlay { position: absolute; inset: 0; background: linear-gradient(to right,transparent 60%,var(--paper) 100%); }
-    .lb-img-location { position: absolute; bottom: 24px; left: 24px; font-family: var(--mono); font-size: 11px; letter-spacing: 3px; color: rgba(255,255,255,0.8); background: rgba(0,0,0,0.35); padding: 5px 12px; border-radius: 3px; }
-    .lb-text-col { padding: 48px 40px 40px; overflow-y: auto; display: flex; flex-direction: column; }
-    .lb-text-col::-webkit-scrollbar { width: 3px; }
-    .lb-text-col::-webkit-scrollbar-thumb { background: var(--faint); }
-    .lb-close { position: absolute; top: 20px; right: 24px; font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); cursor: pointer; background: none; border: none; transition: color 0.2s; z-index: 10; }
-    .lb-close:hover { color: var(--ink); }
-    .lb-tab-label { font-family: var(--mono); font-size: 10px; letter-spacing: 3px; color: var(--teal); margin-bottom: 16px; }
-    .lb-title { font-family: var(--disp); font-size: clamp(28px,3.5vw,48px); color: var(--ink); line-height: 1; margin-bottom: 24px; }
-    .lb-story { font-size: 15px; line-height: 1.85; color: var(--ink2); flex: 1; }
-    .lb-story p { margin-bottom: 16px; }
-    .lb-nav { display: flex; gap: 12px; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--faint); }
-    .lb-nav-btn { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: var(--muted); background: none; border: 1px solid var(--faint); padding: 8px 18px; border-radius: 4px; cursor: pointer; transition: color 0.2s, border-color 0.2s; }
-    .lb-nav-btn:hover { color: var(--teal); border-color: var(--teal); }
-
-    /* ── CAFES ── */
-    .cafes-section { max-width: 1100px; margin: 0 auto 100px; padding: 0 48px; }
-    .cafe-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(320px,1fr)); gap: 24px; margin-top: 40px; }
-    .cafe-card {
-      background: var(--paper2); border: 1px solid var(--faint); border-radius: 14px;
-      overflow: hidden; transition: transform 0.25s, box-shadow 0.25s;
+    /* Each photo is a tilted print */
+    .film-frame {
+      flex-shrink: 0; cursor: pointer; position: relative;
+      transition: transform 0.25s, z-index 0s;
     }
-    .cafe-card:hover { transform: translateY(-3px); box-shadow: 0 14px 44px rgba(26,20,16,0.1); }
-    .cafe-img { width: 100%; height: 180px; background: var(--paper3); display: flex; align-items: center; justify-content: center; overflow: hidden; }
-    .cafe-img img { width: 100%; height: 100%; object-fit: cover; }
-    .cafe-img-placeholder { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: var(--muted); }
-    .cafe-body { padding: 22px 22px 24px; }
-    .cafe-type { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--teal); background: var(--teal2); padding: 3px 10px; border-radius: 20px; display: inline-block; margin-bottom: 10px; }
-    .cafe-name { font-family: var(--disp); font-size: 28px; color: var(--ink); line-height: 1; margin-bottom: 4px; }
-    .cafe-location { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--muted); margin-bottom: 14px; }
-    .cafe-vibe { font-size: 13px; font-style: italic; color: var(--ink2); line-height: 1.6; margin-bottom: 10px; }
-    .cafe-ordered { font-family: var(--mono); font-size: 11px; color: var(--muted); margin-bottom: 14px; }
-    .cafe-ordered span { color: var(--gold); }
-    .cafe-story { font-size: 13px; line-height: 1.75; color: var(--muted); display: none; }
-    .cafe-card.open .cafe-story { display: block; }
-    .cafe-footer { display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--faint); }
-    .cafe-rating { font-size: 13px; color: var(--gold); letter-spacing: 1px; }
-    .cafe-expand { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: var(--teal); background: none; border: none; cursor: pointer; transition: color 0.2s; }
+    .film-frame:nth-child(odd)  { transform: rotate(-2.2deg); }
+    .film-frame:nth-child(even) { transform: rotate(1.8deg); }
+    .film-frame:nth-child(3n)   { transform: rotate(-0.8deg); }
+    .film-frame:hover {
+      transform: rotate(0deg) scale(1.06) translateY(-6px) !important;
+      z-index: 10;
+    }
 
-    /* ── COUNTRIES ── */
-    .countries-section { max-width: 1100px; margin: 0 auto 100px; padding: 0 48px; }
-    .countries-grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(155px,1fr)); gap: 8px; margin-top: 28px; }
-    .country-chip { display: flex; align-items: center; gap: 9px; padding: 9px 12px; background: var(--paper2); border: 1px solid var(--faint); border-radius: 7px; font-size: 13px; color: var(--ink2); transition: background 0.2s, border-color 0.2s; }
-    .country-chip:hover { background: var(--teal2); border-color: var(--teal); }
-    .country-chip img { width: 22px; height: 15px; object-fit: cover; border-radius: 2px; }
+    .film-print {
+      width: 180px; background: #FEFCF8;
+      padding: 8px 8px 36px;
+      box-shadow: 3px 4px 16px rgba(28,17,9,0.22), 0 1px 0 rgba(28,17,9,0.1);
+    }
+    .film-img-wrap { width: 100%; height: 144px; overflow: hidden; position: relative; }
+    .film-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; filter:sepia(8%); }
+    .film-grain {
+      position: absolute; inset: 0; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay; opacity: 0.5;
+    }
+    .film-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 50%); }
+    .film-loc { position: absolute; bottom: 6px; left: 8px; font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: rgba(255,255,255,0.75); }
+    .film-placeholder { background: rgba(246,241,233,0.06); display:flex; align-items:center; justify-content:center; }
+    .film-ph-text { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.2); text-align:center; line-height:2; }
 
-    /* ── FOOTER ── */
-    .page-footer { background: var(--ink); padding: 48px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px; }
-    .footer-name { font-family: var(--disp); font-size: 22px; color: var(--paper); letter-spacing: 2px; }
-    .footer-links { display: flex; gap: 24px; }
-    .footer-links a { font-family: var(--mono); font-size: 11px; letter-spacing: 1px; color: rgba(245,241,235,0.35); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--teal); }
+    .film-caption {
+      padding: 6px 4px 0; text-align: center;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+      color: var(--muted); /* handwritten feel */
+    }
+    .film-frame.active .film-print { box-shadow: 3px 4px 16px rgba(46,139,122,0.3), 0 0 0 2px var(--teal); }
 
-    /* ── SOCIAL BAR ── */
-    .social-bar { position: fixed; top: 50%; left: 0; transform: translateY(-50%); z-index: 400; display: flex; flex-direction: column; gap: 22px; background: rgba(245,241,235,0.88); padding: 18px 11px; border-radius: 0 22px 22px 0; box-shadow: 0 4px 24px rgba(26,20,16,0.1); }
-    .social-bar a { display: flex; align-items: center; justify-content: center; opacity: 0.72; transition: opacity 0.2s, transform 0.2s; }
-    .social-bar a:hover { opacity: 1; transform: scale(1.14); }
-    .social-bar svg { display: block; width: 34px; height: 34px; }
+    /* ─ Lightbox — postcard lift-off ─ */
+    .lightbox {
+      position: fixed; inset: 0; z-index: 3000;
+      background: rgba(28,17,9,0); display: flex; align-items: center;
+      justify-content: center; padding: 24px;
+      pointer-events: none; transition: background 0.4s;
+    }
+    .lightbox.open { background: rgba(28,17,9,0.82); pointer-events: auto; }
 
-    /* ── TERMINAL ── */
-    .term-trigger { position: fixed; top: 50%; right: 0; transform: translateY(-50%); z-index: 400; display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 18px 11px; background: rgba(245,241,235,0.88); border-radius: 22px 0 0 22px; box-shadow: 0 4px 24px rgba(26,20,16,0.1); cursor: pointer; border: none; transition: background 0.2s, transform 0.25s; }
-    .term-trigger:hover { background: rgba(245,241,235,1); transform: translateY(-50%) translateX(-4px); }
-    .term-trigger svg { display: block; width: 34px; height: 34px; }
-    .term-trigger-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--teal); box-shadow: 0 0 6px var(--teal); animation: tpulse 2.4s ease-in-out infinite; }
+    .lb-panel {
+      width: 100%; max-width: 900px; max-height: 90vh;
+      background: #FDFAF4;
+      border-radius: 3px;
+      overflow: hidden;
+      transform: scale(0.88) translateY(28px); opacity: 0;
+      transition: transform 0.42s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease;
+      display: grid; grid-template-columns: 1fr 1fr;
+      box-shadow: 12px 16px 64px rgba(28,17,9,0.35), 0 2px 0 rgba(28,17,9,0.12);
+      position: relative;
+    }
+    /* Ruled lines on right side */
+    .lb-panel::after {
+      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
+      background: repeating-linear-gradient(
+        to bottom, transparent, transparent 31px,
+        rgba(28,17,9,0.04) 31px, rgba(28,17,9,0.04) 32px
+      );
+      pointer-events: none;
+    }
+    .lightbox.open .lb-panel { transform: scale(1) translateY(0); opacity: 1; }
+
+    .lb-img-col { position: relative; overflow: hidden; min-height: 420px; }
+    .lb-img-col img { width:100%; height:100%; object-fit:cover; display:block; filter:sepia(8%); }
+    .lb-img-overlay { position:absolute; inset:0; background: linear-gradient(to right, transparent 55%, #FDFAF4 100%); }
+    .lb-img-placeholder { background:var(--paper2); width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--muted); }
+    .lb-loc-badge { position:absolute; bottom:20px; left:20px; font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(255,255,255,0.85); background:rgba(0,0,0,0.35); padding:4px 10px; border-radius:2px; }
+
+    .lb-text-col { padding: 40px 36px 32px; overflow-y: auto; display: flex; flex-direction: column; position: relative; z-index: 1; }
+    /* Red margin line */
+    .lb-text-col::before { content:''; position:absolute; left:24px; top:0; bottom:0; width:1px; background:rgba(212,121,42,0.25); }
+    .lb-close { position:absolute; top:16px; right:18px; font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted); cursor:pointer; background:none; border:none; transition:color 0.2s; z-index:10; }
+    .lb-close:hover { color:var(--ink); }
+    .lb-tab-label { font-family:var(--mono); font-size:9px; letter-spacing:3px; color:var(--teal); margin-bottom:14px; }
+    .lb-title { font-family:var(--disp); font-size:clamp(26px,3.2vw,44px); color:var(--ink); line-height:1; margin-bottom:20px; }
+    .lb-story { font-size:14px; line-height:1.9; color:var(--ink2); flex:1; }
+    .lb-story p { margin-bottom:14px; }
+    .lb-nav { display:flex; gap:10px; margin-top:24px; padding-top:18px; border-top:1px solid var(--faint); }
+    .lb-nav-btn { font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted); background:none; border:1px solid var(--faint); padding:7px 16px; border-radius:2px; cursor:pointer; transition:all 0.2s; }
+    .lb-nav-btn:hover { color:var(--teal); border-color:var(--teal); }
+
+    /* ═══════════════════════════════
+       PHASE 5b — FLIGHTS
+    ═══════════════════════════════ */
+    .flights-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
+
+    /* Boarding pass cards */
+    .boarding-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; margin-bottom:48px; }
+    .boarding-pass {
+      background:#FEFCF8; border:1px solid var(--paper3);
+      border-radius:3px; overflow:hidden;
+      display:grid; grid-template-columns:1fr auto;
+      box-shadow:2px 3px 12px rgba(28,17,9,0.08);
+      transition:transform 0.2s, box-shadow 0.2s;
+    }
+    .boarding-pass:hover { transform:translateY(-2px); box-shadow:4px 6px 20px rgba(28,17,9,0.13); }
+    .bp-main { padding:16px 14px 14px; }
+    .bp-airline-bar {
+      height: 3px; width: 100%; margin-bottom: 10px;
+      background: linear-gradient(to right, var(--teal), var(--gold));
+    }
+    .bp-route { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
+    .bp-iata { font-family:var(--disp); font-size:36px; color:var(--ink); line-height:1; letter-spacing:1px; }
+    .bp-arrow { color:var(--amber); font-size:14px; }
+    .bp-cities { font-family:var(--mono); font-size:9px; letter-spacing:1px; color:var(--muted); margin-bottom:8px; }
+    .bp-meta { display:flex; gap:12px; flex-wrap:wrap; }
+    .bp-meta-item { font-family:var(--mono); font-size:9px; letter-spacing:1px; }
+    .bp-meta-label { color:var(--muted); display:block; }
+    .bp-meta-val { color:var(--ink2); }
+    /* Perforation */
+    .bp-stub {
+      width:64px; background:var(--paper2);
+      border-left:2px dashed var(--paper3);
+      display:flex; flex-direction:column; align-items:center;
+      justify-content:center; padding:8px 6px; gap:4px;
+    }
+    .bp-stub-date { font-family:var(--mono); font-size:8px; letter-spacing:1px; color:var(--muted); writing-mode:vertical-rl; transform:rotate(180deg); }
+    .bp-stub-miles { font-family:var(--disp); font-size:16px; color:var(--teal); }
+    .bp-stub-mi { font-family:var(--mono); font-size:7px; color:var(--muted); letter-spacing:1px; }
+
+    /* Flight log table */
+    .flight-log-wrap { overflow-x:auto; border-radius:4px; border:1px solid var(--faint); }
+    table { width:100%; border-collapse:collapse; font-size:13px; }
+    thead th { background:var(--ink); color:rgba(246,241,233,0.5); font-family:var(--mono); font-size:9px; letter-spacing:2px; padding:13px 18px; text-align:left; font-weight:400; }
+    tbody tr { border-bottom:1px solid var(--faint); transition:background 0.15s; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:var(--teal2); }
+    tbody td { padding:12px 18px; color:var(--ink2); vertical-align:middle; }
+    td.route { font-family:var(--mono); font-size:12px; color:var(--ink); letter-spacing:0.5px; }
+    td.airline { color:var(--muted); font-size:12px; }
+    td.date { font-family:var(--mono); font-size:11px; color:var(--muted); }
+    td.miles { font-family:var(--mono); font-size:11px; color:var(--teal); }
+    td.aircraft { font-size:11px; color:var(--muted); }
+
+    /* Flight stats */
+    .flight-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:2px; margin-bottom:40px; }
+    .fs-block { background:var(--paper2); padding:22px 18px; text-align:center; border:1px solid var(--faint); }
+    .fs-block:first-child { border-radius:4px 0 0 4px; }
+    .fs-block:last-child  { border-radius:0 4px 4px 0; }
+    .fs-num { font-family:var(--disp); font-size:clamp(28px,3.5vw,44px); color:var(--ink); line-height:1; }
+    .fs-num span { color:var(--teal); }
+    .fs-label { font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--muted); margin-top:5px; }
+
+    /* ═══════════════════════════════
+       PHASE 6 — CAFES (receipts)
+    ═══════════════════════════════ */
+    .cafes-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
+    .cafe-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
+
+    .cafe-receipt {
+      background:#FEFEFE;
+      border:1px solid var(--paper3);
+      border-radius:2px;
+      padding:0;
+      box-shadow: 2px 3px 12px rgba(28,17,9,0.07), 0 -2px 6px rgba(28,17,9,0.03);
+      transition:transform 0.25s, box-shadow 0.25s;
+      overflow:hidden;
+      position:relative;
+    }
+    .cafe-receipt:hover { transform:translateY(-3px); box-shadow:4px 8px 24px rgba(28,17,9,0.12); }
+    /* Thermal paper top curl effect */
+    .cafe-receipt::before {
+      content:''; position:absolute; top:0; left:0; right:0; height:4px;
+      background: linear-gradient(to bottom, rgba(28,17,9,0.04), transparent);
+    }
+    /* Perforation line */
+    .receipt-perf {
+      border-top:2px dashed var(--paper3);
+      margin:0 8px;
+    }
+    .receipt-header {
+      padding:18px 18px 12px;
+      text-align:center;
+      border-bottom:1px solid var(--paper3);
+    }
+    .receipt-type { font-family:var(--mono); font-size:8px; letter-spacing:2.5px; color:var(--teal); margin-bottom:6px; }
+    .receipt-name { font-family:var(--disp); font-size:28px; color:var(--ink); line-height:1; }
+    .receipt-city { font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:var(--muted); margin-top:3px; }
+    .receipt-body { padding:14px 18px; }
+    .receipt-line {
+      display:flex; justify-content:space-between; align-items:baseline;
+      font-family:var(--mono); font-size:11px; padding:3px 0;
+      border-bottom:1px dotted rgba(28,17,9,0.07);
+    }
+    .receipt-line:last-child { border-bottom:none; }
+    .rl-label { color:var(--muted); font-size:10px; letter-spacing:1px; }
+    .rl-val   { color:var(--ink2); text-align:right; max-width:55%; font-size:11px; }
+    .receipt-vibe {
+      padding:10px 18px; font-style:italic; font-size:12px;
+      color:var(--muted); line-height:1.6;
+      border-top:1px dashed var(--paper3);
+    }
+    .receipt-story-wrap {
+      padding:0 18px; max-height:0; overflow:hidden;
+      transition:max-height 0.4s ease, padding 0.3s ease;
+    }
+    .receipt-story-wrap.open { max-height:300px; padding:12px 18px; }
+    .receipt-story { font-size:12px; line-height:1.75; color:var(--muted); }
+    .receipt-footer {
+      padding:10px 18px 14px;
+      display:flex; align-items:center; justify-content:space-between;
+      border-top:1px solid var(--paper3);
+    }
+    .receipt-rating { color:var(--gold); font-size:14px; letter-spacing:2px; }
+    .receipt-expand {
+      font-family:var(--mono); font-size:9px; letter-spacing:1.5px;
+      color:var(--teal); background:none; border:none; cursor:pointer;
+      transition:color 0.2s; padding:0;
+    }
+    .receipt-expand:hover { color:var(--amber); }
+
+    /* ═══════════════════════════════
+       PHASE 7 — COUNTRIES (stamps)
+    ═══════════════════════════════ */
+    .countries-section { max-width:1120px; margin:0 auto 0; padding:0 56px 80px; }
+    .stamps-grid {
+      display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+      gap:16px; margin-top:32px;
+    }
+    .stamp {
+      background:#FEFCF8;
+      border:1px solid var(--paper3);
+      padding:10px 8px 8px;
+      text-align:center; cursor:default;
+      position:relative; overflow:hidden;
+      transition:transform 0.2s, box-shadow 0.2s;
+      box-shadow: 1px 2px 8px rgba(28,17,9,0.07);
+      animation: stampFill 0.4s ease both;
+    }
+    @keyframes stampFill {
+      from { opacity:0; transform:scale(0.85) rotate(var(--stamp-rot,0deg)); }
+      to   { opacity:1; transform:scale(1)    rotate(var(--stamp-rot,0deg)); }
+    }
+    .stamp:hover { transform:scale(1.06) rotate(0deg) !important; box-shadow:3px 4px 16px rgba(28,17,9,0.14); z-index:2; }
+    /* Perforation border */
+    .stamp::before {
+      content:''; position:absolute; inset:4px;
+      border:1px dashed rgba(28,17,9,0.1); pointer-events:none;
+    }
+    .stamp-flag { width:44px; height:29px; object-fit:cover; border-radius:1px; margin:0 auto 7px; display:block; }
+    .stamp-name { font-family:var(--mono); font-size:8px; letter-spacing:1px; color:var(--ink2); line-height:1.3; }
+    .stamp-status {
+      display:inline-block; font-family:var(--mono); font-size:7px; letter-spacing:1px;
+      padding:1px 5px; border-radius:1px; margin-top:4px;
+    }
+    .stamp-status.visited   { background:var(--teal2); color:var(--teal); }
+    .stamp-status.transiting { background:var(--gold2); color:var(--amber); }
+    .stamp-emoji { font-size:13px; position:absolute; top:6px; right:7px; }
+
+    /* ═══════════════════════════════
+       PHASE 7 — CLOSING POEM
+    ═══════════════════════════════ */
+    .closing-section {
+      background:var(--dark);
+      padding:96px 56px;
+      text-align:center;
+      position:relative; overflow:hidden;
+    }
+    .closing-section::before {
+      content:''; position:absolute; inset:0;
+      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(46,139,122,0.06) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .closing-globe-mini {
+      width:200px; height:200px; margin:0 auto 48px;
+      position:relative;
+    }
+    #closingCanvas { width:100%; height:100%; border-radius:50%; overflow:hidden; }
+
+    .closing-poem { position:relative; z-index:1; }
+    .poem-couplet {
+      margin-bottom:32px; opacity:0; transform:translateY(14px);
+      transition:opacity 0.7s ease, transform 0.7s ease;
+    }
+    .poem-couplet.vis { opacity:1; transform:translateY(0); }
+    .poem-urdu {
+      font-size:clamp(13px,1.8vw,18px); color:rgba(200,145,58,0.4);
+      letter-spacing:2px; margin-bottom:4px; font-family:var(--serif); font-style:italic;
+    }
+    .poem-english {
+      font-size:clamp(13px,1.6vw,16px); color:rgba(246,241,233,0.5);
+      font-family:var(--mono); letter-spacing:1px;
+    }
+    .poem-final {
+      margin-top:48px; opacity:0; transform:translateY(20px);
+      transition:opacity 1s ease 0.3s, transform 1s ease 0.3s;
+    }
+    .poem-final.vis { opacity:1; transform:translateY(0); }
+    .poem-final-line {
+      font-family:var(--disp); font-size:clamp(36px,6vw,82px);
+      color:var(--paper); letter-spacing:3px; line-height:1;
+    }
+    .poem-final-line .gold { color:var(--gold); }
+    .poem-final-sub {
+      margin-top:16px; font-family:var(--mono); font-size:11px;
+      letter-spacing:3px; color:rgba(246,241,233,0.3);
+    }
+    .closing-count {
+      margin-top:48px; font-family:var(--mono); font-size:12px;
+      letter-spacing:3px; color:rgba(46,139,122,0.6);
+    }
+    .closing-count span { color:var(--teal); }
+
+    /* ═══════════════════════════════
+       FOOTER
+    ═══════════════════════════════ */
+    .page-footer {
+      background:var(--ink); padding:44px 56px;
+      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
+    }
+    .footer-name { font-family:var(--disp); font-size:22px; color:var(--paper); letter-spacing:2px; }
+    .footer-links { display:flex; gap:24px; }
+    .footer-links a { font-family:var(--mono); font-size:11px; letter-spacing:1px; color:rgba(246,241,233,0.3); text-decoration:none; transition:color 0.2s; }
+    .footer-links a:hover { color:var(--teal); }
+
+    /* ═══════════════════════════════
+       SOCIAL BAR + TERMINAL
+    ═══════════════════════════════ */
+    .social-bar { position:fixed; top:50%; left:0; transform:translateY(-50%); z-index:400; display:flex; flex-direction:column; gap:20px; background:rgba(246,241,233,0.92); padding:16px 10px; border-radius:0 20px 20px 0; box-shadow:0 4px 24px rgba(28,17,9,0.1); }
+    .social-bar a { display:flex; align-items:center; justify-content:center; opacity:0.65; transition:opacity 0.2s, transform 0.2s; }
+    .social-bar a:hover { opacity:1; transform:scale(1.12); }
+    .social-bar svg { display:block; width:32px; height:32px; }
+
+    .term-trigger { position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:400; display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px 10px; background:rgba(246,241,233,0.92); border-radius:20px 0 0 20px; box-shadow:0 4px 24px rgba(28,17,9,0.1); cursor:pointer; border:none; transition:background 0.2s; }
+    .term-trigger:hover { background:rgba(246,241,233,1); }
+    .term-trigger svg { display:block; width:32px; height:32px; }
+    .term-trigger-dot { width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); animation:tpulse 2.4s ease-in-out infinite; }
     @keyframes tpulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-    .term-trigger-label { font-family: var(--mono); font-size: 9px; letter-spacing: 3px; color: var(--muted); writing-mode: vertical-rl; }
-    .term-trigger.away { opacity: 0; pointer-events: none; transform: translateY(-50%) translateX(20px); transition: opacity 0.25s, transform 0.25s; }
-    .term-backdrop { position: fixed; inset: 0; z-index: 700; background: rgba(245,241,235,0.55); backdrop-filter: blur(3px); opacity: 0; pointer-events: none; transition: opacity 0.4s; }
-    .term-backdrop.open { opacity: 1; pointer-events: auto; }
-    .term-drawer { position: fixed; top: 0; right: 0; width: min(460px,92vw); height: 100vh; z-index: 800; transform: translateX(102%); transition: transform 0.42s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; background: #0d1117; box-shadow: -8px 0 48px rgba(0,0,0,0.18); font-family: var(--mono); }
-    .term-drawer.open { transform: translateX(0); }
-    .term-bar { background: #161b22; padding: 11px 18px; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
-    .td { width: 11px; height: 11px; border-radius: 50%; cursor: pointer; }
+    .term-trigger-label { font-family:var(--mono); font-size:8px; letter-spacing:3px; color:var(--muted); writing-mode:vertical-rl; }
+    .term-trigger.away { opacity:0; pointer-events:none; }
+
+    .term-backdrop { position:fixed; inset:0; z-index:700; background:rgba(246,241,233,0.5); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity 0.4s; }
+    .term-backdrop.open { opacity:1; pointer-events:auto; }
+    .term-drawer { position:fixed; top:0; right:0; width:min(460px,92vw); height:100vh; z-index:800; transform:translateX(102%); transition:transform 0.42s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; background:#0d1117; box-shadow:-8px 0 48px rgba(0,0,0,0.2); font-family:var(--mono); }
+    .term-drawer.open { transform:translateX(0); }
+    .term-bar { background:#161b22; padding:11px 18px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.05); flex-shrink:0; }
+    .td{width:11px;height:11px;border-radius:50%;cursor:pointer}
     .td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
-    .t-title { font-size: 11px; color: rgba(255,255,255,0.25); letter-spacing: 1.5px; margin-left: 6px; }
-    .t-clock { margin-left: auto; font-size: 11px; color: rgba(58,158,156,0.5); }
-    .term-body { flex: 1; overflow-y: auto; padding: 18px; display: flex; flex-direction: column; gap: 2px; }
-    .term-body::-webkit-scrollbar { width: 3px; }
-    .term-body::-webkit-scrollbar-thumb { background: rgba(91,192,190,0.2); border-radius: 2px; }
+    .t-title{font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1.5px;margin-left:6px}
+    .t-clock{margin-left:auto;font-size:11px;color:rgba(46,139,122,0.5)}
+    .term-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:2px}
+    .term-body::-webkit-scrollbar{width:3px}
+    .term-body::-webkit-scrollbar-thumb{background:rgba(91,192,190,0.2);border-radius:2px}
     .tl{font-size:12px;line-height:1.85}.tl.out{padding-left:14px}.tl.gap{height:8px}.tl.pl{display:flex;gap:8px}
     .tps{color:#5bc0be;font-size:11px;flex-shrink:0}.tc{color:#e6edf3}
     .ct{color:#5bc0be}.cd{color:rgba(230,237,243,0.28)}.cm{color:rgba(230,237,243,0.6)}
     .cw{color:#e6edf3;font-weight:600}.cok{color:#3fb950}.cerr{color:#f85149}.camb{color:#d29922}
-    .clnk{color:#58a6ff;cursor:pointer;text-decoration:underline}.clnk:hover{color:#79c0ff}
+    .clnk{color:#58a6ff;cursor:pointer;text-decoration:underline}
     .chip-row{display:flex;flex-wrap:wrap;gap:7px;padding:8px 0 8px 14px}
     .chip{font-size:11px;padding:5px 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);letter-spacing:0.5px;border:1px solid rgba(91,192,190,0.25);background:rgba(91,192,190,0.07);color:#5bc0be;transition:background 0.15s}
     .chip:hover{background:rgba(91,192,190,0.18);border-color:#5bc0be}
@@ -432,27 +920,37 @@
     .t-cur{width:7px;height:13px;border-radius:1px;background:#5bc0be;animation:blink 1s step-end infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-    /* ── RESPONSIVE ── */
-    @media (max-width:768px) {
-      .hero,.globe-section,.flights-section,.experiences,.cafes-section,.countries-section{padding:40px 20px}
-      .hero{padding-top:80px}
+    /* Loading skeleton */
+    .skel { background:linear-gradient(90deg,var(--paper2) 25%,var(--paper3) 50%,var(--paper2) 75%); background-size:200% 100%; animation:skelShimmer 1.5s infinite; border-radius:3px; }
+    @keyframes skelShimmer { to{background-position:-200% 0} }
+
+    /* Responsive */
+    @media(max-width:768px){
+      .hero,.globe-inner,.flights-section,.experiences,.cafes-section,.countries-section,.closing-section{padding-left:20px;padding-right:20px}
+      .hero{padding-top:84px}
+      .hero-avatar-wrap{display:none}
+      .hero-urdu-bg{display:none}
       .facts-strip{gap:32px;padding:40px 20px}
-      .film-frame{width:160px}.film-img-wrap{height:120px}
-      .lb-inner{grid-template-columns:1fr}.lb-img-col{min-height:220px}.lb-text-col{padding:28px 24px}
-      .origin-quote{padding:0 20px 0 22px;margin-bottom:48px}
-      .countries-grid{grid-template-columns:repeat(2,1fr)}
+      .film-print{width:150px}.film-img-wrap{height:120px}
+      .lb-panel{grid-template-columns:1fr;max-width:480px}
+      .lb-img-col{min-height:200px}
+      .stamps-grid{grid-template-columns:repeat(3,1fr)}
       .social-bar{display:none}
-      .flight-stats{grid-template-columns:repeat(2,1fr)}
-      .fs-block:first-child{border-radius:10px 10px 0 0}.fs-block:last-child{border-radius:0 0 10px 10px}
-      .cafe-grid{grid-template-columns:1fr}
+      .origin-postcard{transform:none;padding:28px 24px 24px 32px}
     }
   </style>
 </head>
 <body>
 
-<!-- INTRO -->
+<!-- ══════════════════════════════
+     INTRO — The Awakening
+══════════════════════════════ -->
 <div id="intro">
   <div class="intro-grain"></div>
+  <div class="intro-postcard-bg"></div>
+  <div class="intro-urdu">تو زندہ ہو تم</div>
+  <div class="intro-beam"></div>
+
   <div class="intro-lines">
     <p class="il sm" id="il1">I grew up in a small town in India.</p>
     <p class="il sm" id="il2">Our world was the street, the school, the neighbours.</p>
@@ -460,157 +958,233 @@
     <p class="il lg" id="il3">"I thought that was the whole world."</p>
     <div class="ir" id="ir2"></div>
     <p class="il sm" id="il4">Then I left. And I never stopped leaving.</p>
-    <p class="il sm" id="il5">Every passport stamp was a lesson no classroom taught me.</p>
+    <p class="il sm" id="il5">Every country was a classroom. Every stranger, a mirror.</p>
     <div class="ir" id="ir3"></div>
-    <p class="il tag" id="il6">40+ COUNTRIES · 7 CONTINENTS · ONE UNFINISHED JOURNEY</p>
+    <p class="il proof" id="il6">TOH ZINDA HO TUM.</p>
+    <p class="il tag" id="il7">53 COUNTRIES · 7 CONTINENTS · STILL COUNTING</p>
   </div>
-  <div class="intro-skip" id="introSkip">TAP ANYWHERE TO EXPLORE →</div>
+
+  <div class="intro-tear"><div class="tear-paper"></div></div>
+  <div class="intro-skip" id="introSkip">TAP ANYWHERE →</div>
 </div>
 
-<!-- PAGE -->
+<!-- ══════════════════════════════
+     PAGE
+══════════════════════════════ -->
 <div id="page">
+
   <nav class="top-nav" id="topNav">
     <a class="nav-logo" href="home.html">AR // NOMAD</a>
     <a class="nav-back" href="home.html">← HOME</a>
   </nav>
 
-  <!-- Hero -->
+  <!-- ── HERO ── -->
   <section class="hero">
-    <div>
+    <div class="hero-urdu-bg" aria-hidden="true">تو زندہ<br>ہو تم</div>
+    <div class="hero-content">
       <div class="hero-eyebrow">// NOMAD CHRONICLES</div>
-      <h1 class="hero-title">THE WORLD<br>OPENED UP.</h1>
-      <p class="hero-sub">From a small town in India to every continent on earth — one stamp, one stranger, one story at a time.</p>
-    </div>
-    <div class="hero-stats">
-      <div><div class="stat-num" id="heroCountries">—</div><div class="stat-label">Countries</div></div>
-      <div><div class="stat-num">7</div><div class="stat-label">Continents</div></div>
-      <div><div class="stat-num" id="heroFlights">—</div><div class="stat-label">Flights</div></div>
-    </div>
-  </section>
-
-  <!-- Globe -->
-  <section class="globe-section">
-    <div class="section-label">// DRAG THE GLOBE · HOVER FOR DETAILS</div>
-    <div class="globe-toggle">
-      <button class="gtog active" id="togCountries" onclick="setGlobeMode('countries',this)">COUNTRIES</button>
-      <button class="gtog" id="togFlights" onclick="setGlobeMode('flights',this)">FLIGHT ROUTES</button>
-    </div>
-    <div class="globe-wrap" id="globeWrap">
-      <canvas id="globeCanvas"></canvas>
-      <div class="globe-hint" id="globeHint">DRAG TO SPIN · SCROLL TO ZOOM</div>
-      <div class="globe-tooltip" id="globeTip"></div>
-      <div class="globe-counter"><span id="visitCount">—</span> visited</div>
-      <div class="globe-legend" id="globeLegend">
-        <div class="leg-item"><div class="leg-dot" style="background:#5bc0be"></div>VISITED</div>
-        <div class="leg-item"><div class="leg-dot" style="background:rgba(245,241,235,0.2)"></div>NOT YET</div>
+      <h1 class="hero-title">
+        <span id="heroLine1">THE WORLD</span><br>
+        <span id="heroLine2">IS PROOF</span><br>
+        I AM <span class="proof-word">ALIVE.</span>
+      </h1>
+      <p class="hero-sub" id="heroSub">From a small town in India to every continent on earth — one stamp, one stranger, one story at a time.</p>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num"><span id="statCountries">—</span><span class="accent">+</span></div>
+          <div class="hero-stat-label">Countries</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num">7</div>
+          <div class="hero-stat-label">Continents</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num"><span id="statFlights">—</span></div>
+          <div class="hero-stat-label">Flights</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hero-stat-num"><span id="statMiles">—</span><span class="accent">K</span></div>
+          <div class="hero-stat-label">Miles in the air</div>
+        </div>
       </div>
     </div>
-    <div class="globe-caption">Every <span>glowing dot</span> is a country I've stood in</div>
+
+    <!-- Thumbtack photo -->
+    <div class="hero-avatar-wrap">
+      <div class="thumbtack"></div>
+      <img class="hero-avatar" src="Avatar.jpg" alt="Anuraag Ravulaparthi">
+      <div class="avatar-caption">ANURAAG · NOMAD</div>
+    </div>
   </section>
 
-  <!-- Origin -->
-  <div class="origin-quote">
-    <blockquote>"Growing up, a household income of ₹1,200 a month meant our world fit inside one town. Travel taught me that the most important education happens when you sit across from someone whose life looks nothing like yours — and realise you're the same."</blockquote>
-    <cite>— Anuraag Ravulaparthi</cite>
-  </div>
+  <!-- ── GLOBE ── -->
+  <section class="globe-section">
+    <div class="globe-outer">
+      <div class="globe-inner">
+        <div class="globe-stamp-row">
+          <div class="globe-stamp">
+            <span>✦</span>
+            <span id="globeStampText">53 COUNTRIES VISITED · EST. 2016</span>
+          </div>
+          <div class="globe-toggle">
+            <button class="gtog active" id="togCountries" onclick="setGlobeMode('countries',this)">COUNTRIES</button>
+            <button class="gtog" id="togFlights" onclick="setGlobeMode('flights',this)">FLIGHT ROUTES</button>
+          </div>
+        </div>
+        <div class="globe-wrap" id="globeWrap">
+          <canvas id="globeCanvas"></canvas>
+          <div class="globe-hint" id="globeHint">DRAG TO SPIN · SCROLL TO ZOOM</div>
+          <div class="globe-tooltip" id="globeTip"></div>
+          <div class="globe-counter"><span id="visitCount">—</span> visited</div>
+          <div class="globe-legend" id="globeLegend">
+            <div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div>
+            <div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>
+          </div>
+        </div>
+        <div class="globe-caption">Every <span>ember glow</span> is a country I've stood in</div>
+      </div>
+    </div>
+  </section>
 
-  <!-- Facts -->
-  <div class="facts-strip" id="factsStrip">
+  <!-- ── ORIGIN POSTCARD ── -->
+  <section class="origin-section">
+    <div class="origin-inner">
+      <div class="section-eyebrow" style="margin-bottom:28px">// LETTER TO THE YOUNGER ME</div>
+      <div class="origin-postcard" id="originPostcard">
+        <div class="postcard-header">
+          <div class="postcard-to">To: Anuraag, age 17<br>Small town, Andhra Pradesh</div>
+          <div class="postcard-stamp-img">
+            <div class="stamp-globe">🌍</div>
+            <div>NOMAD<br>SERIES</div>
+          </div>
+        </div>
+        <div class="postmark">
+          HYDERABAD<br>INDIA<br>2016
+        </div>
+        <div class="origin-text" id="originText">
+          Growing up, a household income of ₹1,200 a month meant our world fit inside one town.
+          I watched planes from rooftops and wondered where they were going.
+          I didn't know then that the sky was an invitation —
+          and that the most important education happens when you sit across from someone
+          whose life looks nothing like yours, and realise you are the same.
+        </div>
+        <div class="origin-cite">— Anuraag Ravulaparthi</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FACTS STRIP ── -->
+  <div class="facts-strip">
     <div class="fact-item"><div class="fact-num">7<span> continents</span></div><div class="fact-desc">Including Antarctica</div></div>
     <div class="fact-item"><div class="fact-num" id="fCountries">—</div><div class="fact-desc">Countries visited</div></div>
     <div class="fact-item"><div class="fact-num" id="fFlights">—</div><div class="fact-desc">Flights taken</div></div>
     <div class="fact-item"><div class="fact-num" id="fMiles">—</div><div class="fact-desc">Miles in the air</div></div>
+    <div class="fact-item"><div class="fact-num" id="fAirlines">—</div><div class="fact-desc">Airlines flown</div></div>
   </div>
 
-  <!-- Flights -->
-  <section class="flights-section">
-    <div class="section-header">
-      <div class="section-eyebrow">// THE OBSESSION</div>
-      <div class="section-title">FLIGHTS.</div>
-      <div class="section-sub">I track every flight. Every airline. Every airport. This is the inventory.</div>
-    </div>
-
-    <div class="flight-stats" id="flightStats"></div>
-
-    <div class="section-eyebrow" style="margin-bottom:16px">// FLIGHT LOG</div>
-    <div class="flight-log-wrap">
-      <table>
-        <thead>
-          <tr>
-            <th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>MILES</th><th>NOTES</th>
-          </tr>
-        </thead>
-        <tbody id="flightLog"></tbody>
-      </table>
-    </div>
-
-    <div class="section-eyebrow" style="margin-bottom:24px">// FAVOURITE AIRPORTS</div>
-    <div class="airport-grid" id="airportGrid"></div>
-  </section>
-
-  <!-- Experiences -->
+  <!-- ── EXPERIENCES ── -->
   <section class="experiences">
     <div class="section-header">
       <div class="section-eyebrow">// FIELD NOTES</div>
       <div class="section-title">EXPERIENCES.</div>
-      <div class="section-sub">Adventures, strangers, and moments that changed everything.</div>
+      <div class="section-poem-line" id="expPoemLine">Nazar mein khwaabon ki bijliyan leke chal rahe ho — the proof.</div>
     </div>
+
     <div class="exp-tabs">
-      <button class="exp-tab active" id="tab-btn-adventures" onclick="switchTab('adventures',this)">
+      <button class="exp-tab active" onclick="switchTab('adventures',this)">
         <span class="tab-icon">⚡</span>ADVENTURES
       </button>
-      <button class="exp-tab" id="tab-btn-people" onclick="switchTab('people',this)">
+      <button class="exp-tab" onclick="switchTab('people',this)">
         <span class="tab-icon">👤</span>PEOPLE
       </button>
-      <button class="exp-tab" id="tab-btn-moments" onclick="switchTab('moments',this)">
+      <button class="exp-tab" onclick="switchTab('moments',this)">
         <span class="tab-icon">✦</span>MOMENTS
       </button>
     </div>
 
     <div class="reel-wrap active" id="tab-adventures">
-      <div class="tab-context">
-        <span class="tab-context-label">// ADRENALINE CHAPTER</span>
-        <span class="tab-context-hint">DRAG TO SCROLL · CLICK TO OPEN</span>
-      </div>
+      <div class="tab-poem" id="poem-adventures">// Nazar mein khwaabon ki bijliyan — the adrenaline chapter</div>
       <div class="sprocket-row" id="spr-t-adv"></div>
       <div class="film-track-outer" id="track-adv"><div class="film-track" id="reel-adventures"></div></div>
       <div class="sprocket-row" id="spr-b-adv"></div>
     </div>
     <div class="reel-wrap" id="tab-people">
-      <div class="tab-context">
-        <span class="tab-context-label">// HUMAN CONNECTIONS</span>
-        <span class="tab-context-hint">YOUR STORIES GO HERE</span>
-      </div>
+      <div class="tab-poem" id="poem-people">// Ik baat honton tak hai jo aayi nahin — human connections</div>
       <div class="sprocket-row" id="spr-t-ppl"></div>
       <div class="film-track-outer" id="track-ppl"><div class="film-track" id="reel-people"></div></div>
       <div class="sprocket-row" id="spr-b-ppl"></div>
     </div>
     <div class="reel-wrap" id="tab-moments">
-      <div class="tab-context">
-        <span class="tab-context-label">// THE QUIET ONES</span>
-        <span class="tab-context-hint">THE ONES THAT STAY WITH YOU</span>
-      </div>
+      <div class="tab-poem" id="poem-moments">// Hawa ke jhokon ke jaise aazad — the quiet ones</div>
       <div class="sprocket-row" id="spr-t-mom"></div>
       <div class="film-track-outer" id="track-mom"><div class="film-track" id="reel-moments"></div></div>
       <div class="sprocket-row" id="spr-b-mom"></div>
     </div>
   </section>
 
-  <!-- Cafes -->
+  <!-- ── FLIGHTS ── -->
+  <section class="flights-section">
+    <div class="section-header">
+      <div class="section-eyebrow">// THE OBSESSION</div>
+      <div class="section-title">FLIGHTS.</div>
+      <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
+    </div>
+    <div class="flight-stats" id="flightStats"></div>
+    <div class="section-eyebrow" style="margin-bottom:20px">// BOARDING PASSES</div>
+    <div class="boarding-grid" id="boardingGrid"></div>
+    <div class="section-eyebrow" style="margin:40px 0 16px">// FULL FLIGHT LOG</div>
+    <div class="flight-log-wrap">
+      <table>
+        <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
+        <tbody id="flightLog"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ── CAFES ── -->
   <section class="cafes-section">
     <div class="section-header">
       <div class="section-eyebrow">// CAFFEINE & CULTURE</div>
       <div class="section-title">CAFES.</div>
-      <div class="section-sub">Every city I land in, I find a cafe first. The menu is secondary. The feeling is everything.</div>
+      <div class="section-poem-line">Har ek lamhe se tum milo — every cup is a city, every city a cup.</div>
     </div>
     <div class="cafe-grid" id="cafeGrid"></div>
   </section>
 
-  <!-- Countries -->
+  <!-- ── COUNTRIES ── -->
   <section class="countries-section">
     <div class="section-eyebrow">// EVERY STAMP</div>
-    <div class="section-title" style="font-size:clamp(32px,4vw,52px)">COUNTRIES VISITED</div>
-    <div class="countries-grid" id="countriesGrid"></div>
+    <div class="section-title" style="font-size:clamp(36px,5vw,64px)">COUNTRIES.</div>
+    <div class="stamps-grid" id="stampsGrid"></div>
+  </section>
+
+  <!-- ── CLOSING POEM ── -->
+  <section class="closing-section" id="closingSection">
+    <div class="closing-poem" id="closingPoem">
+      <div class="poem-couplet" id="pc1">
+        <div class="poem-urdu">دلوں میں تم اپنی بے تابیاں لیے چل رہے ہو</div>
+        <div class="poem-english">Dilon mein tum apni betaabiyan leke chal rahe ho</div>
+      </div>
+      <div class="poem-couplet" id="pc2">
+        <div class="poem-urdu">نظر میں خوابوں کی بجلیاں لیے چل رہے ہو</div>
+        <div class="poem-english">Nazar mein khwaabon ki bijliyan leke chal rahe ho</div>
+      </div>
+      <div class="poem-couplet" id="pc3">
+        <div class="poem-urdu">ہوا کے جھونکوں کے جیسے آزاد ہو تم</div>
+        <div class="poem-english">Hawa ke jhokon ke jaise aazad ho tum</div>
+      </div>
+      <div class="poem-couplet" id="pc4">
+        <div class="poem-urdu">جو اپنی آنکھوں میں حیرانیاں لیے چل رہے ہو</div>
+        <div class="poem-english">Jo apni aankhon mein hairaniyan leke chal rahe ho</div>
+      </div>
+      <div class="poem-final" id="poemFinal">
+        <div class="poem-final-line">TOH <span class="gold">ZINDA</span><br>HO TUM.</div>
+        <div class="poem-final-sub">— JAVED AKHTAR, ZINDAGI NA MILEGI DOBARA</div>
+      </div>
+      <div class="closing-count">
+        <span id="closingCount">53</span> COUNTRIES · 7 CONTINENTS · <span>STILL COUNTING</span>
+      </div>
+    </div>
   </section>
 
   <footer class="page-footer">
@@ -626,33 +1200,28 @@
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLB(event)">
   <div class="lb-panel">
-    <button class="lb-close" onclick="closeLightbox()">ESC / CLOSE</button>
-    <div class="lb-inner">
-      <div class="lb-img-col">
-        <img id="lbImg" src="" alt="" style="display:none">
-        <div class="lb-img-overlay"></div>
-        <div class="lb-img-location" id="lbLoc"></div>
-      </div>
-      <div class="lb-text-col">
-        <div class="lb-tab-label" id="lbTab"></div>
-        <div class="lb-title" id="lbTitle"></div>
-        <div class="lb-story" id="lbStory"></div>
-        <div class="lb-nav">
-          <button class="lb-nav-btn" onclick="lbStep(-1)">← PREV</button>
-          <button class="lb-nav-btn" onclick="lbStep(1)">NEXT →</button>
-        </div>
+    <button class="lb-close" onclick="closeLightbox()">ESC / CLOSE ✕</button>
+    <div class="lb-img-col">
+      <img id="lbImg" src="" alt="" style="display:none">
+      <div class="lb-img-placeholder" id="lbImgPlaceholder" style="display:none">NO PHOTO YET</div>
+      <div class="lb-img-overlay"></div>
+      <div class="lb-loc-badge" id="lbLoc"></div>
+    </div>
+    <div class="lb-text-col">
+      <div class="lb-tab-label" id="lbTab"></div>
+      <div class="lb-title" id="lbTitle"></div>
+      <div class="lb-story" id="lbStory"></div>
+      <div class="lb-nav">
+        <button class="lb-nav-btn" onclick="lbStep(-1)">← PREV</button>
+        <button class="lb-nav-btn" onclick="lbStep(1)">NEXT →</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Terminal trigger -->
+<!-- Terminal -->
 <button class="term-trigger" id="termTrigger" onclick="openTerm()">
-  <svg viewBox="0 0 34 34" fill="none">
-    <circle cx="17" cy="17" r="15" fill="#1a1410" opacity="0.85"/>
-    <path d="M10 13 L15 17 L10 21" stroke="#3a9e9c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
-    <path d="M17 21 L24 21" stroke="#3a9e9c" stroke-width="1.8" stroke-linecap="round"/>
-  </svg>
+  <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
   <div class="term-trigger-dot"></div>
   <span class="term-trigger-label">TERMINAL</span>
 </button>
@@ -660,15 +1229,14 @@
 <div class="term-drawer" id="termDrawer">
   <div class="term-bar">
     <div class="td td-r" onclick="closeTerm()"></div>
-    <div class="td td-y"></div>
-    <div class="td td-g"></div>
+    <div class="td td-y"></div><div class="td td-g"></div>
     <span class="t-title">anuraag.sh — nomad</span>
     <span class="t-clock" id="tClock"></span>
   </div>
   <div class="term-body" id="tBody"></div>
   <div class="term-foot">
     <span class="t-ps">anuraag@world:~$</span>
-    <input class="t-in" id="tIn" placeholder="type or click a chip…" autocomplete="off" spellcheck="false">
+    <input class="t-in" id="tIn" placeholder="type a command…" autocomplete="off" spellcheck="false">
     <div class="t-cur"></div>
   </div>
 </div>
@@ -679,483 +1247,337 @@
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
   </a>
   <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#5bc0be"/><path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/></svg>
+    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2E8B7A"/><path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/></svg>
   </a>
   <a href="https://twitter.com/" target="_blank" aria-label="Twitter">
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
   </a>
-  <a href="/cdn-cgi/l/email-protection#e3919090828d9691828284a3848e828a8fcd808c8e" aria-label="Email">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#F5F1EB"/><rect x="7" y="10" width="18" height="12" rx="3" fill="#fff"/><polyline points="7,10 16,18 25,10" stroke="#3a506b" stroke-width="2" fill="none"/></svg>
-  </a>
 </div>
+<script type="module">
+import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc }
+                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
-// ════════════════════════════════════════
-// EXPERIENCES DATA (local — no JSON needed)
-// ════════════════════════════════════════
-const EXPERIENCES = {
-  adventures: [
-    {id:'a1',img:'images/skydive.jpeg',loc:'DUBAI, UAE',label:'SKYDIVE',title:'Jump out of a plane — twice.',story:`<p>So there I was, jumping out of a plane over the Palm Islands in Dubai — once. And naturally, like any rational human being, I thought, "You know what would make this even better? Doing it again… on the same day."</p><p>Because why just experience sheer adrenaline and the stunning aerial view once, when you can double the thrill and the risk? My second jump felt exactly like the first… only with a little more smug satisfaction and slightly more panic.</p>`},
-    {id:'a2',img:'images/inca.jpeg',loc:'MACHU PICCHU, PERU',label:'INCA TRAIL',title:'Walking the Inca Trail.',story:`<p>So I hiked the Inca Trail once — because obviously, a leisurely stroll through breathtaking Andean landscapes and ancient ruins isn't enough. Naturally, I thought, "Why stop at one day of grueling climbs, questionable altitude sickness, and awe-inspiring views?"</p><p>Spoiler: the second day was just as brutal, just with more blisters and slightly less dignity. Some people take scenic walks. I take scenic masochism.</p>`},
-    {id:'a3',img:'images/iceland.jpeg',loc:'ICELAND',label:'AURORA',title:'Chasing the Northern Lights.',story:`<p>So I went to chase the Northern Lights once, because standing in freezing darkness staring at the sky sounded like a solid plan. But of course, one night wasn't enough — why not freeze my toes off again?</p><p>The second night was basically the same: cold, magical, and me pretending my teeth weren't chattering. Some people chase sunsets. I chase hypothermia in style.</p>`},
-    {id:'a4',img:'images/amazon.jpeg',loc:'AMAZON, BRAZIL',label:'SUNRISE',title:'Amazon sunrise at an ungodly hour.',story:`<p>So I woke up at an unholy hour to catch the Amazon sunrise — because apparently, watching the sky turn gold while surrounded by mosquitoes and jungle noise sounded like a great idea.</p><p>One sunrise wasn't enough — so I did it again the same day. Twice the awe, twice the bug spray, twice the questioning of my life choices.</p>`},
-    {id:'a5',img:'images/aus.jpg',loc:'QUEENSLAND, AUSTRALIA',label:'REEF',title:'The Great Barrier Reef.',story:`<p>So I went snorkeling the Great Barrier Reef once, because swimming with colorful fish in crystal-clear water seemed like a chill day. Apparently, one round of floating among corals wasn't enough.</p><p>So I went back the same day. Twice the awe, twice the sunburn, twice the awkward flailing trying not to touch anything.</p>`},
-    {id:'a6',img:'images/dive.jpeg',loc:'OPEN OCEAN',label:'SHARKS',title:'Diving with sharks.',story:`<p>So I went diving with sharks once, because apparently, I like making questionable life choices. One brush with razor-toothed predators wasn't enough — so I went back the same day.</p><p>Twice the adrenaline, twice the heart-stopping moments, twice the awkward mental pep talks: "Don't look like lunch."</p>`},
-    {id:'a7',img:'images/us.jpeg',loc:'UNITED STATES',label:'ROAD TRIP',title:'Cross-country road trip, USA.',story:`<p>I drove coast-to-coast across the USA. From deserts to mountains, diners to motels, every mile was a new adventure.</p><p>I learned that the best playlist is the one you sing to yourself when the radio signal fades — and that America is both exactly what you imagine and nothing like it at all.</p>`},
-  ],
-  people:[
-    {id:'p1',img:null,loc:'PLACEHOLDER',label:'STRANGER',title:'A story about someone I met.',story:`<p>Your story here — a short, vivid account of a person who changed the way you saw something. It doesn't have to be long. Even three sentences can hold a whole life.</p>`},
-    {id:'p2',img:null,loc:'PLACEHOLDER',label:'CONNECTION',title:'The taxi driver in Tokyo.',story:`<p>Placeholder — replace with your story. Who was this person? What did they say? What did it change?</p>`},
-    {id:'p3',img:null,loc:'PLACEHOLDER',label:'ENCOUNTER',title:'The woman on the train in India.',story:`<p>Placeholder — your story here.</p>`},
-    {id:'p4',img:null,loc:'PLACEHOLDER',label:'FRIENDSHIP',title:'A friendship that lasted one day.',story:`<p>Placeholder — your story here.</p>`},
-  ],
-  moments:[
-    {id:'m1',img:null,loc:'PLACEHOLDER',label:'SUNRISE',title:'The morning I forgot I had a phone.',story:`<p>Placeholder — a quiet moment worth writing down. The ones that don't make Instagram but stay with you for years.</p>`},
-    {id:'m2',img:null,loc:'PLACEHOLDER',label:'MEAL',title:'The best meal I never ordered.',story:`<p>Placeholder — your story here.</p>`},
-    {id:'m3',img:null,loc:'PLACEHOLDER',label:'VIEW',title:'A view that stopped time.',story:`<p>Placeholder — your story here.</p>`},
-    {id:'m4',img:null,loc:'PLACEHOLDER',label:'SILENCE',title:'Learning to sit with nothing.',story:`<p>Placeholder — your story here.</p>`},
-  ]
-};
+// ── FIREBASE ──────────────────────────────────────────────────────
+const app = initializeApp({
+  apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+  authDomain:"nomad-404.firebaseapp.com",
+  projectId:"nomad-404",
+  appId:"1:638331724572:web:baa0d70108e920099150d9"
+});
+const db = getFirestore(app);
 
-// ════════════════════════════════════════
-// STATE
-// ════════════════════════════════════════
-let countriesData = null, flightsData = null, cafesData = null;
-let globeMode = 'countries';
-let globeScene, globeGlobe, globeFlightLines = [];
+// ── STATE ─────────────────────────────────────────────────────────
+let countriesData=[], flightsData=[], cafesData=[], experiencesData=[];
+let globeMode='countries', globeGlobe=null, globeFlightLines=[], globeCamera=null, globeRenderer=null;
 
-// ════════════════════════════════════════
-// INTRO
-// ════════════════════════════════════════
-const introSeq=[{el:'il1',d:300},{el:'il2',d:900},{el:'ir1',d:1400},{el:'il3',d:1600},{el:'ir2',d:2300},{el:'il4',d:2600},{el:'il5',d:3200},{el:'ir3',d:3800},{el:'il6',d:4100}];
+// ── INTRO ─────────────────────────────────────────────────────────
+const introSeq=[
+  {el:'il1',d:300},{el:'il2',d:900},{el:'ir1',d:1400},
+  {el:'il3',d:1600},{el:'ir2',d:2300},
+  {el:'il4',d:2700},{el:'il5',d:3300},{el:'ir3',d:3900},
+  {el:'il6',d:4200},{el:'il7',d:5000}
+];
 let introDone=false;
-function dismissIntro(){
-  if(introDone)return; introDone=true;
-  document.getElementById('intro').classList.add('gone');
-  document.getElementById('page').classList.add('vis');
-  loadAllData();
-}
-introSeq.forEach(({el,d})=>setTimeout(()=>{const n=document.getElementById(el);if(n)n.classList.add('vis');},d));
-setTimeout(dismissIntro,5800);
-document.getElementById('intro').addEventListener('click',dismissIntro);
-document.getElementById('introSkip').addEventListener('click',e=>{e.stopPropagation();dismissIntro();});
 
-// ════════════════════════════════════════
-// LOAD ALL JSON
-// ════════════════════════════════════════
-function loadAllData(){
-  // All data inline — works in preview and production alike.
-  // When deploying, replace these with fetch() calls to your JSON files.
-  countriesData = { visited: [
-    {id:"IN",name:"India",lat:20.6,lon:78.9},
-    {id:"LK",name:"Sri Lanka",lat:7.9,lon:80.7},
-    {id:"TH",name:"Thailand",lat:13.0,lon:100.5},
-    {id:"KR",name:"South Korea",lat:36.5,lon:127.9},
-    {id:"AU",name:"Australia",lat:-25.3,lon:133.8},
-    {id:"US",name:"USA",lat:37.1,lon:-95.7},
-    {id:"MX",name:"Mexico",lat:23.6,lon:-102.6},
-    {id:"PE",name:"Peru",lat:-9.2,lon:-75.0},
-    {id:"CL",name:"Chile",lat:-35.7,lon:-71.5},
-    {id:"AR",name:"Argentina",lat:-38.4,lon:-63.6},
-    {id:"IS",name:"Iceland",lat:64.9,lon:-18.7},
-    {id:"FR",name:"France",lat:46.2,lon:2.2},
-    {id:"ES",name:"Spain",lat:40.5,lon:-3.7},
-    {id:"LU",name:"Luxembourg",lat:49.8,lon:6.1},
-    {id:"IT",name:"Italy",lat:41.9,lon:12.6},
-    {id:"GR",name:"Greece",lat:39.1,lon:21.8},
-    {id:"PT",name:"Portugal",lat:39.4,lon:-8.2},
-    {id:"DE",name:"Germany",lat:51.2,lon:10.5},
-    {id:"TR",name:"Turkey",lat:38.9,lon:35.2},
-    {id:"CH",name:"Switzerland",lat:46.8,lon:8.2},
-    {id:"VN",name:"Vietnam",lat:14.1,lon:108.3},
-    {id:"AE",name:"UAE",lat:23.4,lon:53.8},
-    {id:"CZ",name:"Czech Republic",lat:49.8,lon:15.5},
-    {id:"VA",name:"Vatican City",lat:41.9,lon:12.5},
-    {id:"PL",name:"Poland",lat:51.9,lon:19.1},
-    {id:"BE",name:"Belgium",lat:50.5,lon:4.5},
-    {id:"NL",name:"Netherlands",lat:52.1,lon:5.3},
-    {id:"PR",name:"Puerto Rico",lat:18.2,lon:-66.6},
-    {id:"AT",name:"Austria",lat:47.5,lon:14.6},
-    {id:"BR",name:"Brazil",lat:-14.2,lon:-51.9},
-    {id:"PK",name:"Pakistan",lat:30.4,lon:69.3},
-    {id:"BD",name:"Bangladesh",lat:23.7,lon:90.4},
-    {id:"NP",name:"Nepal",lat:28.4,lon:84.1},
-    {id:"GB",name:"UK",lat:55.4,lon:-3.4},
-    {id:"HK",name:"Hong Kong",lat:22.3,lon:114.2},
-    {id:"JP",name:"Japan",lat:36.2,lon:138.3},
-    {id:"KP",name:"North Korea (DMZ)",lat:40.3,lon:127.5},
-    {id:"AQ",name:"Antarctica",lat:-82.0,lon:0.0},
-    {id:"ZA",name:"South Africa",lat:-30.6,lon:22.9}
-  ]};
-
-  flightsData = {
-    stats:{total_flights:87,total_miles:312000,airlines:34,airports:68,most_flown:"Emirates"},
-    airports:[
-      {code:"DXB",name:"Dubai International",city:"Dubai",country:"UAE",lat:25.2532,lon:55.3657,visits:24,
-       story:"If airports had personalities, DXB would be that impossibly well-dressed friend who somehow makes a 3am layover feel like a luxury event. I've spent more nights here than I have in some cities I call visited. Terminal 3 at 2am, the whole world is passing through — and somehow it still feels like mine."},
-      {code:"HND",name:"Haneda Airport",city:"Tokyo",country:"Japan",lat:35.5494,lon:139.7798,visits:3,
-       story:"Haneda is what airports dream of being. Clean enough to eat off the floor. Staff who bow when you board. A ramen shop at gate 52 that made me miss my connection on purpose, or at least that's my story. Tokyo starts the moment you land."},
-      {code:"SIN",name:"Changi Airport",city:"Singapore",country:"Singapore",lat:1.3644,lon:103.9915,visits:6,
-       story:"Changi has a waterfall. A seven-story indoor waterfall. I've seen it four times and it still stops me cold. The kind of airport that makes you wish your layover was longer."},
-      {code:"DEL",name:"Indira Gandhi International",city:"New Delhi",country:"India",lat:28.5562,lon:77.1,visits:19,
-       story:"Terminal 3 is the airport I grew up through. Every time I land here I remember being seventeen, watching planes take off from a rooftop in my town, wondering where they were going. Now I'm on them."},
-      {code:"LHR",name:"London Heathrow",city:"London",country:"UK",lat:51.47,lon:-0.4543,visits:8,
-       story:"Heathrow is the airport equivalent of a commuter train — efficient, slightly tired, everyone has somewhere else to be. But Terminal 5 at dawn, coffee in hand — there's a quiet dignity to it."},
-      {code:"JFK",name:"JFK International",city:"New York",country:"USA",lat:40.6413,lon:-73.7781,visits:5,
-       story:"JFK is barely functional and somehow still iconic. The chaos, the accents, the taxi line that tests your patience — and then you're in Manhattan 45 minutes later and you forget all of it."}
-    ],
-    flights:[
-      {from:"DEL",to:"DXB",from_city:"New Delhi",to_city:"Dubai",from_lat:28.5562,from_lon:77.1,to_lat:25.2532,to_lon:55.3657,airline:"Emirates",date:"2024-03",miles:1200,notes:"Window seat, chai from home"},
-      {from:"DXB",to:"LHR",from_city:"Dubai",to_city:"London",from_lat:25.2532,from_lon:55.3657,to_lat:51.47,to_lon:-0.4543,airline:"Emirates",date:"2024-03",miles:3400,notes:"Sunrise over the Alps"},
-      {from:"LHR",to:"JFK",from_city:"London",to_city:"New York",from_lat:51.47,from_lon:-0.4543,to_lat:40.6413,to_lon:-73.7781,airline:"British Airways",date:"2023-11",miles:3450,notes:"Classic transatlantic, classic delay"},
-      {from:"JFK",to:"MIA",from_city:"New York",to_city:"Miami",from_lat:40.6413,from_lon:-73.7781,to_lat:25.7959,to_lon:-80.287,airline:"Delta",date:"2023-11",miles:1090,notes:""},
-      {from:"DEL",to:"SIN",from_city:"New Delhi",to_city:"Singapore",from_lat:28.5562,from_lon:77.1,to_lat:1.3644,to_lon:103.9915,airline:"Singapore Airlines",date:"2023-07",miles:2540,notes:"Best in-flight food I've ever had"},
-      {from:"SIN",to:"HND",from_city:"Singapore",to_city:"Tokyo",from_lat:1.3644,from_lon:103.9915,to_lat:35.5494,to_lon:139.7798,airline:"ANA",date:"2023-07",miles:3310,notes:"Slept through the whole thing. No regrets."},
-      {from:"DEL",to:"CDG",from_city:"New Delhi",to_city:"Paris",from_lat:28.5562,from_lon:77.1,to_lat:49.0097,to_lon:2.5479,airline:"Air France",date:"2022-06",miles:4100,notes:"Landed at dawn. Paris is best at dawn."},
-      {from:"GRU",to:"LIM",from_city:"São Paulo",to_city:"Lima",from_lat:-23.4356,from_lon:-46.4731,to_lat:-12.0219,to_lon:-77.1143,airline:"LATAM",date:"2021-11",miles:2380,notes:"South America hop"},
-      {from:"DEL",to:"BKK",from_city:"New Delhi",to_city:"Bangkok",from_lat:28.5562,from_lon:77.1,to_lat:13.6811,to_lon:100.747,airline:"Thai Airways",date:"2020-01",miles:1550,notes:"Last flight before the world changed"}
-    ]
-  };
-
-  cafesData = {cafes:[
-    {name:"Onibus Coffee",city:"Tokyo",country:"Japan",type:"Specialty Coffee",ordered:"Single origin pour-over, no milk",
-     vibe:"Minimalist timber interior, jazz at just the right volume. The kind of quiet that doesn't feel empty.",
-     story:"I found this place by getting completely lost in Nakameguro at 7am. The barista didn't speak English. I didn't speak Japanese. We communicated entirely through nods and the coffee said everything else. I sat there for two hours and didn't open my phone once.",
-     rating:"★★★★★",img:null},
-    {name:"Café de Flore",city:"Paris",country:"France",type:"Classic Parisian",ordered:"Café crème, croissant",
-     vibe:"Every table has a story. Sartre sat here. You can feel the weight of a hundred years.",
-     story:"Tourist trap? Maybe. But when you're there at 8am before the tour groups arrive, with a crème and a croissant and the whole boulevard to yourself, you understand exactly why this place survived a hundred years. Some places earn their reputation.",
-     rating:"★★★★☆",img:null},
-    {name:"Proud Mary",city:"Melbourne",country:"Australia",type:"Australian Specialty",ordered:"Flat white, banana bread",
-     vibe:"Bright, loud, full of people who take their coffee more seriously than most people take anything.",
-     story:"Melbourne taught me that coffee is a culture, not a beverage. This place had a waitlist at 9am on a Tuesday. I waited 20 minutes and every second was worth it. The flat white was the best I've ever had.",
-     rating:"★★★★★",img:null},
-    {name:"The Barn",city:"Berlin",country:"Germany",type:"Specialty Third Wave",ordered:"Black filter, nothing else",
-     vibe:"Industrial and precise. Like drinking coffee inside a philosophy lecture. In the best way.",
-     story:"Berlin runs on coffee and existential dread and I mean that as a compliment. The Barn is where the serious drinkers go. No oat milk here. Just coffee done with the kind of rigour that Germans apply to everything.",
-     rating:"★★★★☆",img:null},
-    {name:"Blue Tokai — Lado Sarai",city:"New Delhi",country:"India",type:"Indian Specialty",ordered:"Cold brew, black",
-     vibe:"Home base. Where I come back to. The smell alone is enough.",
-     story:"When I'm back in India and need to think, I come here. The same stools, the same roast, the same barista who still doesn't remember my name but always gets my order right. Home doesn't have to be a place. Sometimes it's a cup.",
-     rating:"★★★★★",img:null},
-    {name:"Caffe Sant'Eustachio",city:"Rome",country:"Italy",type:"Roman Classic",ordered:"Gran caffè, with sugar (they put it in, no choice)",
-     vibe:"Standing room only. Tiny cups. Maximum opinion about everything.",
-     story:"They add sugar to the espresso before they give it to you and if you ask them not to, they'll argue with you about it. They're right. I was wrong. It's the best coffee in Rome, possibly Italy, possibly the world, and I say that as someone who doesn't take sugar.",
-     rating:"★★★★★",img:null}
-  ]};
-
-  initGlobe();
-  buildFlights();
-  buildReels();
-  buildCafes();
-  buildCountries();
-  updateStats();
+function dismissIntro() {
+  if(introDone) return;
+  introDone = true;
+  const intro = document.getElementById('intro');
+  // Tear effect
+  intro.classList.add('tearing');
+  setTimeout(() => {
+    intro.classList.add('gone');
+    document.getElementById('page').classList.add('vis');
+    loadAllData();
+  }, 550);
 }
 
-// ════════════════════════════════════════
-// STATS
-// ════════════════════════════════════════
-function updateStats(){
-  const nc = countriesData.visited.length;
-  const nf = flightsData.stats.total_flights;
-  const nm = flightsData.stats.total_miles;
+introSeq.forEach(({el,d}) => {
+  setTimeout(() => {
+    const n = document.getElementById(el);
+    if(n) n.classList.add('vis');
+  }, d);
+});
+setTimeout(dismissIntro, 6200);
+document.getElementById('intro').addEventListener('click', dismissIntro);
+document.getElementById('introSkip').addEventListener('click', e => { e.stopPropagation(); dismissIntro(); });
 
-  document.getElementById('heroCountries').innerHTML = `${nc}<span>+</span>`;
-  document.getElementById('heroFlights').innerHTML   = `${nf}<span>+</span>`;
-  document.getElementById('visitCount').textContent  = nc + ' countries';
-  document.getElementById('fCountries').textContent  = nc + '+';
-  document.getElementById('fFlights').textContent    = nf + '+';
-  document.getElementById('fMiles').innerHTML        = Math.round(nm/1000) + '<span>K+</span>';
+// ── LOAD ALL FROM FIRESTORE ───────────────────────────────────────
+async function loadAllData() {
+  try {
+    // Parallel load all collections
+    const [countriesSnap, flightsSnap, cafesSnap, expSnap] = await Promise.all([
+      getDocs(collection(db,'countries')),
+      getDocs(query(collection(db,'flights'), orderBy('date','desc'))),
+      getDocs(collection(db,'cafes')),
+      getDocs(collection(db,'experiences')),
+    ]);
+
+    countriesData = countriesSnap.docs.map(d => ({id:d.id, ...d.data()}))
+      .filter(c => c.status !== 'wishlist');
+    flightsData   = flightsSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    cafesData     = cafesSnap.docs.map(d => ({id:d.id, ...d.data()}));
+    experiencesData = expSnap.docs.map(d => ({id:d.id, ...d.data()}));
+
+    updateStats();
+    initGlobe();
+    revealOriginText();
+    buildFlights();
+    buildReels();
+    buildCafes();
+    buildStamps();
+    setupClosingPoem();
+  } catch(e) {
+    console.error('Firestore load failed:', e);
+    // Graceful fallback — show empty states
+  }
 }
 
-// ════════════════════════════════════════
-// 3D GLOBE — satellite texture + routes
-// ════════════════════════════════════════
-function initGlobe(){
-  const wrap=document.getElementById('globeWrap');
-  const canvas=document.getElementById('globeCanvas');
-  const tip=document.getElementById('globeTip');
-  const W=wrap.clientWidth, H=wrap.clientHeight;
+// ── STATS ─────────────────────────────────────────────────────────
+function animateCount(el, target, suffix='') {
+  if(!el || !target) return;
+  let current = 0;
+  const step = Math.ceil(target / 40);
+  const timer = setInterval(() => {
+    current = Math.min(current + step, target);
+    el.textContent = current + suffix;
+    if(current >= target) clearInterval(timer);
+  }, 30);
+}
 
-  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+function updateStats() {
+  const nc = countriesData.length;
+  const nf = flightsData.length;
+  const totalMiles = flightsData.reduce((s,f) => s+(f.distance_miles||0),0);
+  const airlines = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))].length;
+
+  animateCount(document.getElementById('statCountries'), nc);
+  animateCount(document.getElementById('statFlights'), nf);
+  animateCount(document.getElementById('statMiles'), Math.round(totalMiles/1000));
+  document.getElementById('visitCount').innerHTML = `<span>${nc}</span> countries`;
+  document.getElementById('globeStampText').textContent = `${nc} COUNTRIES VISITED · EST. 2016`;
+  document.getElementById('fCountries').innerHTML = `${nc}<span>+</span>`;
+  document.getElementById('fFlights').innerHTML = `${nf}`;
+  document.getElementById('fMiles').innerHTML = `${Math.round(totalMiles/1000)}<span>K</span>`;
+  document.getElementById('fAirlines').innerHTML = `${airlines}`;
+  document.getElementById('closingCount').textContent = nc;
+}
+
+// ── GLOBE ─────────────────────────────────────────────────────────
+function latLonToVec(lat, lon, r=1.025) {
+  const la = lat*Math.PI/180, lo = lon*Math.PI/180;
+  return new THREE.Vector3(r*Math.cos(la)*Math.cos(lo), r*Math.sin(la), r*Math.cos(la)*Math.sin(lo));
+}
+
+function initGlobe() {
+  const wrap = document.getElementById('globeWrap');
+  const canvas = document.getElementById('globeCanvas');
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.setSize(W,H);
-  renderer.setClearColor(0x040a14,1);
+  renderer.setClearColor(0x030608,1);
+  globeRenderer = renderer;
 
-  const scene=new THREE.Scene();
-  const camera=new THREE.PerspectiveCamera(45,W/H,0.1,1000);
-  camera.position.z=2.8;
-  globeScene=scene;
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45,W/H,0.1,1000);
+  camera.position.z = 2.8;
+  globeCamera = camera;
 
   // Stars
   const sv=[];
-  for(let i=0;i<3500;i++){
-    const t=Math.random()*Math.PI*2, p=Math.acos(2*Math.random()-1), r=6+Math.random()*4;
+  for(let i=0;i<3000;i++){
+    const t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1),r=6+Math.random()*4;
     sv.push(r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));
   }
   const sGeo=new THREE.BufferGeometry();
   sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
-  scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:0.012,transparent:true,opacity:0.55})));
+  scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:0.011,transparent:true,opacity:0.5})));
 
-  // Globe — high-res procedural satellite-style texture (no CDN dependency)
-  const gGeo=new THREE.SphereGeometry(1,72,72);
-
-  // Build a 2048x1024 canvas that mimics satellite imagery
+  // Globe texture
   const tc=document.createElement('canvas'); tc.width=2048; tc.height=1024;
   const cx=tc.getContext('2d');
-
-  // Deep ocean base with gradient depth
   const oceanG=cx.createLinearGradient(0,0,0,1024);
-  oceanG.addColorStop(0.0,'#020c1a');
-  oceanG.addColorStop(0.15,'#031524');
-  oceanG.addColorStop(0.35,'#041e30');
-  oceanG.addColorStop(0.5,'#052038');
-  oceanG.addColorStop(0.65,'#041e30');
-  oceanG.addColorStop(0.85,'#031524');
-  oceanG.addColorStop(1.0,'#020c1a');
+  oceanG.addColorStop(0,'#020c1a'); oceanG.addColorStop(0.5,'#052038'); oceanG.addColorStop(1,'#020c1a');
   cx.fillStyle=oceanG; cx.fillRect(0,0,2048,1024);
 
-  // Approximate continent shapes in equirectangular projection
-  // Each array: [path of [x,y] points as % of 2048x1024]
-  const continents = [
-    // Eurasia — large landmass
-    [[490,120],[780,100],[900,110],[980,140],[1050,130],[1120,150],[1180,130],[1260,140],
-     [1350,120],[1420,130],[1480,120],[1520,140],[1540,160],[1560,190],[1500,220],[1450,240],
-     [1400,260],[1350,280],[1280,300],[1200,310],[1140,330],[1100,320],[1050,340],[1000,360],
-     [940,370],[880,350],[820,330],[760,310],[700,300],[640,280],[590,260],[540,240],
-     [500,210],[480,180],[470,160]],
-    // Africa
-    [[620,310],[680,290],[730,300],[760,320],[780,360],[790,410],[800,460],[810,510],
-     [800,560],[780,610],[750,640],[720,660],[690,650],[660,630],[640,600],[620,560],
-     [600,510],[590,460],[580,410],[590,360],[600,330]],
-    // North America
-    [[80,120],[140,100],[200,110],[250,130],[290,150],[310,180],[320,220],[310,260],
-     [290,300],[260,330],[230,350],[200,370],[160,380],[120,360],[90,330],[70,290],
-     [60,250],[65,200],[70,160],[75,130]],
-    // South America
-    [[220,420],[260,400],[290,410],[310,440],[320,480],[315,530],[300,580],[280,630],
-     [260,670],[240,700],[210,710],[190,690],[170,660],[160,620],[155,570],[160,520],
-     [175,470],[195,440]],
-    // Australia
-    [[1580,530],[1650,510],[1720,520],[1770,540],[1800,570],[1810,610],[1800,650],
-     [1770,680],[1720,690],[1660,680],[1610,660],[1580,630],[1565,590],[1568,555]],
-    // Greenland
-    [[260,50],[310,40],[360,45],[390,60],[400,80],[390,100],[360,110],[320,115],
-     [280,105],[255,85],[250,65]],
-    // Antarctica strip at bottom
+  const continents=[
+    [[490,120],[780,100],[900,110],[980,140],[1050,130],[1120,150],[1180,130],[1260,140],[1350,120],[1420,130],[1480,120],[1520,140],[1540,160],[1560,190],[1500,220],[1450,240],[1400,260],[1350,280],[1280,300],[1200,310],[1140,330],[1100,320],[1050,340],[1000,360],[940,370],[880,350],[820,330],[760,310],[700,300],[640,280],[590,260],[540,240],[500,210],[480,180],[470,160]],
+    [[620,310],[680,290],[730,300],[760,320],[780,360],[790,410],[800,460],[810,510],[800,560],[780,610],[750,640],[720,660],[690,650],[660,630],[640,600],[620,560],[600,510],[590,460],[580,410],[590,360],[600,330]],
+    [[80,120],[140,100],[200,110],[250,130],[290,150],[310,180],[320,220],[310,260],[290,300],[260,330],[230,350],[200,370],[160,380],[120,360],[90,330],[70,290],[60,250],[65,200],[70,160],[75,130]],
+    [[220,420],[260,400],[290,410],[310,440],[320,480],[315,530],[300,580],[280,630],[260,670],[240,700],[210,710],[190,690],[170,660],[160,620],[155,570],[160,520],[175,470],[195,440]],
+    [[1580,530],[1650,510],[1720,520],[1770,540],[1800,570],[1810,610],[1800,650],[1770,680],[1720,690],[1660,680],[1610,660],[1580,630],[1565,590],[1568,555]],
+    [[260,50],[310,40],[360,45],[390,60],[400,80],[390,100],[360,110],[320,115],[280,105],[255,85],[250,65]],
     [[0,900],[2048,900],[2048,1024],[0,1024]],
-    // Japan
-    [[1680,220],[1700,210],[1720,215],[1730,230],[1720,245],[1700,250],[1680,240]],
-    // UK/Ireland
-    [[540,165],[560,155],[575,160],[580,175],[570,185],[550,185],[535,175]],
-    // Indian subcontinent
-    [[950,310],[1000,300],[1040,310],[1060,340],[1070,380],[1060,420],[1040,450],
-     [1010,470],[980,460],[960,430],[945,390],[940,350]],
-    // SE Asia peninsula
-    [[1160,380],[1200,360],[1230,370],[1240,400],[1230,430],[1200,450],[1170,440],[1155,410]],
+    [[950,310],[1000,300],[1040,310],[1060,340],[1070,380],[1060,420],[1040,450],[1010,470],[980,460],[960,430],[945,390],[940,350]],
   ];
-
-  // Draw continent fills
   continents.forEach(pts=>{
-    cx.beginPath();
-    // Scale from % coords — these are already in pixel coords for 2048x1024
-    cx.moveTo(pts[0][0], pts[0][1]);
-    pts.slice(1).forEach(([x,y])=>cx.lineTo(x,y));
-    cx.closePath();
-    const landG=cx.createLinearGradient(0,200,0,700);
-    landG.addColorStop(0,'rgba(45,72,38,0.92)');
-    landG.addColorStop(0.4,'rgba(38,62,32,0.88)');
-    landG.addColorStop(0.7,'rgba(52,78,42,0.85)');
-    landG.addColorStop(1,'rgba(42,58,35,0.9)');
-    cx.fillStyle=landG;
-    cx.fill();
+    cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]);
+    pts.slice(1).forEach(([x,y])=>cx.lineTo(x,y)); cx.closePath();
+    const lg=cx.createLinearGradient(0,200,0,700);
+    lg.addColorStop(0,'rgba(40,65,33,0.92)'); lg.addColorStop(0.5,'rgba(34,55,28,0.88)'); lg.addColorStop(1,'rgba(45,70,37,0.9)');
+    cx.fillStyle=lg; cx.fill();
   });
-
-  // Desert tones over parts of continents
-  cx.fillStyle='rgba(120,90,40,0.25)';
-  [[800,250,200,80],[1050,250,150,70],[660,380,120,60]].forEach(([x,y,w,h])=>{
-    cx.fillRect(x-w/2,y-h/2,w,h);
-  });
-
-  // Ice caps - polar white
-  const iceN=cx.createRadialGradient(1024,0,0,1024,0,180);
-  iceN.addColorStop(0,'rgba(220,235,245,0.95)');
-  iceN.addColorStop(0.6,'rgba(180,210,230,0.6)');
-  iceN.addColorStop(1,'rgba(150,190,220,0)');
+  // Ice caps
+  const iceN=cx.createRadialGradient(1024,0,0,1024,0,200);
+  iceN.addColorStop(0,'rgba(210,230,245,0.95)'); iceN.addColorStop(1,'rgba(150,190,220,0)');
   cx.fillStyle=iceN; cx.fillRect(0,0,2048,160);
-
-  const iceS=cx.createRadialGradient(1024,1024,0,1024,1024,200);
-  iceS.addColorStop(0,'rgba(230,240,250,0.98)');
-  iceS.addColorStop(0.5,'rgba(190,215,235,0.7)');
-  iceS.addColorStop(1,'rgba(160,195,220,0)');
-  cx.fillStyle=iceS; cx.fillRect(0,860,2048,164);
-
-  // Cloud wisps for atmosphere feel
-  cx.fillStyle='rgba(255,255,255,0.06)';
-  for(let i=0;i<20;i++){
-    const x=Math.random()*2048, y=100+Math.random()*824;
-    const w=100+Math.random()*300, h=10+Math.random()*30;
-    cx.beginPath(); cx.ellipse(x,y,w/2,h/2,Math.random()*0.5,0,Math.PI*2); cx.fill();
-  }
-
-  // Fine noise for texture
-  const id=cx.getImageData(0,0,2048,1024);
-  for(let i=0;i<id.data.length;i+=4){
-    const n=(Math.random()-0.5)*14;
-    id.data[i]  =Math.max(0,Math.min(255,id.data[i]+n));
-    id.data[i+1]=Math.max(0,Math.min(255,id.data[i+1]+n));
-    id.data[i+2]=Math.max(0,Math.min(255,id.data[i+2]+n*0.6));
-  }
-  cx.putImageData(id,0,0);
+  const iceS=cx.createRadialGradient(1024,1024,0,1024,1024,220);
+  iceS.addColorStop(0,'rgba(225,240,250,0.98)'); iceS.addColorStop(1,'rgba(160,200,225,0)');
+  cx.fillStyle=iceS; cx.fillRect(0,850,2048,174);
 
   const globeTex=new THREE.CanvasTexture(tc);
   globeTex.anisotropy=4;
-  const gMat=new THREE.MeshPhongMaterial({
-    map:globeTex, shininess:90, specular:new THREE.Color(0x334466)
-  });
+  const gGeo=new THREE.SphereGeometry(1,72,72);
+  const gMat=new THREE.MeshPhongMaterial({map:globeTex,shininess:80,specular:new THREE.Color(0x223344)});
   const globe=new THREE.Mesh(gGeo,gMat);
   scene.add(globe);
   globeGlobe=globe;
 
-  // Try to load real NASA texture on top (enhances if available, degrades gracefully)
-  new THREE.TextureLoader().load(
-    'https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-    tex=>{ tex.anisotropy=4; gMat.map=tex; gMat.needsUpdate=true; }
-  );
+  // Try NASA texture
+  new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
+    tex=>{tex.anisotropy=4;gMat.map=tex;gMat.needsUpdate=true;});
 
-  // Atmospheric scatter glow — thick blue halo
+  // Atmosphere
   const aGeo=new THREE.SphereGeometry(1.12,64,64);
-  const aFrag=`
-    varying vec3 vNormal;
-    void main(){
-      float intensity=pow(0.72-dot(vNormal,vec3(0,0,1)),4.0);
-      gl_FragColor=vec4(0.18,0.55,0.9,1.0)*intensity;
-    }`;
-  const aVert=`varying vec3 vNormal;void main(){vNormal=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);}`;
   const aMat=new THREE.ShaderMaterial({
-    uniforms:{},vertexShader:aVert,fragmentShader:aFrag,
-    side:THREE.BackSide,blending:THREE.AdditiveBlending,transparent:true,depthWrite:false
+    uniforms:{},transparent:true,depthWrite:false,side:THREE.BackSide,blending:THREE.AdditiveBlending,
+    vertexShader:'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
+    fragmentShader:'varying vec3 vN;void main(){float i=pow(0.72-dot(vN,vec3(0,0,1)),4.);gl_FragColor=vec4(0.15,0.5,0.85,1.)*i;}'
   });
   scene.add(new THREE.Mesh(aGeo,aMat));
 
-  // Inner rim teal glow
-  const rGeo=new THREE.SphereGeometry(1.06,64,64);
-  const rMat=new THREE.MeshBasicMaterial({color:0x3a9e9c,transparent:true,opacity:0.06,side:THREE.BackSide});
-  scene.add(new THREE.Mesh(rGeo,rMat));
-
-  // Very faint lat/lon grid
-  const wGeo=new THREE.SphereGeometry(1.002,24,24);
-  const wMat=new THREE.MeshBasicMaterial({color:0x5bc0be,wireframe:true,transparent:true,opacity:0.06});
-  globe.add(new THREE.Mesh(wGeo,wMat));
+  // Wireframe grid
+  globe.add(new THREE.Mesh(
+    new THREE.SphereGeometry(1.002,24,24),
+    new THREE.MeshBasicMaterial({color:0x2E8B7A,wireframe:true,transparent:true,opacity:0.05})
+  ));
 
   // Lights
-  scene.add(new THREE.AmbientLight(0x334455,1.5));
-  const sun=new THREE.DirectionalLight(0x88aacc,1.6); sun.position.set(4,2,5); scene.add(sun);
-  const fill=new THREE.DirectionalLight(0x3a9e9c,0.4); fill.position.set(-3,-1,-2); scene.add(fill);
+  scene.add(new THREE.AmbientLight(0x334455,1.6));
+  const sun=new THREE.DirectionalLight(0x88aacc,1.4); sun.position.set(4,2,5); scene.add(sun);
 
-  // Country dots
-  const dotGeo=new THREE.SphereGeometry(0.022,10,10);
-  const dotMat=new THREE.MeshBasicMaterial({color:0x5bc0be});
-  const pulseGeo=new THREE.SphereGeometry(0.034,10,10);
-  const pulseMat=new THREE.MeshBasicMaterial({color:0x5bc0be,transparent:true,opacity:0.3});
+  // Country dots — amber ember glow
+  const dotGeo=new THREE.SphereGeometry(0.02,10,10);
+  const dotMat=new THREE.MeshBasicMaterial({color:0xD4792A});
+  const pulseMat=new THREE.MeshBasicMaterial({color:0xD4792A,transparent:true,opacity:0.25});
+  const pulseGeo=new THREE.SphereGeometry(0.032,10,10);
 
+  const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,countriesData.length);
   const dotData=[];
   const dummy=new THREE.Object3D();
-
-  const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,countriesData.visited.length);
-  countriesData.visited.forEach((c,i)=>{
-    const lat=c.lat*Math.PI/180, lon=c.lon*Math.PI/180, r=1.025;
-    const pos=new THREE.Vector3(r*Math.cos(lat)*Math.cos(lon),r*Math.sin(lat),r*Math.cos(lat)*Math.sin(lon));
+  countriesData.forEach((c,i)=>{
+    const pos=latLonToVec(c.lat,c.lon);
     dummy.position.copy(pos); dummy.updateMatrix();
     dotMesh.setMatrixAt(i,dummy.matrix);
-    dotData.push({name:c.name,id:c.id,pos});
+    dotData.push({name:c.name,id:c.id,pos,status:c.status});
   });
   dotMesh.instanceMatrix.needsUpdate=true;
   globe.add(dotMesh);
 
-  // Pulse rings
+  // Pulse rings for first 10
   const rings=[];
-  countriesData.visited.slice(0,8).forEach((c,i)=>{
-    const lat=c.lat*Math.PI/180, lon=c.lon*Math.PI/180, r=1.025;
-    const ring=new THREE.Mesh(pulseGeo,pulseMat.clone());
-    ring.position.set(r*Math.cos(lat)*Math.cos(lon),r*Math.sin(lat),r*Math.cos(lat)*Math.sin(lon));
-    ring._phase=i*0.8;
-    globe.add(ring);
-    rings.push(ring);
+  countriesData.slice(0,10).forEach((c,i)=>{
+    const r=new THREE.Mesh(pulseGeo,pulseMat.clone());
+    const p=latLonToVec(c.lat,c.lon);
+    r.position.copy(p); r._phase=i*0.7;
+    globe.add(r); rings.push(r);
   });
 
   // Drag
-  let isDragging=false, prevX=0, prevY=0, autoRotate=true, hintHidden=false;
-  wrap.addEventListener('mousedown',e=>{isDragging=true;autoRotate=false;prevX=e.clientX;prevY=e.clientY;if(!hintHidden){document.getElementById('globeHint').style.opacity='0';hintHidden=true;}});
+  const tip=document.getElementById('globeTip');
+  let isDragging=false,prevX=0,prevY=0,autoRotate=true,hintHidden=false;
+  const wrap2=document.getElementById('globeWrap');
+  wrap2.addEventListener('mousedown',e=>{isDragging=true;autoRotate=false;prevX=e.clientX;prevY=e.clientY;if(!hintHidden){document.getElementById('globeHint').style.opacity='0';hintHidden=true;}});
   window.addEventListener('mouseup',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2500);});
-  wrap.addEventListener('mousemove',e=>{
+  wrap2.addEventListener('mousemove',e=>{
     if(isDragging){
       globe.rotation.y+=(e.clientX-prevX)*0.005;
-      globe.rotation.x+=(e.clientY-prevY)*0.003;
-      globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x));
-      prevX=e.clientX; prevY=e.clientY;
+      globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.clientY-prevY)*0.003));
+      prevX=e.clientX;prevY=e.clientY;
     }
-    const rect=wrap.getBoundingClientRect();
-    const mx=((e.clientX-rect.left)/W)*2-1, my=-((e.clientY-rect.top)/H)*2+1;
+    const rect=wrap2.getBoundingClientRect();
+    const mx=((e.clientX-rect.left)/W)*2-1,my=-((e.clientY-rect.top)/H)*2+1;
     const ray=new THREE.Raycaster(); ray.setFromCamera({x:mx,y:my},camera);
     const hits=ray.intersectObject(dotMesh);
     if(hits.length>0&&dotData[hits[0].instanceId]){
-      tip.textContent=dotData[hits[0].instanceId].name;
+      const d=dotData[hits[0].instanceId];
+      tip.textContent=d.name+(d.status==='transiting'?' *':'');
       tip.style.left=(e.clientX-rect.left+14)+'px';
       tip.style.top=(e.clientY-rect.top-32)+'px';
       tip.style.opacity='1';
     } else tip.style.opacity='0';
   });
-  wrap.addEventListener('mouseleave',()=>tip.style.opacity='0');
-  wrap.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=Math.max(1.6,Math.min(5,camera.position.z+e.deltaY*0.003));},{passive:false});
-  wrap.addEventListener('touchstart',e=>{isDragging=true;autoRotate=false;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
-  wrap.addEventListener('touchend',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2000);});
-  wrap.addEventListener('touchmove',e=>{if(!isDragging)return;globe.rotation.y+=(e.touches[0].clientX-prevX)*0.005;globe.rotation.x+=(e.touches[0].clientY-prevY)*0.003;globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x));prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
+  wrap2.addEventListener('mouseleave',()=>tip.style.opacity='0');
+  wrap2.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=Math.max(1.5,Math.min(5,camera.position.z+e.deltaY*0.003));},{passive:false});
+  wrap2.addEventListener('touchstart',e=>{isDragging=true;autoRotate=false;prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
+  wrap2.addEventListener('touchend',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2000);});
+  wrap2.addEventListener('touchmove',e=>{if(!isDragging)return;globe.rotation.y+=(e.touches[0].clientX-prevX)*0.005;globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.touches[0].clientY-prevY)*0.003));prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
+  window.addEventListener('resize',()=>{const nW=wrap2.clientWidth,nH=wrap2.clientHeight;camera.aspect=nW/nH;camera.updateProjectionMatrix();renderer.setSize(nW,nH);});
 
-  window.addEventListener('resize',()=>{const nW=wrap.clientWidth,nH=wrap.clientHeight;camera.aspect=nW/nH;camera.updateProjectionMatrix();renderer.setSize(nW,nH);});
+  buildFlightLines(globe);
 
   let clock=0;
   (function animate(){
     requestAnimationFrame(animate);
     clock+=0.016;
     if(autoRotate&&!isDragging) globe.rotation.y+=0.0015;
-    // Pulse rings
     rings.forEach(r=>{
-      const s=1+(Math.sin(clock*1.5+r._phase)*0.3);
-      r.scale.setScalar(s); r.material.opacity=0.25*(1-Math.abs(Math.sin(clock*1.5+r._phase))*0.8);
+      const s=1+Math.sin(clock*1.4+r._phase)*0.28;
+      r.scale.setScalar(s);
+      r.material.opacity=0.2*(1-Math.abs(Math.sin(clock*1.4+r._phase))*0.75);
     });
-    // Animate flight lines if visible
     globeFlightLines.forEach(fl=>{
-      if(fl.material&&fl.userData.animate){
-        fl.userData.dashOffset=(fl.userData.dashOffset||0)-0.008;
+      if(fl.userData.animate){
+        fl.userData.dashOffset=(fl.userData.dashOffset||0)-0.007;
         fl.material.dashOffset=fl.userData.dashOffset;
       }
     });
     renderer.render(scene,camera);
   })();
-
-  // Build flight lines (hidden by default)
-  buildFlightLines(globe);
 }
 
-function latLonToVec(lat,lon,r=1.03){
-  const la=lat*Math.PI/180, lo=lon*Math.PI/180;
-  return new THREE.Vector3(r*Math.cos(la)*Math.cos(lo),r*Math.sin(la),r*Math.cos(la)*Math.sin(lo));
-}
+function buildFlightLines(globe) {
+  flightsData.forEach(f=>{
+    if(!f.from||!f.to) return;
+    // Use adsb_track if available, otherwise use coordinates from airport data
+    const AIRPORT_COORDS={
+      DEL:[28.5562,77.1],BOM:[19.09,72.87],HYD:[17.24,78.43],MAA:[12.99,80.17],BLR:[13.20,77.71],
+      DXB:[25.25,55.37],AUH:[24.43,54.65],DOH:[25.26,51.61],SIN:[1.36,103.99],BKK:[13.68,100.75],
+      HKG:[22.31,113.92],NRT:[35.77,140.39],HND:[35.55,139.78],ICN:[37.46,126.44],SYD:[-33.94,151.18],
+      MEL:[-37.67,144.84],LHR:[51.47,-0.45],LGW:[51.15,-0.18],CDG:[49.01,2.55],AMS:[52.31,4.76],
+      FRA:[50.04,8.56],MUC:[48.35,11.78],MAD:[40.49,-3.57],BCN:[41.30,2.08],FCO:[41.80,12.24],
+      ZRH:[47.46,8.55],VIE:[48.11,16.57],IST:[41.28,28.75],JFK:[40.64,-73.78],EWR:[40.69,-74.17],
+      LAX:[33.94,-118.41],ORD:[41.97,-87.91],DFW:[32.90,-97.04],MIA:[25.80,-80.29],SFO:[37.62,-122.38],
+      IAH:[29.99,-95.34],BOS:[42.37,-71.01],ATL:[33.64,-84.43],SEA:[47.45,-122.31],
+      GRU:[-23.44,-46.47],EZE:[-34.82,-58.54],LIM:[-12.02,-77.11],SCL:[-33.39,-70.79],
+      BOG:[4.70,-74.15],MEX:[19.44,-99.07],GIG:[-22.81,-43.25],
+      NBO:[-1.32,36.93],JNB:[-26.14,28.25],CPT:[-33.96,18.60],CAI:[30.12,31.41],ADD:[8.98,38.80],
+      BEG:[44.82,20.31],ZAG:[45.74,16.07],SJJ:[43.82,18.33],OMO:[43.28,17.85],BVA:[49.45,2.11],
+      ORY:[48.72,2.38],MCI:[39.30,-94.71],DTW:[42.21,-83.35],IAD:[38.95,-77.46],
+      YYZ:[43.68,-79.62],YVR:[49.20,-123.18],
+    };
+    const fc=AIRPORT_COORDS[f.from], tc2=AIRPORT_COORDS[f.to];
+    if(!fc||!tc2) return;
 
-function buildFlightLines(globe){
-  if(!flightsData||!flightsData.flights) return;
-  flightsData.flights.forEach(f=>{
-    const start=latLonToVec(f.from_lat,f.from_lon);
-    const end=latLonToVec(f.to_lat,f.to_lon);
-    const mid=new THREE.Vector3().addVectors(start,end).multiplyScalar(0.5);
-    const dist=start.distanceTo(end);
-    mid.normalize().multiplyScalar(1.03+dist*0.4);
+    // Use stored flight_path if available (real ADS-B track)
+    let points;
+    if(f.flight_path&&Array.isArray(f.flight_path)&&f.flight_path.length>2){
+      points=f.flight_path.map(p=>latLonToVec(p.lat,p.lon,1.025));
+    } else {
+      const start=latLonToVec(fc[0],fc[1]);
+      const end=latLonToVec(tc2[0],tc2[1]);
+      const mid=new THREE.Vector3().addVectors(start,end).multiplyScalar(0.5);
+      const dist=start.distanceTo(end);
+      mid.normalize().multiplyScalar(1.025+dist*0.35);
+      const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
+      points=curve.getPoints(50);
+    }
 
-    const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
-    const pts=curve.getPoints(60);
-    const geo=new THREE.BufferGeometry().setFromPoints(pts);
-    const mat=new THREE.LineDashedMaterial({color:0xf59e0b,dashSize:0.04,gapSize:0.03,transparent:true,opacity:0.7});
+    const geo=new THREE.BufferGeometry().setFromPoints(points);
+    const mat=new THREE.LineDashedMaterial({color:0xC8913A,dashSize:0.04,gapSize:0.03,transparent:true,opacity:0.65});
     const line=new THREE.Line(geo,mat);
     line.computeLineDistances();
     line.userData.animate=true;
@@ -1166,234 +1588,403 @@ function buildFlightLines(globe){
   });
 }
 
-function setGlobeMode(mode,btn){
+window.setGlobeMode=function(mode,btn){
   globeMode=mode;
   document.querySelectorAll('.gtog').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   const showFlights=(mode==='flights');
   globeFlightLines.forEach(l=>l.visible=showFlights);
   const leg=document.getElementById('globeLegend');
-  const cap=document.querySelector('.globe-caption span');
   if(showFlights){
-    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#f59e0b"></div>FLIGHT ROUTE</div><div class="leg-item"><div class="leg-dot" style="background:#5bc0be"></div>COUNTRY VISITED</div>';
-    if(cap) cap.textContent='animated route line';
-    document.querySelector('.globe-caption').innerHTML='Each <span>animated route line</span> is a flight I\'ve taken';
+    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#C8913A"></div>FLIGHT ROUTE</div><div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>COUNTRY</div>';
   } else {
-    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#5bc0be"></div>VISITED</div><div class="leg-item"><div class="leg-dot" style="background:rgba(245,241,235,0.2)"></div>NOT YET</div>';
-    document.querySelector('.globe-caption').innerHTML='Every <span>glowing dot</span> is a country I\'ve stood in';
+    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div><div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>';
   }
+};
+
+// ── ORIGIN TEXT REVEAL ─────────────────────────────────────────────
+function revealOriginText() {
+  const el = document.getElementById('originText');
+  if(!el) return;
+  const obs = new IntersectionObserver(entries=>{
+    if(entries[0].isIntersecting) {
+      el.style.opacity='1';
+      obs.disconnect();
+    }
+  },{threshold:0.4});
+  obs.observe(el);
 }
 
-// ════════════════════════════════════════
-// FLIGHTS
-// ════════════════════════════════════════
-function buildFlights(){
-  if(!flightsData) return;
-  const s=flightsData.stats;
+// ── FLIGHTS ───────────────────────────────────────────────────────
+function buildFlights() {
+  const totalMiles = flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
+  const airlines   = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))];
+  const airports   = [...new Set([...flightsData.map(f=>f.from), ...flightsData.map(f=>f.to)].filter(Boolean))];
+  const topAirline = airlines.reduce((best,a)=>{
+    const c=flightsData.filter(f=>f.airline===a).length;
+    return c>(best.count||0)?{name:a,count:c}:best;
+  },{});
 
   // Stats blocks
-  const statsEl=document.getElementById('flightStats');
-  const blocks=[
-    {num:s.total_flights+'+',label:'TOTAL FLIGHTS'},
-    {num:Math.round(s.total_miles/1000)+'K+',label:'MILES FLOWN'},
-    {num:s.airlines+'+',label:'AIRLINES'},
-    {num:s.airports+'+',label:'AIRPORTS VISITED'},
-    {num:s.most_flown,label:'MOST FLOWN'},
-  ];
-  blocks.forEach((b,i)=>{
+  const statsEl = document.getElementById('flightStats');
+  [
+    {num:flightsData.length,label:'TOTAL FLIGHTS'},
+    {num:Math.round(totalMiles/1000).toLocaleString()+'K',label:'MILES FLOWN'},
+    {num:airlines.length,label:'AIRLINES'},
+    {num:airports.length,label:'AIRPORTS'},
+    {num:topAirline.name||'Emirates',label:'MOST FLOWN'},
+  ].forEach((b,i)=>{
     const el=document.createElement('div'); el.className='fs-block';
     el.innerHTML=`<div class="fs-num">${b.num}</div><div class="fs-label">${b.label}</div>`;
     statsEl.appendChild(el);
   });
 
-  // Flight log table
-  const tbody=document.getElementById('flightLog');
-  flightsData.flights.forEach(f=>{
+  // Boarding passes — show last 6 flights
+  const grid = document.getElementById('boardingGrid');
+  flightsData.slice(0,6).forEach(f=>{
+    const el=document.createElement('div'); el.className='boarding-pass';
+    el.innerHTML=`
+      <div class="bp-main">
+        <div class="bp-airline-bar"></div>
+        <div class="bp-route">
+          <div class="bp-iata">${f.from||'???'}</div>
+          <div class="bp-arrow">→</div>
+          <div class="bp-iata">${f.to||'???'}</div>
+        </div>
+        <div class="bp-cities">${f.from_city||''} → ${f.to_city||''}</div>
+        <div class="bp-meta">
+          <div class="bp-meta-item"><span class="bp-meta-label">CARRIER</span><span class="bp-meta-val">${f.airline||'—'}</span></div>
+          <div class="bp-meta-item"><span class="bp-meta-label">AIRCRAFT</span><span class="bp-meta-val">${f.aircraft_type||'—'}</span></div>
+          <div class="bp-meta-item"><span class="bp-meta-label">FLIGHT</span><span class="bp-meta-val">${f.flight_number||'—'}</span></div>
+        </div>
+      </div>
+      <div class="bp-stub">
+        <div class="bp-stub-date">${f.date||'—'}</div>
+        <div class="bp-stub-miles">${f.distance_miles?Math.round(f.distance_miles/1000):'—'}</div>
+        <div class="bp-stub-mi">K MI</div>
+      </div>`;
+    grid.appendChild(el);
+  });
+
+  // Full flight log table
+  const tbody = document.getElementById('flightLog');
+  flightsData.forEach(f=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`<td class="route">${f.from} → ${f.to}<br><span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city} → ${f.to_city}</span></td><td class="airline">${f.airline}</td><td class="date">${f.date}</td><td class="miles">${f.miles.toLocaleString()}</td><td class="notes">${f.notes||'—'}</td>`;
+    tr.innerHTML=`
+      <td class="route">${f.from||'?'} → ${f.to||'?'}<br><span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city||''} → ${f.to_city||''}</span></td>
+      <td class="airline">${f.airline||'—'}</td>
+      <td class="date">${f.date||'—'}</td>
+      <td class="aircraft">${f.aircraft_type||'—'}</td>
+      <td class="miles">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>`;
     tbody.appendChild(tr);
   });
-
-  // Airport cards
-  const grid=document.getElementById('airportGrid');
-  flightsData.airports.forEach(a=>{
-    const card=document.createElement('div'); card.className='airport-card';
-    card.innerHTML=`<div class="airport-code">${a.code}</div><div class="airport-name">${a.name} · ${a.city}, ${a.country}</div><div class="airport-visits">${a.visits} visits</div><div class="airport-vibe">${a.story.substring(0,120)}...</div><div class="airport-story">${a.story}</div><button class="airport-expand" onclick="this.closest('.airport-card').classList.toggle('open');this.textContent=this.closest('.airport-card').classList.contains('open')?'READ LESS ↑':'READ MORE ↓'">READ MORE ↓</button>`;
-    grid.appendChild(card);
-  });
 }
 
-// ════════════════════════════════════════
-// FILM REELS
-// ════════════════════════════════════════
-function makeSprockets(id,count){
-  const row=document.getElementById(id); if(!row)return;
-  for(let i=0;i<count+2;i++){const s=document.createElement('div');s.className='sprocket';const h=document.createElement('div');h.className='sprocket-hole';s.appendChild(h);row.appendChild(s);}
+// ── FILM REELS ────────────────────────────────────────────────────
+function makeSprockets(id,n){
+  const row=document.getElementById(id); if(!row) return;
+  for(let i=0;i<n+2;i++){
+    const s=document.createElement('div'); s.className='sprocket';
+    const h=document.createElement('div'); h.className='sprocket-hole';
+    s.appendChild(h); row.appendChild(s);
+  }
 }
-function buildReel(key){
-  const data=EXPERIENCES[key];
-  const reel=document.getElementById('reel-'+key);
-  const track=document.getElementById('track-'+key);
-  if(!reel)return;
-  const pfx=key.slice(0,3);
-  makeSprockets('spr-t-'+pfx,data.length);
-  makeSprockets('spr-b-'+pfx,data.length);
+
+function buildReel(tab) {
+  const data = experiencesData.filter(e=>e.tab===tab);
+  const reel  = document.getElementById('reel-'+tab);
+  const track = document.getElementById('track-'+tab);
+  if(!reel) return;
+  const pfx={adventures:'adv',people:'ppl',moments:'mom'}[tab];
+  makeSprockets('spr-t-'+pfx, data.length);
+  makeSprockets('spr-b-'+pfx, data.length);
+
   data.forEach((item,i)=>{
-    const frame=document.createElement('div'); frame.className='film-frame'; frame.dataset.tab=key; frame.dataset.idx=i;
+    const frame=document.createElement('div');
+    frame.className='film-frame';
+    frame.style.setProperty('--stamp-rot','0deg');
+
+    const print=document.createElement('div'); print.className='film-print';
     const iw=document.createElement('div'); iw.className='film-img-wrap';
-    if(item.img){const img=document.createElement('img');img.src=item.img;img.alt=item.label;img.loading='lazy';iw.appendChild(img);}
-    else{iw.classList.add('film-placeholder');const ph=document.createElement('div');ph.className='film-ph-icon';ph.innerHTML='+<br>YOUR STORY<br>HERE';iw.appendChild(ph);}
-    const gr=document.createElement('div');gr.className='film-grain';
-    const ov=document.createElement('div');ov.className='film-overlay';
-    const lc=document.createElement('div');lc.className='film-loc';lc.textContent=item.loc;
-    const nm=document.createElement('div');nm.className='film-num';nm.textContent=String(i+1).padStart(2,'0');
-    const cp=document.createElement('div');cp.className='film-caption';cp.textContent=item.label;
-    iw.appendChild(gr);iw.appendChild(ov);iw.appendChild(lc);iw.appendChild(nm);
-    frame.appendChild(iw);frame.appendChild(cp);
-    frame.addEventListener('click',()=>openLightbox(key,i));
+
+    if(item.img){
+      const img=document.createElement('img'); img.src=item.img; img.alt=item.label||''; img.loading='lazy';
+      iw.appendChild(img);
+    } else {
+      iw.classList.add('film-placeholder');
+      const ph=document.createElement('div'); ph.className='film-ph-text';
+      ph.innerHTML='✦<br>'+(item.label||tab.toUpperCase());
+      iw.appendChild(ph);
+    }
+    const grain=document.createElement('div'); grain.className='film-grain';
+    const ov=document.createElement('div'); ov.className='film-overlay';
+    const lc=document.createElement('div'); lc.className='film-loc'; lc.textContent=item.loc||'';
+    iw.appendChild(grain); iw.appendChild(ov); iw.appendChild(lc);
+    print.appendChild(iw);
+
+    const cap=document.createElement('div'); cap.className='film-caption';
+    cap.textContent=item.label||'';
+    print.appendChild(cap);
+    frame.appendChild(print);
+    frame.addEventListener('click',()=>openLightbox(tab,i));
     reel.appendChild(frame);
   });
+
   // Drag scroll
   let isDown=false,startX=0,sl=0;
   track.addEventListener('mousedown',e=>{isDown=true;startX=e.pageX-track.offsetLeft;sl=track.scrollLeft;});
   window.addEventListener('mouseup',()=>isDown=false);
   track.addEventListener('mousemove',e=>{if(!isDown)return;e.preventDefault();track.scrollLeft=sl-(e.pageX-track.offsetLeft-startX);});
 }
-function buildReels(){Object.keys(EXPERIENCES).forEach(buildReel);}
-function switchTab(key,btn){
-  // Fade out current
+
+function buildReels() {
+  ['adventures','people','moments'].forEach(buildReel);
+}
+
+window.switchTab=function(key,btn){
   document.querySelectorAll('.reel-wrap.active').forEach(r=>{
-    r.style.animation='none';
-    r.style.opacity='0';
-    r.style.transform='translateY(8px)';
-    setTimeout(()=>{ r.classList.remove('active'); r.style.opacity=''; r.style.transform=''; }, 300);
+    r.classList.remove('active');
   });
   document.querySelectorAll('.exp-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  // Fade in new with slight delay
   setTimeout(()=>{
     const target=document.getElementById('tab-'+key);
-    target.classList.add('active');
-  }, 320);
-}
+    if(target) target.classList.add('active');
+  },50);
+};
 
-// ════════════════════════════════════════
-// LIGHTBOX
-// ════════════════════════════════════════
-let lbTab='',lbIdx=0;
-function openLightbox(tabKey,idx){lbTab=tabKey;lbIdx=idx;renderLB();document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}
+// ── LIGHTBOX ──────────────────────────────────────────────────────
+let lbTab='adventures', lbIdx=0;
+function getTabData(tab){ return experiencesData.filter(e=>e.tab===tab); }
+
+function openLightbox(tab,idx){
+  lbTab=tab; lbIdx=idx;
+  renderLB();
+  document.getElementById('lightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+}
 function renderLB(){
-  const item=EXPERIENCES[lbTab][lbIdx];
+  const data=getTabData(lbTab);
+  const item=data[lbIdx];
+  if(!item) return;
   const img=document.getElementById('lbImg');
-  if(item.img){img.src=item.img;img.style.display='block';}else img.style.display='none';
-  document.getElementById('lbLoc').textContent=item.loc;
+  const ph=document.getElementById('lbImgPlaceholder');
+  if(item.img){img.src=item.img;img.style.display='block';ph.style.display='none';}
+  else{img.style.display='none';ph.style.display='flex';}
+  document.getElementById('lbLoc').textContent=item.loc||'';
   document.getElementById('lbTab').textContent=lbTab.toUpperCase();
-  document.getElementById('lbTitle').textContent=item.title;
-  document.getElementById('lbStory').innerHTML=item.story;
-  document.querySelectorAll('.film-frame').forEach(f=>f.classList.remove('active'));
-  const frames=document.querySelectorAll(`[data-tab="${lbTab}"]`);
-  if(frames[lbIdx])frames[lbIdx].classList.add('active');
+  document.getElementById('lbTitle').textContent=item.title||'';
+  document.getElementById('lbStory').innerHTML=item.story||'';
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';document.querySelectorAll('.film-frame').forEach(f=>f.classList.remove('active'));}
-function closeLB(e){if(e.target===document.getElementById('lightbox'))closeLightbox();}
-function lbStep(dir){lbIdx=(lbIdx+dir+EXPERIENCES[lbTab].length)%EXPERIENCES[lbTab].length;renderLB();}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+window.closeLightbox=closeLightbox;
+window.closeLB=function(e){if(e.target===document.getElementById('lightbox'))closeLightbox();};
+window.lbStep=function(dir){
+  const data=getTabData(lbTab);
+  lbIdx=(lbIdx+dir+data.length)%data.length;
+  renderLB();
+};
 
-// ════════════════════════════════════════
-// CAFES
-// ════════════════════════════════════════
-function buildCafes(){
-  if(!cafesData)return;
+// ── CAFES ─────────────────────────────────────────────────────────
+function buildCafes() {
   const grid=document.getElementById('cafeGrid');
-  cafesData.cafes.forEach(c=>{
-    const card=document.createElement('div'); card.className='cafe-card';
+  cafesData.forEach(c=>{
+    const card=document.createElement('div'); card.className='cafe-receipt';
     card.innerHTML=`
-      <div class="cafe-img">${c.img?`<img src="${c.img}" alt="${c.name}" loading="lazy">`:'<span class="cafe-img-placeholder">PHOTO COMING SOON</span>'}</div>
-      <div class="cafe-body">
-        <div class="cafe-type">${c.type}</div>
-        <div class="cafe-name">${c.name}</div>
-        <div class="cafe-location">${c.city} · ${c.country}</div>
-        <div class="cafe-vibe">${c.vibe}</div>
-        <div class="cafe-ordered">Ordered: <span>${c.ordered}</span></div>
-        <div class="cafe-story">${c.story}</div>
-        <div class="cafe-footer">
-          <div class="cafe-rating">${c.rating}</div>
-          <button class="cafe-expand" onclick="const cc=this.closest('.cafe-card');cc.classList.toggle('open');this.textContent=cc.classList.contains('open')?'READ LESS ↑':'THE FULL STORY ↓'">THE FULL STORY ↓</button>
-        </div>
+      <div class="receipt-header">
+        <div class="receipt-type">${c.type||'CAFE'}</div>
+        <div class="receipt-name">${c.name}</div>
+        <div class="receipt-city">${c.city||''}, ${c.country||''}</div>
+      </div>
+      <div class="receipt-body">
+        <div class="receipt-line"><span class="rl-label">ORDERED</span><span class="rl-val">${c.ordered||'—'}</span></div>
+        <div class="receipt-line"><span class="rl-label">RATING</span><span class="rl-val">${c.rating||'—'}</span></div>
+      </div>
+      <div class="receipt-vibe">${c.vibe||''}</div>
+      <div class="receipt-perf"></div>
+      <div class="receipt-story-wrap"><div class="receipt-story">${c.story||''}</div></div>
+      <div class="receipt-footer">
+        <div class="receipt-rating">${c.rating||''}</div>
+        <button class="receipt-expand" onclick="
+          const w=this.closest('.cafe-receipt').querySelector('.receipt-story-wrap');
+          w.classList.toggle('open');
+          this.textContent=w.classList.contains('open')?'READ LESS ↑':'THE STORY ↓';
+        ">THE STORY ↓</button>
       </div>`;
     grid.appendChild(card);
   });
 }
 
-// ════════════════════════════════════════
-// COUNTRIES CHIPS
-// ════════════════════════════════════════
-function buildCountries(){
-  if(!countriesData)return;
-  const grid=document.getElementById('countriesGrid');
-  countriesData.visited.forEach(c=>{
-    const chip=document.createElement('div'); chip.className='country-chip';
-    chip.innerHTML=`<img src="https://flagcdn.com/${c.id.toLowerCase()}.svg" alt="${c.name}" loading="lazy"><span>${c.name}</span>`;
-    grid.appendChild(chip);
+// ── STAMPS / COUNTRIES ────────────────────────────────────────────
+function buildStamps() {
+  const grid=document.getElementById('stampsGrid');
+  const rots=[-2.5,-1.5,-0.5,0.5,1.5,2.5];
+  countriesData.forEach((c,i)=>{
+    const stamp=document.createElement('div');
+    stamp.className='stamp';
+    const rot=rots[i%rots.length];
+    stamp.style.setProperty('--stamp-rot',rot+'deg');
+    stamp.style.animationDelay=(i*0.04)+'s';
+    stamp.style.transform=`rotate(${rot}deg)`;
+
+    const flagId=c.id.toLowerCase().replace('_ei','').replace('cl_ei','cl');
+    stamp.innerHTML=`
+      ${c.emoji?`<div class="stamp-emoji">${c.emoji}</div>`:''}
+      <img class="stamp-flag" src="https://flagcdn.com/${flagId}.svg"
+        onerror="this.style.display='none'" alt="${c.name}" loading="lazy">
+      <div class="stamp-name">${c.name}</div>
+      <div class="stamp-status ${c.status}">${c.status==='transiting'?'TRANSIT*':'VISITED'}</div>`;
+    grid.appendChild(stamp);
   });
 }
 
-// ════════════════════════════════════════
-// NAV SCROLL
-// ════════════════════════════════════════
-window.addEventListener('scroll',()=>document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>60));
+// ── CLOSING POEM (scroll reveal) ──────────────────────────────────
+function setupClosingPoem() {
+  const couplets=['pc1','pc2','pc3','pc4','poemFinal'];
+  const obs=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting) {
+        const idx=couplets.indexOf(e.target.id);
+        setTimeout(()=>e.target.classList.add('vis'), idx*400);
+        obs.unobserve(e.target);
+      }
+    });
+  },{threshold:0.3});
+  couplets.forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) obs.observe(el);
+  });
+}
 
-// ════════════════════════════════════════
-// TERMINAL
-// ════════════════════════════════════════
-const drawer=document.getElementById('termDrawer'),backdrop=document.getElementById('termBackdrop'),trigger=document.getElementById('termTrigger'),tIn=document.getElementById('tIn'),tBody=document.getElementById('tBody');
+// ── NAV SCROLL ────────────────────────────────────────────────────
+window.addEventListener('scroll',()=>{
+  document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>60);
+});
+
+// ── TERMINAL ──────────────────────────────────────────────────────
+const drawer=document.getElementById('termDrawer'),
+      backdrop=document.getElementById('termBackdrop'),
+      trigger=document.getElementById('termTrigger'),
+      tIn=document.getElementById('tIn'),
+      tBody=document.getElementById('tBody');
 let tBooted=false;
-function openTerm(){drawer.classList.add('open');backdrop.classList.add('open');trigger.classList.add('away');if(!tBooted){tBoot();tBooted=true;}setTimeout(()=>tIn.focus(),440);}
-function closeTerm(){drawer.classList.remove('open');backdrop.classList.remove('open');trigger.classList.remove('away');}
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTerm();closeLightbox();}});
+
+window.openTerm=function(){
+  drawer.classList.add('open');
+  backdrop.classList.add('open');
+  trigger.classList.add('away');
+  if(!tBooted){tBoot();tBooted=true;}
+  setTimeout(()=>tIn.focus(),440);
+};
+window.closeTerm=function(){
+  drawer.classList.remove('open');
+  backdrop.classList.remove('open');
+  trigger.classList.remove('away');
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){closeTerm();closeLightbox();}
+});
 drawer.addEventListener('click',()=>tIn.focus());
 setInterval(()=>{const el=document.getElementById('tClock');if(el)el.textContent=new Date().toLocaleTimeString();},1000);
 
-const TNAV={home:'home.html',engineer:'Profile.html',profile:'Profile.html',about:'Professional.html',contact:'Contact.html'};
+const TNAV={home:'home.html',engineer:'Profile.html',contact:'Contact.html'};
+const tAdd=el=>{tBody.appendChild(el);tBody.scrollTop=tBody.scrollHeight;return el;};
+const tEsc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function tLn(cls,html,indent=true){const d=document.createElement('div');d.className='tl'+(indent?' out':'');d.innerHTML=`<span class="${cls}">${html}</span>`;return tAdd(d);}
+function tGap(){const d=document.createElement('div');d.className='tl gap';return tAdd(d);}
+function tPl(cmd){const d=document.createElement('div');d.className='tl pl';d.innerHTML=`<span class="tps">anuraag@world:~$</span><span class="tc"> ${tEsc(cmd)}</span>`;return tAdd(d);}
+function tChips(p=[],s=[]){
+  const row=document.createElement('div');row.className='chip-row';
+  p.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});
+  s.forEach(c=>{const b=document.createElement('button');b.className='chip s';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});
+  tAdd(row);
+}
+function tHints(pairs){
+  const row=document.createElement('div');row.className='hint-row';
+  pairs.forEach(([k,v])=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<span>${k}</span> ${v}`;row.appendChild(h);});
+  tAdd(row);
+}
+
 const TCMDS={
   help:tHelp,ls:tLs,whoami:tWhoami,clear:tClear,
-  home:()=>tGo('home'),engineer:()=>tGo('engineer'),profile:()=>tGo('profile'),about:()=>tGo('about'),contact:()=>tGo('contact'),
+  home:()=>tGo('home'),engineer:()=>tGo('engineer'),contact:()=>tGo('contact'),
   globe:()=>{closeTerm();document.querySelector('.globe-section').scrollIntoView({behavior:'smooth'});},
   flights:()=>{closeTerm();document.querySelector('.flights-section').scrollIntoView({behavior:'smooth'});},
   stories:()=>{closeTerm();document.querySelector('.experiences').scrollIntoView({behavior:'smooth'});},
   cafes:()=>{closeTerm();document.querySelector('.cafes-section').scrollIntoView({behavior:'smooth'});},
+  countries:()=>{closeTerm();document.querySelector('.countries-section').scrollIntoView({behavior:'smooth'});},
+  poem:()=>{closeTerm();document.querySelector('.closing-section').scrollIntoView({behavior:'smooth'});},
 };
-const tHist=[]; let tHIdx=-1; const TALL=Object.keys(TCMDS);
-const tDelay=ms=>new Promise(r=>setTimeout(r,ms));
-const tAdd=el=>{tBody.appendChild(el);tBody.scrollTop=tBody.scrollHeight;return el;};
-const tEsc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-function tLn(cls,html,indent=true){const d=document.createElement('div');d.className='tl'+(indent?' out':'');d.innerHTML=`<span class="${cls}">${html}</span>`;return tAdd(d);}
-function tGap(){const d=document.createElement('div');d.className='tl gap';return tAdd(d);}
-function tPl(cmd){const d=document.createElement('div');d.className='tl pl';d.innerHTML=`<span class="tps">anuraag@world:~$</span><span class="tc"> ${tEsc(cmd)}</span>`;return tAdd(d);}
-function tOut(lines){lines.forEach(([c,h])=>tLn(c,h));}
-function tChips(p=[],s=[]){const row=document.createElement('div');row.className='chip-row';p.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});s.forEach(c=>{const b=document.createElement('button');b.className='chip s';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});tAdd(row);}
-function tHints(pairs){const row=document.createElement('div');row.className='hint-row';pairs.forEach(([k,v])=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<span>${k}</span> ${v}`;row.appendChild(h);});tAdd(row);}
-function tHelp(){tGap();tLn('camb','// NAVIGATE');tOut([['ct','&nbsp;&nbsp;home &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ homepage</span>'],['ct','&nbsp;&nbsp;engineer &nbsp;&nbsp;<span class="cd">→ professional portfolio</span>'],['ct','&nbsp;&nbsp;contact &nbsp;&nbsp;&nbsp;<span class="cd">→ start a conversation</span>']]);tGap();tLn('camb','// THIS PAGE');tOut([['cm','&nbsp;&nbsp;globe &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ scroll to 3D globe</span>'],['cm','&nbsp;&nbsp;flights &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ scroll to flight log</span>'],['cm','&nbsp;&nbsp;stories &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ scroll to experiences</span>'],['cm','&nbsp;&nbsp;cafes &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ scroll to cafe section</span>'],['cm','&nbsp;&nbsp;whoami &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ who is this nomad</span>']]);tGap();tChips(['engineer','home'],['globe','flights','stories','cafes']);}
-function tLs(){tGap();tOut([['ct','&nbsp;&nbsp;globe/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">satellite texture · '+((countriesData&&countriesData.visited.length)||'—')+' countries glowing</span>'],['ct','&nbsp;&nbsp;flights/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">'+((flightsData&&flightsData.stats.total_flights)||'—')+' flights · '+((flightsData&&flightsData.stats.airports)||'—')+' airports</span>'],['ct','&nbsp;&nbsp;experiences/ &nbsp;&nbsp;<span class="cd">adventures · people · moments</span>'],['ct','&nbsp;&nbsp;cafes/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">6 cafes, 6 cities, 1 obsession</span>'],['cd','&nbsp;&nbsp;photography/ &nbsp;&nbsp;<span class="cd">coming soon — world through my eyes</span>']]);tGap();tChips(['globe','flights'],['stories','cafes']);}
-function tWhoami(){tGap();tLn('cw','The Nomad');tOut([['cm','&nbsp;&nbsp;Origin &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">:</span> Small town, India · ₹1,200/month household'],['cm','&nbsp;&nbsp;Countries &nbsp;<span class="cd">:</span> '+((countriesData&&countriesData.visited.length)||'—')+'+'],['cm','&nbsp;&nbsp;Flights &nbsp;&nbsp;&nbsp;<span class="cd">:</span> '+((flightsData&&flightsData.stats.total_flights)||'—')+'+'],['cm','&nbsp;&nbsp;Cafes &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">:</span> Countless. Never enough.'],['ct','&nbsp;&nbsp;Status &nbsp;&nbsp;&nbsp;<span class="cd">:</span> <span class="cok">● UNFINISHED</span>']]);tGap();tChips(['engineer'],['home','contact']);}
-function tGo(dest){const url=TNAV[dest];tGap();tLn('ct',`Navigating to <span class="cw">${dest}</span> ...`);tGap();const d=document.createElement('div');d.className='tl out';d.innerHTML=`<span class="cok">✓</span> <span class="clnk" onclick="window.location.href='${url}'">${url} →</span>`;tAdd(d);}
-function tClear(){tBody.innerHTML='';tLn('cd','Terminal cleared.',false);tGap();tChips(['engineer','home'],['globe','flights','stories','cafes']);}
-function tRun(raw){const cmd=raw.trim().split(/\s+/)[0].toLowerCase();if(!cmd)return;tHist.unshift(raw.trim());tHIdx=-1;tPl(raw.trim());if(TCMDS[cmd])TCMDS[cmd]();else{tLn('cerr',`command not found: <span class="cw">${tEsc(cmd)}</span>`);tChips(['help'],[]);}tIn.value='';tBody.scrollTop=tBody.scrollHeight;}
+const tHist=[]; let tHIdx=-1;
+const TALL=Object.keys(TCMDS);
+
+function tHelp(){
+  tGap();
+  tLn('camb','// NAVIGATE');
+  [['home','→ homepage'],['engineer','→ professional portfolio'],['contact','→ get in touch']].forEach(([k,v])=>tLn('ct',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));
+  tGap();
+  tLn('camb','// THIS PAGE');
+  [['globe','→ 3D globe'],['flights','→ flight log'],['stories','→ experiences'],['cafes','→ cafe receipts'],['countries','→ stamp collection'],['poem','→ Toh Zinda Ho Tum']].forEach(([k,v])=>tLn('cm',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));
+  tGap();
+  tChips(['engineer','home'],['globe','flights','stories','poem']);
+}
+function tLs(){
+  tGap();
+  tLn('ct',`&nbsp;&nbsp;globe/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${countriesData.length} countries</span>`);
+  tLn('ct',`&nbsp;&nbsp;flights/&nbsp;&nbsp;&nbsp;<span class="cd">${flightsData.length} flights</span>`);
+  tLn('ct',`&nbsp;&nbsp;stories/&nbsp;&nbsp;&nbsp;<span class="cd">${experiencesData.length} entries</span>`);
+  tLn('ct',`&nbsp;&nbsp;cafes/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${cafesData.length} cafes</span>`);
+  tGap();
+  tChips(['globe','flights'],['stories','cafes']);
+}
+function tWhoami(){
+  tGap();
+  tLn('cw','The Nomad');
+  tLn('cm',`&nbsp;&nbsp;Origin&nbsp;&nbsp;&nbsp;<span class="cd">:</span> Small town, Andhra Pradesh`);
+  tLn('cm',`&nbsp;&nbsp;Countries<span class="cd">:</span> ${countriesData.length}+`);
+  tLn('cm',`&nbsp;&nbsp;Flights&nbsp;&nbsp;<span class="cd">:</span> ${flightsData.length}+`);
+  tLn('ct',`&nbsp;&nbsp;Status&nbsp;&nbsp;&nbsp;<span class="cd">:</span> <span class="cok">● ALIVE</span>`);
+  tGap();
+  tChips(['engineer'],['home','contact']);
+}
+function tGo(dest){
+  const url=TNAV[dest];
+  tGap();tLn('ct',`Navigating to <span class="cw">${dest}</span>...`);tGap();
+  const d=document.createElement('div');d.className='tl out';
+  d.innerHTML=`<span class="cok">✓</span> <span class="clnk" onclick="window.location.href='${url}'">${url} →</span>`;
+  tAdd(d);
+}
+function tClear(){tBody.innerHTML='';tLn('cd','// cleared',false);tGap();tChips(['home','engineer'],['globe','stories','poem']);}
+
+function tRun(raw){
+  const cmd=raw.trim().split(/\s+/)[0].toLowerCase();
+  if(!cmd) return;
+  tHist.unshift(raw.trim()); tHIdx=-1;
+  tPl(raw.trim());
+  if(TCMDS[cmd]) TCMDS[cmd]();
+  else{tLn('cerr',`command not found: <span class="cw">${tEsc(cmd)}</span>`);tChips(['help'],[]);}
+  tIn.value=''; tBody.scrollTop=tBody.scrollHeight;
+}
+
 tIn.addEventListener('keydown',e=>{
-  if(e.key==='Enter')tRun(tIn.value);
+  if(e.key==='Enter') tRun(tIn.value);
   else if(e.key==='Tab'){e.preventDefault();const v=tIn.value.toLowerCase();if(!v)return;const m=TALL.find(c=>c.startsWith(v));if(m)tIn.value=m;}
   else if(e.key==='ArrowUp'){e.preventDefault();if(tHIdx<tHist.length-1){tHIdx++;tIn.value=tHist[tHIdx];}}
   else if(e.key==='ArrowDown'){e.preventDefault();if(tHIdx>0){tHIdx--;tIn.value=tHist[tHIdx];}else{tHIdx=-1;tIn.value='';}}
 });
+
 async function tBoot(){
-  await tDelay(200);tLn('cd','Initializing nomad.sh ...',false);
-  await tDelay(380);tLn('cd','Loading journey data ......... <span class="cok">OK</span>');
-  await tDelay(280);tLn('cd','Mounting countries & flights ... <span class="cok">OK</span>');
-  await tDelay(280);tLn('cd','Brewing virtual coffee ........ <span class="cok">OK</span>');
-  await tDelay(450);tGap();
-  tLn('cw','Welcome. The world is big.',false);
-  tLn('cm',"Here's how I've been making it smaller.");
-  tGap();tLn('ct','What do you want to explore?');
-  tChips(['globe','flights','stories','cafes'],['whoami','home','engineer']);
+  const delay=ms=>new Promise(r=>setTimeout(r,ms));
+  await delay(200); tLn('cd','Initializing nomad.sh ...',false);
+  await delay(360); tLn('cd','Connecting to Firestore .......... <span class="cok">OK</span>');
+  await delay(280); tLn('cd',`Loading ${countriesData.length} countries ......... <span class="cok">OK</span>`);
+  await delay(280); tLn('cd',`Mounting ${flightsData.length} flights ............. <span class="cok">OK</span>`);
+  await delay(280); tLn('cd','Brewing virtual coffee ............. <span class="cok">OK</span>');
+  await delay(400); tGap();
+  tLn('cw','Toh zinda ho tum.',false);
+  tLn('cm','The world is still out there. Make it smaller.');
+  tGap(); tLn('ct','What do you want to explore?');
+  tChips(['globe','flights','stories','poem'],['whoami','home','engineer']);
   tHints([['Tab','autocomplete'],['↑↓','history'],['Esc','close']]);
 }
 </script>
