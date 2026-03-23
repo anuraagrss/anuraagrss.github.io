@@ -562,7 +562,7 @@
     </div>
     <div class="intro-cta">TAP ANYWHERE TO ENTER THE DARKROOM</div>
   </div>
-  <div class="intro-skip" onclick="dismissIntro()">SKIP →</div>
+  <div class="intro-skip" id="introSkip" onclick="window.dismissIntro()">SKIP →</div>
 </div>
 
 <!-- ── PAGE ── -->
@@ -615,7 +615,7 @@
 </div>
 
 <!-- ── FULLSCREEN VIEWER ── -->
-<div id="viewer" onclick="closeViewer()">
+<div id="viewer" onclick="window.closeViewer()">
   <img id="viewer-img" src="" alt="" draggable="false">
   <div id="viewer-watermark">© ANURAAG RAVULAPARTHI · anuraag.me</div>
   <div id="viewer-hint">PRESS ESC OR CLICK TO EXIT</div>
@@ -677,8 +677,7 @@ const ELEMENT_ORDER = ['ice','sky','water','fire','earth'];
 let photosData = [], introDone = false;
 
 // ── INTRO ─────────────────────────────────────────────────────────
-let introTimer = setTimeout(dismissIntro, 5500);
-
+// Define before the timer so the callback can reference it
 window.dismissIntro = function() {
   if(introDone) return;
   introDone = true;
@@ -687,8 +686,10 @@ window.dismissIntro = function() {
   document.getElementById('page').classList.add('vis');
 };
 
+const introTimer = setTimeout(window.dismissIntro, 5500);
+
 document.getElementById('intro').addEventListener('click', function(e) {
-  if(e.target.id !== 'introSkip') dismissIntro();
+  if(e.target.id !== 'introSkip') window.dismissIntro();
 });
 
 // ── LOAD PHOTOS ───────────────────────────────────────────────────
