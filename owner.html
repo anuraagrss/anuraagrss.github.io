@@ -211,6 +211,39 @@
     .notes-input{background:var(--bg3);border:1px solid var(--border);border-radius:4px;padding:4px 8px;color:var(--muted);font-family:var(--mono);font-size:10px;width:140px;outline:none}
     .notes-input:focus{border-color:rgba(91,192,190,0.4)}
 
+    /* ── CONFIG TOGGLE SWITCH ── */
+    .cfg-toggle { position:relative; display:inline-block; width:40px; height:22px; flex-shrink:0; cursor:pointer; }
+    .cfg-toggle input { opacity:0; width:0; height:0; position:absolute; }
+    .cfg-toggle-track {
+      position:absolute; inset:0; border-radius:11px;
+      background:rgba(255,255,255,0.08); border:1px solid var(--border);
+      transition:background 0.2s;
+    }
+    .cfg-toggle-track::before {
+      content:''; position:absolute;
+      width:16px; height:16px; border-radius:50%;
+      left:2px; top:2px; background:rgba(255,255,255,0.35);
+      transition:transform 0.2s, background 0.2s;
+    }
+    .cfg-toggle input:checked + .cfg-toggle-track { background:rgba(91,192,190,0.25); border-color:rgba(91,192,190,0.4); }
+    .cfg-toggle input:checked + .cfg-toggle-track::before { transform:translateX(18px); background:var(--teal); }
+
+    /* ── API KEY ROW ── */
+    .api-key-row {
+      display:flex; align-items:center; gap:12px;
+      padding:12px 14px; background:var(--bg3);
+      border:1px solid var(--border); border-radius:6px;
+    }
+    .api-key-service { font-size:11px; letter-spacing:1.5px; color:var(--teal); min-width:120px; }
+    .api-key-type    { font-size:10px; letter-spacing:1px;   color:var(--muted); min-width:90px; }
+    .api-key-value   {
+      flex:1; font-family:var(--mono); font-size:11px; color:var(--text);
+      background:transparent; border:none; outline:none;
+      letter-spacing:1px; min-width:0;
+    }
+    .api-key-notes   { font-size:10px; color:var(--muted); font-style:italic; max-width:160px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .api-key-date    { font-size:9px;  letter-spacing:1px;  color:rgba(230,237,243,0.2); white-space:nowrap; }
+
     @media(max-width:768px){
       .sidebar{width:56px}
       .sidebar-header,.sidebar-user,.nav-section-label,.sidebar-footer{padding:10px}
@@ -309,6 +342,11 @@
         <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="5.5" cy="5.5" r="4" stroke="currentColor" stroke-width="1.2"/><path d="M9 9l2.5 2.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
         <span>Award search</span>
         <span class="nav-badge">MILES</span>
+      </div>
+      <div class="nav-item" id="configNav" onclick="showPanel('config')">
+        <svg class="nav-icon" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="2" stroke="currentColor" stroke-width="1.2"/><path d="M7 1v1.5M7 11.5V13M1 7h1.5M11.5 7H13M2.6 2.6l1.1 1.1M10.3 10.3l1.1 1.1M2.6 11.4l1.1-1.1M10.3 3.7l1.1-1.1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span>Config & API keys</span>
+        <span class="nav-badge">SUPER</span>
       </div>
       <div class="nav-section-label" id="privateSection">Private</div>
       <div class="nav-item" id="journalNav" onclick="showPanel('journal')">
@@ -668,6 +706,172 @@
         <div class="journal-entries" id="journalEntries"><div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div></div>
       </div>
 
+      <!-- ── CONFIG & API KEYS ── -->
+      <div class="panel" id="panel-config">
+        <div class="panel-header">
+          <div class="panel-eyebrow">// SUPER-ADMIN ONLY</div>
+          <div class="panel-title">CONFIG.</div>
+          <div class="panel-sub">API keys and site configuration — stored encrypted in Firestore config collection. Only super-admin can read or write.</div>
+        </div>
+
+        <!-- API KEYS -->
+        <div class="section-card">
+          <div class="section-card-title">// API KEYS</div>
+          <div style="display:flex;flex-direction:column;gap:14px" id="apiKeysList">
+            <div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div>
+          </div>
+        </div>
+
+        <!-- ADD / UPDATE KEY -->
+        <div class="section-card">
+          <div class="section-card-title">// ADD OR UPDATE API KEY</div>
+          <div class="form-grid cols-3">
+            <div class="form-group">
+              <label class="form-label">SERVICE NAME</label>
+              <select class="form-select" id="cfg-service" onchange="onConfigServiceChange()">
+                <option value="">— select —</option>
+                <option value="fr24">FR24 (FlightRadar24)</option>
+                <option value="seats_aero">Seats.aero</option>
+                <option value="planespotters">Planespotters</option>
+                <option value="unsplash">Unsplash</option>
+                <option value="google_maps">Google Maps</option>
+                <option value="openai">OpenAI</option>
+                <option value="custom">Custom…</option>
+              </select>
+            </div>
+            <div class="form-group" id="cfg-custom-wrap" style="display:none">
+              <label class="form-label">CUSTOM SERVICE NAME</label>
+              <input class="form-input" id="cfg-custom" placeholder="my_service">
+            </div>
+            <div class="form-group">
+              <label class="form-label">KEY TYPE</label>
+              <select class="form-select" id="cfg-type">
+                <option value="api_key">API Key</option>
+                <option value="bearer_token">Bearer Token</option>
+                <option value="client_id">Client ID</option>
+                <option value="client_secret">Client Secret</option>
+                <option value="webhook_url">Webhook URL</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group">
+              <label class="form-label">VALUE</label>
+              <div style="position:relative">
+                <input class="form-input" id="cfg-value" type="password" placeholder="Paste key here…" style="padding-right:80px">
+                <button onclick="toggleCfgVisibility()" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:transparent;border:none;cursor:pointer;font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted)" id="cfg-vis-btn">SHOW</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group">
+              <label class="form-label">NOTES (optional)</label>
+              <input class="form-input" id="cfg-notes" placeholder="Rate limit, plan tier, expiry date…">
+            </div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveApiKey()">SAVE KEY</button>
+            <button class="btn btn-ghost" onclick="clearConfigForm()">CLEAR</button>
+          </div>
+        </div>
+
+        <!-- SITE SETTINGS -->
+        <div class="section-card">
+          <div class="section-card-title">// SITE SETTINGS</div>
+          <div style="display:flex;flex-direction:column;gap:16px">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:12px;color:var(--text);margin-bottom:3px">MAINTENANCE MODE</div>
+                <div style="font-size:10px;color:var(--muted);letter-spacing:1px">Show a maintenance message on public pages</div>
+              </div>
+              <label class="cfg-toggle">
+                <input type="checkbox" id="cfg-maintenance" onchange="saveSiteSetting('maintenance_mode',this.checked)">
+                <span class="cfg-toggle-track"></span>
+              </label>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:12px;color:var(--text);margin-bottom:3px">PHOTOGRAPHY PAGE VISIBLE</div>
+                <div style="font-size:10px;color:var(--muted);letter-spacing:1px">Show photography.html link in navigation</div>
+              </div>
+              <label class="cfg-toggle">
+                <input type="checkbox" id="cfg-photo-visible" checked onchange="saveSiteSetting('photography_visible',this.checked)">
+                <span class="cfg-toggle-track"></span>
+              </label>
+            </div>
+
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid var(--border)">
+              <div>
+                <div style="font-size:12px;color:var(--text);margin-bottom:3px">NOMAD PAGE — SHOW FLIGHTS</div>
+                <div style="font-size:10px;color:var(--muted);letter-spacing:1px">Display the flights section publicly</div>
+              </div>
+              <label class="cfg-toggle">
+                <input type="checkbox" id="cfg-show-flights" checked onchange="saveSiteSetting('show_flights',this.checked)">
+                <span class="cfg-toggle-track"></span>
+              </label>
+            </div>
+
+            <div style="padding:14px 0;border-bottom:1px solid var(--border)">
+              <div style="font-size:12px;color:var(--text);margin-bottom:6px">SITE TAGLINE</div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:10px">Appears on home page and meta tags</div>
+              <div style="display:flex;gap:8px">
+                <input class="form-input" id="cfg-tagline" placeholder="Nomad · Engineer · Storyteller" style="flex:1">
+                <button class="btn btn-ghost" onclick="saveSiteText('tagline')">SAVE</button>
+              </div>
+            </div>
+
+            <div style="padding:14px 0">
+              <div style="font-size:12px;color:var(--text);margin-bottom:6px">CONTACT EMAIL</div>
+              <div style="font-size:10px;color:var(--muted);letter-spacing:1px;margin-bottom:10px">Shown on contact page</div>
+              <div style="display:flex;gap:8px">
+                <input class="form-input" id="cfg-email" placeholder="hello@404-nomad.com" type="email" style="flex:1">
+                <button class="btn btn-ghost" onclick="saveSiteText('contact_email')">SAVE</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- FIREBASE INFO (read-only reference) -->
+        <div class="section-card">
+          <div class="section-card-title">// FIREBASE PROJECT INFO</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+            <div>
+              <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:4px">PROJECT ID</div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--teal)">nomad-404</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:4px">STORAGE BUCKET</div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--teal)">nomad-404.firebasestorage.app</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:4px">AUTH DOMAIN</div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--teal)">nomad-404.firebaseapp.com</div>
+            </div>
+            <div>
+              <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:4px">ENVIRONMENT</div>
+              <div style="font-family:var(--mono);font-size:12px;color:var(--green)">● PRODUCTION</div>
+            </div>
+          </div>
+          <div style="margin-top:16px;padding-top:16px;border-top:1px solid var(--border)">
+            <div style="font-size:9px;letter-spacing:2px;color:var(--muted);margin-bottom:8px">CORS STATUS</div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <div style="font-family:var(--mono);font-size:11px;color:var(--muted)" id="corsStatus">Run check to verify</div>
+              <button class="btn btn-ghost" style="font-size:9px;padding:5px 12px" onclick="checkCors()">CHECK CORS</button>
+            </div>
+            <div style="margin-top:10px;padding:10px 12px;background:var(--bg3);border-radius:6px;font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8">
+              If uploads are blocked by CORS, run in Google Cloud Shell:<br>
+              <span style="color:var(--teal);user-select:all">gcloud config set project nomad-404</span><br>
+              <span style="color:var(--teal);user-select:all">gcloud storage buckets update gs://nomad-404.firebasestorage.app --cors-file=cors.json</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
       <!-- ── USERS ── -->
       <div class="panel" id="panel-users">
         <div class="panel-header"><div class="panel-eyebrow">// SUPER-ADMIN ONLY</div><div class="panel-title">USER MANAGEMENT.</div><div class="panel-sub">Add and manage dashboard access.</div></div>
@@ -745,7 +949,7 @@ function showApp(adminData){
   if(currentUser.photoURL) av.innerHTML=`<img src="${currentUser.photoURL}" alt="">`;
   else av.textContent=(adminData.name||'U')[0].toUpperCase();
   if(currentRole!=='super-admin'){
-    ['journalNav','usersNav','privateSection'].forEach(id=>{
+    ['journalNav','usersNav','privateSection','configNav'].forEach(id=>{
       const el=document.getElementById(id); if(el)el.style.display='none';
     });
   }
@@ -784,11 +988,13 @@ window.showPanel=function(name){
   document.querySelectorAll(`.nav-item[onclick="showPanel('${name}')"]`).forEach(n=>n.classList.add('active'));
   const titles={home:'DASHBOARD',flights:'FLIGHTS',cafes:'CAFES',experiences:'EXPERIENCES',
     adventures:'ADVENTURES',people:'PEOPLE',photos:'PHOTOGRAPHY',trips:'TRIPS',
-    countries:'COUNTRIES',content:'PAGE CONTENT',travel:'TRAVEL PLANS',journal:'JOURNAL',users:'USERS'};
+    countries:'COUNTRIES',content:'PAGE CONTENT',travel:'TRAVEL PLANS',journal:'JOURNAL',
+    users:'USERS',config:'CONFIG & API KEYS'};
   document.getElementById('topbarTitle').textContent=titles[name]||name.toUpperCase();
   const loaders={flights:loadFlightsTable,cafes:loadCafesTable,experiences:loadExpTable,
     adventures:loadAdvTable,people:loadPeopleTable,photos:loadPhotoGrid,trips:loadTripsTable,
-    countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,content:loadContent};
+    countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,
+    content:loadContent,config:loadConfig};
   if(loaders[name])loaders[name]();
 };
 
@@ -1644,6 +1850,255 @@ window.deleteEntry=async function(col,docId,reloadFn){
   if(!confirm('Delete? Cannot be undone.'))return;
   try{await deleteDoc(doc(db,col,docId));toast('✓ Deleted','ok');if(typeof reloadFn==='function')reloadFn();}
   catch(e){toast('✗ '+e.message,'err');}
+};
+
+
+// ══════════════════════════════════════════════════════════════════
+// CONFIG & API KEYS
+// ══════════════════════════════════════════════════════════════════
+
+// Map service key → display label
+const SERVICE_LABELS = {
+  fr24:          'FR24 — FlightRadar24',
+  seats_aero:    'Seats.aero',
+  planespotters: 'Planespotters',
+  unsplash:      'Unsplash',
+  google_maps:   'Google Maps',
+  openai:        'OpenAI',
+};
+
+async function loadConfig() {
+  if(currentRole !== 'super-admin') return;
+  loadApiKeys();
+  loadSiteSettings();
+}
+
+// ── API KEYS ──────────────────────────────────────────────────────
+async function loadApiKeys() {
+  const el = document.getElementById('apiKeysList');
+  if(!el) return;
+  try {
+    const snap = await getDocs(collection(db,'config'));
+    // Filter to docs that look like API key docs (have api_key or token field)
+    const keyDocs = snap.docs
+      .map(d => ({id:d.id,...d.data()}))
+      .filter(d => d.api_key || d.bearer_token || d.client_id ||
+                   d.client_secret || d.webhook_url || d.value);
+
+    if(!keyDocs.length) {
+      el.innerHTML = `<div class="empty-state" style="padding:20px 0"><div class="empty-state-text">No API keys saved yet — add one below</div></div>`;
+      return;
+    }
+
+    el.innerHTML = '';
+    keyDocs.forEach(doc => {
+      const label   = SERVICE_LABELS[doc.id] || doc.id;
+      const keyType = doc.key_type || 'api_key';
+      const rawVal  = doc.api_key || doc.bearer_token || doc.client_id || doc.client_secret || doc.webhook_url || doc.value || '';
+      const masked  = rawVal.length > 8 ? rawVal.substring(0,4)+'••••••••'+rawVal.slice(-4) : '••••••••';
+      const savedAt = doc.saved_at ? new Date(doc.saved_at).toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}) : '';
+      const notes   = doc.notes || '';
+
+      const row = document.createElement('div');
+      row.className = 'api-key-row';
+      row.dataset.docId = doc.id;
+      row.dataset.val   = rawVal;
+      row.dataset.shown = 'false';
+      row.innerHTML = `
+        <div class="api-key-service">${label.toUpperCase()}</div>
+        <div class="api-key-type">${keyType.replace('_',' ').toUpperCase()}</div>
+        <input class="api-key-value" id="kv-${doc.id}" value="${masked}" readonly
+          style="color:var(--muted);cursor:default" autocomplete="off" spellcheck="false">
+        ${notes?`<div class="api-key-notes" title="${notes}">${notes}</div>`:''}
+        <div class="api-key-date">${savedAt}</div>
+        <div style="display:flex;gap:6px;margin-left:auto;flex-shrink:0">
+          <button class="tbl-btn" onclick="toggleKeyVisibility('${doc.id}')" id="vis-${doc.id}">SHOW</button>
+          <button class="tbl-btn" onclick="prefillConfigForm('${doc.id}','${keyType}')">EDIT</button>
+          <button class="tbl-btn del" onclick="deleteConfigKey('${doc.id}')">DEL</button>
+        </div>`;
+      el.appendChild(row);
+    });
+  } catch(e) {
+    el.innerHTML = `<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;
+  }
+}
+
+window.toggleKeyVisibility = function(docId) {
+  const row  = document.querySelector(`[data-doc-id="${docId}"]`);
+  const inp  = document.getElementById(`kv-${docId}`);
+  const btn  = document.getElementById(`vis-${docId}`);
+  if(!row || !inp) return;
+  const shown = row.dataset.shown === 'true';
+  if(shown) {
+    const raw = row.dataset.val;
+    inp.value = raw.length > 8 ? raw.substring(0,4)+'••••••••'+raw.slice(-4) : '••••••••';
+    inp.style.color = 'var(--muted)';
+    btn.textContent = 'SHOW';
+    row.dataset.shown = 'false';
+  } else {
+    inp.value = row.dataset.val;
+    inp.style.color = 'var(--text)';
+    btn.textContent = 'HIDE';
+    row.dataset.shown = 'true';
+  }
+};
+
+window.prefillConfigForm = function(service, keyType) {
+  const sel = document.getElementById('cfg-service');
+  // Set dropdown — if service is in known list, select it; else select custom
+  const knownOptions = Array.from(sel.options).map(o => o.value);
+  if(knownOptions.includes(service)) {
+    sel.value = service;
+    document.getElementById('cfg-custom-wrap').style.display = 'none';
+  } else {
+    sel.value = 'custom';
+    document.getElementById('cfg-custom-wrap').style.display = '';
+    document.getElementById('cfg-custom').value = service;
+  }
+  const typeEl = document.getElementById('cfg-type');
+  if(typeEl) typeEl.value = keyType || 'api_key';
+  document.getElementById('cfg-value').value = '';
+  document.getElementById('cfg-value').focus();
+  toast('Pre-filled — paste new value and save','ok');
+  // Scroll to form
+  document.getElementById('cfg-service').scrollIntoView({behavior:'smooth',block:'center'});
+};
+
+window.onConfigServiceChange = function() {
+  const val = document.getElementById('cfg-service').value;
+  document.getElementById('cfg-custom-wrap').style.display = val === 'custom' ? '' : 'none';
+};
+
+window.toggleCfgVisibility = function() {
+  const inp = document.getElementById('cfg-value');
+  const btn = document.getElementById('cfg-vis-btn');
+  if(inp.type === 'password') {
+    inp.type = 'text'; btn.textContent = 'HIDE';
+  } else {
+    inp.type = 'password'; btn.textContent = 'SHOW';
+  }
+};
+
+window.saveApiKey = async function() {
+  if(currentRole !== 'super-admin') { toast('✗ Super-admin only','err'); return; }
+  const svcEl  = document.getElementById('cfg-service');
+  const svc    = svcEl.value === 'custom'
+    ? (document.getElementById('cfg-custom').value.trim().toLowerCase().replace(/\s+/g,'_'))
+    : svcEl.value;
+  if(!svc) { toast('Select a service','err'); return; }
+  const keyType = document.getElementById('cfg-type').value;
+  const value   = document.getElementById('cfg-value').value.trim();
+  if(!value)    { toast('Value required','err'); return; }
+  const notes   = document.getElementById('cfg-notes').value.trim();
+
+  // Build save object — key field name matches type
+  const save = {
+    key_type:  keyType,
+    notes:     notes || null,
+    saved_at:  new Date().toISOString(),
+    saved_by:  currentUser.uid,
+  };
+  // Store value under the correct field name (adbApiKey reads doc.api_key)
+  save[keyType] = value;
+  // Always also save as api_key for backward compatibility (FR24 reads this)
+  if(keyType !== 'api_key') save.api_key = value;
+
+  try {
+    await setDoc(doc(db,'config',svc), save, {merge:true});
+    toast(`✓ ${svc} key saved`,'ok');
+    clearConfigForm();
+    loadApiKeys();
+    // If FR24 key, refresh in memory
+    if(svc === 'fr24') { adbApiKey = value; document.getElementById('adbKey').placeholder='FR24 token saved ✓'; }
+    // If seats_aero, update award-search if open
+    if(svc === 'seats_aero') window._seatsAeroKey = value;
+  } catch(e) {
+    toast('✗ '+e.message,'err');
+  }
+};
+
+window.deleteConfigKey = async function(docId) {
+  if(!confirm(`Delete ${docId} key? This cannot be undone.`)) return;
+  try {
+    await deleteDoc(doc(db,'config',docId));
+    toast(`✓ ${docId} deleted`,'ok');
+    loadApiKeys();
+  } catch(e) {
+    toast('✗ '+e.message,'err');
+  }
+};
+
+window.clearConfigForm = function() {
+  document.getElementById('cfg-service').value = '';
+  document.getElementById('cfg-custom').value  = '';
+  document.getElementById('cfg-value').value   = '';
+  document.getElementById('cfg-notes').value   = '';
+  document.getElementById('cfg-custom-wrap').style.display = 'none';
+  document.getElementById('cfg-value').type = 'password';
+  document.getElementById('cfg-vis-btn').textContent = 'SHOW';
+};
+
+// ── SITE SETTINGS ─────────────────────────────────────────────────
+async function loadSiteSettings() {
+  try {
+    const snap = await getDoc(doc(db,'config','site_settings'));
+    if(!snap.exists()) return;
+    const d = snap.data();
+    const fields = {
+      'cfg-maintenance':   'maintenance_mode',
+      'cfg-photo-visible': 'photography_visible',
+      'cfg-show-flights':  'show_flights',
+    };
+    Object.entries(fields).forEach(([elId, key]) => {
+      const el = document.getElementById(elId);
+      if(el && d[key] !== undefined) el.checked = !!d[key];
+    });
+    const tagEl   = document.getElementById('cfg-tagline');
+    const emailEl = document.getElementById('cfg-email');
+    if(tagEl   && d.tagline)       tagEl.value   = d.tagline;
+    if(emailEl && d.contact_email) emailEl.value = d.contact_email;
+  } catch(_) {}
+}
+
+window.saveSiteSetting = async function(key, value) {
+  try {
+    await setDoc(doc(db,'config','site_settings'),
+      {[key]: value, updated_at: new Date().toISOString(), updated_by: currentUser.uid},
+      {merge: true}
+    );
+    toast(`✓ ${key.replace(/_/g,' ')} ${value ? 'enabled' : 'disabled'}`,'ok');
+  } catch(e) { toast('✗ '+e.message,'err'); }
+};
+
+window.saveSiteText = async function(key) {
+  const elMap = {tagline:'cfg-tagline', contact_email:'cfg-email'};
+  const el = document.getElementById(elMap[key]); if(!el) return;
+  const value = el.value.trim(); if(!value) { toast('Value required','err'); return; }
+  try {
+    await setDoc(doc(db,'config','site_settings'),
+      {[key]: value, updated_at: new Date().toISOString(), updated_by: currentUser.uid},
+      {merge: true}
+    );
+    toast(`✓ ${key.replace(/_/g,' ')} saved`,'ok');
+  } catch(e) { toast('✗ '+e.message,'err'); }
+};
+
+// ── CORS CHECK ────────────────────────────────────────────────────
+window.checkCors = async function() {
+  const el = document.getElementById('corsStatus');
+  if(el) { el.textContent = 'Checking…'; el.style.color = 'var(--muted)'; }
+  try {
+    const testUrl = `https://firebasestorage.googleapis.com/v0/b/nomad-404.firebasestorage.app/o`;
+    const res = await fetch(testUrl, {method:'OPTIONS'});
+    const ao  = res.headers.get('access-control-allow-origin');
+    if(ao) {
+      if(el) { el.textContent = `✓ CORS OK — allowed: ${ao}`; el.style.color = 'var(--green)'; }
+    } else {
+      if(el) { el.textContent = '✗ CORS not configured — run the gcloud command below'; el.style.color = 'var(--red)'; }
+    }
+  } catch(e) {
+    if(el) { el.textContent = '✗ CORS blocked — run the gcloud command below'; el.style.color = 'var(--red)'; }
+  }
 };
 
 </script>
