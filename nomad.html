@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" href="images/Logo.png" type="image/x-icon">
+  <link rel="icon" href="Logo.png" type="image/x-icon">
   <title>Nomad — Anuraag Ravulaparthi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
@@ -384,36 +384,7 @@
     .origin-inner {
       max-width: 1120px; margin: 0 auto; padding: 0 56px;
     }
-    /* Postcard element */
-    .origin-postcard {
-      background: #FDFAF4;
-      border: 1px solid var(--paper3);
-      border-radius: 3px;
-      padding: 40px 48px 36px 52px;
-      position: relative;
-      box-shadow: 4px 6px 32px rgba(28,17,9,0.1), 0 1px 0 rgba(28,17,9,0.06);
-      max-width: 760px;
-      transform: rotate(-0.4deg);
-    }
-    /* Red left margin line */
-    .origin-postcard::before {
-      content: '';
-      position: absolute; left: 36px; top: 0; bottom: 0;
-      width: 1px; background: rgba(212,121,42,0.3);
-    }
-    /* Ruled lines */
-    .origin-postcard::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 31px,
-        rgba(28,17,9,0.05) 31px,
-        rgba(28,17,9,0.05) 32px
-      );
-      border-radius: 3px; pointer-events: none;
-    }
+    /* postcard: see stack CSS */
     .postcard-header {
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 28px; position: relative; z-index: 1;
@@ -678,224 +649,6 @@
     .bp-stub-miles { font-family:var(--disp); font-size:16px; color:var(--teal); }
     .bp-stub-mi { font-family:var(--mono); font-size:7px; color:var(--muted); letter-spacing:1px; }
 
-    /* ── AIRPORTS SECTION ── */
-    .airports-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
-    .airport-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px; margin-top: 8px;
-    }
-    /* First card spans 2 rows tall */
-    .airport-card:first-child { grid-row: span 2; }
-
-    .airport-card {
-      position: relative; overflow: hidden;
-      border-radius: 3px; cursor: pointer;
-      min-height: 260px;
-      background: var(--ink);
-    }
-    .airport-card:first-child { min-height: 100%; }
-
-    /* Hero photo */
-    .airport-photo {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
-      filter: brightness(0.65) saturate(0.9);
-    }
-    .airport-card:hover .airport-photo {
-      transform: scale(1.05);
-      filter: brightness(0.45) saturate(0.8);
-    }
-
-    /* Dark vignette gradient */
-    .airport-vignette {
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(12,6,2,0.92) 0%,
-        rgba(12,6,2,0.4)  45%,
-        transparent       75%
-      );
-      transition: background 0.4s;
-    }
-    .airport-card:hover .airport-vignette {
-      background: linear-gradient(
-        to top,
-        rgba(12,6,2,0.96) 0%,
-        rgba(12,6,2,0.7)  55%,
-        rgba(12,6,2,0.2)  100%
-      );
-    }
-
-    /* Content layer */
-    .airport-content {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 22px 22px 20px;
-    }
-    .airport-code {
-      font-family: var(--disp); font-size: 54px;
-      color: rgba(246,241,233,0.95); line-height: 1; letter-spacing: 2px;
-      margin-bottom: 2px;
-    }
-    .airport-card:first-child .airport-code { font-size: 72px; }
-    .airport-name {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.45); margin-bottom: 8px;
-    }
-    .airport-visits {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      color: var(--gold); margin-bottom: 10px;
-    }
-    .airport-visits::before { content:''; width:16px; height:1px; background:var(--gold); }
-
-    /* Story — hidden, slides up on hover */
-    .airport-story-text {
-      font-size: 12px; line-height: 1.7;
-      color: rgba(246,241,233,0.7);
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-      opacity: 0;
-    }
-    .airport-card:hover .airport-story-text {
-      max-height: 180px;
-      opacity: 1;
-    }
-    .airport-card:first-child .airport-story-text { max-height: 0; }
-    .airport-card:first-child:hover .airport-story-text { max-height: 240px; }
-
-    /* Read more hint */
-    .airport-hint {
-      position: absolute; top: 16px; right: 16px;
-      font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.25); transition: color 0.3s;
-    }
-    .airport-card:hover .airport-hint { color: rgba(246,241,233,0.5); }
-
-    /* Photo credit */
-    .airport-credit {
-      position: absolute; bottom: 10px; right: 14px;
-      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
-      color: rgba(246,241,233,0.2);
-    }
-
-    @media(max-width:768px){
-      .airport-grid { grid-template-columns: 1fr 1fr; }
-      .airport-card:first-child { grid-row: span 1; }
-    }
-
-    /* ── BOARDING PASS DECK ── */
-    .bp-deck-wrap {
-      position: relative; margin-bottom: 56px;
-    }
-    .bp-stack {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
-    }
-    /* Individual pass */
-    .bp-card {
-      background: #FEFCF8;
-      border: 1px solid var(--paper3);
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 2px 3px 14px rgba(28,17,9,0.09);
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.25s;
-      user-select: none;
-    }
-    .bp-card:hover { transform: translateY(-3px) rotate(0.3deg); box-shadow: 5px 8px 28px rgba(28,17,9,0.15); }
-    .bp-card.open  { box-shadow: 6px 10px 36px rgba(28,17,9,0.18); z-index: 5; }
-
-    /* Airline colour bar */
-    .bp-bar { height: 4px; width: 100%; background: linear-gradient(to right, var(--teal), var(--gold)); }
-
-    /* Main face */
-    .bp-face { padding: 16px 16px 0; }
-    .bp-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .bp-flight-no { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--teal); }
-    .bp-date-badge {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
-      color: var(--muted); background: var(--paper2);
-      padding: 2px 8px; border-radius: 2px;
-    }
-
-    /* Giant route */
-    .bp-route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-    .bp-iata-big { font-family: var(--disp); font-size: 48px; color: var(--ink); line-height: 1; letter-spacing: 1px; }
-    .bp-route-mid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .bp-route-line { width: 100%; height: 1px; background: repeating-linear-gradient(to right, var(--paper3) 0, var(--paper3) 5px, transparent 5px, transparent 10px); position: relative; }
-    .bp-route-plane { font-size: 14px; color: var(--amber); }
-    .bp-cities-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .bp-city-name { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: var(--muted); }
-
-    /* Meta strip */
-    .bp-meta-strip {
-      display: flex; gap: 0; border-top: 1px dashed var(--paper3);
-      margin: 0 -16px;
-    }
-    .bp-meta-cell {
-      flex: 1; padding: 8px 12px; border-right: 1px dashed var(--paper3);
-      text-align: center;
-    }
-    .bp-meta-cell:last-child { border-right: none; }
-    .bp-meta-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); display: block; margin-bottom: 2px; }
-    .bp-meta-val   { font-family: var(--mono); font-size: 11px; color: var(--ink2); }
-    .bp-meta-val.teal { color: var(--teal); }
-
-    /* Expand toggle */
-    .bp-toggle {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px; background: var(--paper2);
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--muted);
-      border-top: 1px solid var(--faint);
-    }
-    .bp-toggle-arrow { transition: transform 0.3s; display: inline-block; }
-    .bp-card.open .bp-toggle-arrow { transform: rotate(180deg); }
-
-    /* Expanded detail */
-    .bp-detail {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
-      background: var(--paper);
-    }
-    .bp-card.open .bp-detail { max-height: 400px; }
-    .bp-detail-inner { padding: 16px 16px 18px; }
-    .bp-detail-title {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: var(--teal); margin-bottom: 12px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--faint);
-    }
-    .bp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .bp-detail-item { display: flex; flex-direction: column; gap: 2px; }
-    .bp-detail-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); }
-    .bp-detail-value { font-size: 12px; color: var(--ink2); }
-    .bp-detail-value.mono { font-family: var(--mono); font-size: 11px; }
-
-    /* Route map mini (SVG inline) */
-    .bp-route-mini {
-      margin-top: 12px; padding-top: 12px;
-      border-top: 1px dashed var(--paper3);
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 10px; color: var(--muted);
-    }
-    .bp-route-mini-line {
-      flex: 1; height: 2px; position: relative;
-      background: repeating-linear-gradient(to right,var(--teal) 0,var(--teal) 4px,transparent 4px,transparent 8px);
-    }
-    .bp-route-mini-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
-    .bp-notes {
-      margin-top: 10px; font-size: 12px; font-style: italic;
-      color: var(--muted); line-height: 1.5;
-    }
-
-    /* Perforated tear between face and stub */
-    .bp-perf {
-      border: none; border-top: 2px dashed var(--paper3);
-      margin: 0;
-    }
-
     /* Flight log table */
     .flight-log-wrap { overflow-x:auto; border-radius:4px; border:1px solid var(--faint); }
     table { width:100%; border-collapse:collapse; font-size:13px; }
@@ -987,43 +740,7 @@
     }
     .receipt-expand:hover { color:var(--amber); }
 
-    /* ═══════════════════════════════
-       PHASE 7 — COUNTRIES (stamps)
-    ═══════════════════════════════ */
-    .countries-section { max-width:1120px; margin:0 auto 0; padding:0 56px 80px; }
-    .stamps-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-      gap:16px; margin-top:32px;
-    }
-    .stamp {
-      background:#FEFCF8;
-      border:1px solid var(--paper3);
-      padding:10px 8px 8px;
-      text-align:center; cursor:default;
-      position:relative; overflow:hidden;
-      transition:transform 0.2s, box-shadow 0.2s;
-      box-shadow: 1px 2px 8px rgba(28,17,9,0.07);
-      animation: stampFill 0.4s ease both;
-    }
-    @keyframes stampFill {
-      from { opacity:0; transform:scale(0.85) rotate(var(--stamp-rot,0deg)); }
-      to   { opacity:1; transform:scale(1)    rotate(var(--stamp-rot,0deg)); }
-    }
-    .stamp:hover { transform:scale(1.06) rotate(0deg) !important; box-shadow:3px 4px 16px rgba(28,17,9,0.14); z-index:2; }
-    /* Perforation border */
-    .stamp::before {
-      content:''; position:absolute; inset:4px;
-      border:1px dashed rgba(28,17,9,0.1); pointer-events:none;
-    }
-    .stamp-flag { width:44px; height:29px; object-fit:cover; border-radius:1px; margin:0 auto 7px; display:block; }
-    .stamp-name { font-family:var(--mono); font-size:8px; letter-spacing:1px; color:var(--ink2); line-height:1.3; }
-    .stamp-status {
-      display:inline-block; font-family:var(--mono); font-size:7px; letter-spacing:1px;
-      padding:1px 5px; border-radius:1px; margin-top:4px;
-    }
-    .stamp-status.visited   { background:var(--teal2); color:var(--teal); }
-    .stamp-status.transiting { background:var(--gold2); color:var(--amber); }
-    .stamp-emoji { font-size:13px; position:absolute; top:6px; right:7px; }
+    .countries-section{max-width:1120px;margin:0 auto 0;padding:0 56px 80px}
 
     /* ═══════════════════════════════
        PHASE 7 — CLOSING POEM
@@ -1138,130 +855,6 @@
     .t-cur{width:7px;height:13px;border-radius:1px;background:#5bc0be;animation:blink 1s step-end infinite}
     @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
 
-    /* ── FLEET GRID (aircraft heroes) ── */
-    .fleet-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px; margin-bottom: 48px;
-    }
-    .fleet-card {
-      position: relative; overflow: hidden;
-      border-radius: 3px; min-height: 220px;
-      background: var(--ink); cursor: default;
-    }
-    .fleet-card:first-child { grid-row: span 2; min-height: 100%; }
-    .fleet-photo {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
-      filter: brightness(0.6) saturate(0.85) sepia(8%);
-    }
-    .fleet-card:hover .fleet-photo {
-      transform: scale(1.04);
-      filter: brightness(0.42) saturate(0.75);
-    }
-    .fleet-vignette {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(28,17,9,0.94) 0%, rgba(28,17,9,0.35) 50%, transparent 80%);
-      transition: background 0.4s;
-    }
-    .fleet-card:hover .fleet-vignette {
-      background: linear-gradient(to top, rgba(28,17,9,0.97) 0%, rgba(28,17,9,0.6) 55%, rgba(28,17,9,0.1) 100%);
-    }
-    .fleet-content {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 18px 20px 16px;
-    }
-    .fleet-iata {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
-      color: var(--amber); margin-bottom: 4px; opacity: 0.8;
-    }
-    .fleet-model {
-      font-family: var(--disp); font-size: clamp(28px,3.5vw,44px);
-      color: rgba(246,241,233,0.95); line-height: 1; letter-spacing: 1px;
-      margin-bottom: 2px;
-    }
-    .fleet-card:first-child .fleet-model { font-size: clamp(38px,5vw,60px); }
-    .fleet-nickname {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.4); margin-bottom: 8px;
-    }
-    .fleet-count {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      color: var(--gold);
-    }
-    .fleet-count::before { content: ''; width: 14px; height: 1px; background: var(--gold); }
-    /* Story — slides up on hover */
-    .fleet-story {
-      font-size: 11px; line-height: 1.7; color: rgba(246,241,233,0.6);
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s;
-      opacity: 0; margin-top: 0;
-    }
-    .fleet-card:hover .fleet-story { max-height: 140px; opacity: 1; margin-top: 8px; }
-    .fleet-card:first-child:hover .fleet-story { max-height: 200px; }
-    @media(max-width:768px){
-      .fleet-grid { grid-template-columns: 1fr 1fr; }
-      .fleet-card:first-child { grid-row: span 1; }
-    }
-
-    /* ── BOARDING PASS STACK PEEK ── */
-    .bp-stack-peek {
-      position: relative; height: 80px; cursor: pointer;
-      margin: 0 auto;
-    }
-    .bp-peek-card {
-      position: absolute; left: 0; right: 0;
-      height: 64px; border-radius: 4px;
-      border: 1px solid var(--paper3);
-      background: #FEFCF8;
-      box-shadow: 2px 3px 10px rgba(28,17,9,0.08);
-      transition: transform 0.35s cubic-bezier(0.34,1.3,0.64,1);
-    }
-    /* Three cards peek out beneath the top one */
-    .bp-peek-3 { bottom: 0; transform: rotate(-2.8deg) translateY(8px); background:#F5EFE6; }
-    .bp-peek-2 { bottom: 0; transform: rotate( 1.4deg) translateY(4px); background:#FAF6EF; }
-    .bp-peek-1 { bottom: 0; transform: rotate(-0.5deg); }
-    /* Hover — fan them out */
-    .bp-stack-peek:hover .bp-peek-3 { transform: rotate(-5deg) translateY(14px); }
-    .bp-stack-peek:hover .bp-peek-2 { transform: rotate( 3deg) translateY(8px); }
-    .bp-stack-peek:hover .bp-peek-1 { transform: rotate(-1deg) translateY(-3px); }
-    /* Top card face */
-    .bp-peek-face {
-      position: absolute; inset: 0;
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 0 20px;
-      border-top: 3px solid transparent;
-      border-image: linear-gradient(to right, var(--teal), var(--gold)) 1;
-    }
-    .bp-peek-label {
-      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
-      color: var(--ink2);
-    }
-    .bp-peek-hint {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: var(--muted);
-    }
-    .bp-peek-arrow {
-      font-size: 14px; color: var(--teal);
-      transition: transform 0.3s;
-    }
-    .bp-peek-arrow.open { transform: rotate(180deg); }
-
-    /* ── EXPAND BUTTON ── */
-    .expand-btn {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: var(--muted); background: transparent;
-      border: 1px solid var(--faint); padding: 8px 20px; border-radius: 2px;
-      cursor: pointer; transition: all 0.2s;
-      display: inline-flex; align-items: center; gap: 8px;
-    }
-    .expand-btn:hover { color: var(--teal); border-color: var(--teal); }
-    .expand-btn-arrow { transition: transform 0.3s; display: inline-block; font-size: 11px; }
-    .expand-btn-arrow.open { transform: rotate(180deg); }
-
     /* Loading skeleton */
     .skel { background:linear-gradient(90deg,var(--paper2) 25%,var(--paper3) 50%,var(--paper2) 75%); background-size:200% 100%; animation:skelShimmer 1.5s infinite; border-radius:3px; }
     @keyframes skelShimmer { to{background-position:-200% 0} }
@@ -1276,23 +869,88 @@
       .film-print{width:150px}.film-img-wrap{height:120px}
       .lb-panel{grid-template-columns:1fr;max-width:480px}
       .lb-img-col{min-height:200px}
-      .stamps-grid{grid-template-columns:repeat(3,1fr)}
+      
       .social-bar{display:none}
       .origin-postcard{transform:none;padding:28px 24px 24px 32px}
     }
+
+    /* ── POSTCARD STACK ── */
+    .postcard-stack-wrap{position:relative;max-width:680px}
+    .postcard-ghost{position:absolute;left:0;right:0;background:#F5EFE5;border:1px solid var(--paper3);border-radius:3px;box-shadow:3px 5px 20px rgba(28,17,9,0.07);pointer-events:none}
+    .postcard-ghost-2{top:12px;height:100%;transform:rotate(1.8deg) translateX(6px)}
+    .postcard-ghost-1{top:6px;height:100%;transform:rotate(-1.1deg) translateX(-4px)}
+    .origin-postcard{background:#FDFAF4;border:1px solid var(--paper3);border-radius:3px;padding:40px 48px 36px 52px;position:relative;z-index:3;box-shadow:4px 6px 32px rgba(28,17,9,0.1),0 1px 0 rgba(28,17,9,0.06);transition:transform 0.35s cubic-bezier(0.4,0,0.2,1),opacity 0.3s}
+    .origin-postcard.slide-out-left{transform:translateX(-60px) rotate(-3deg);opacity:0}
+    .origin-postcard.slide-out-right{transform:translateX(60px) rotate(3deg);opacity:0}
+    .origin-postcard.slide-in{animation:cardIn 0.4s cubic-bezier(0.34,1.3,0.64,1) forwards}
+    @keyframes cardIn{from{transform:translateX(40px) rotate(2deg);opacity:0}to{transform:none;opacity:1}}
+    .origin-postcard::before{content:'';position:absolute;left:36px;top:0;bottom:0;width:1px;background:rgba(212,121,42,0.3)}
+    .origin-postcard::after{content:'';position:absolute;inset:0;background:repeating-linear-gradient(to bottom,transparent,transparent 31px,rgba(28,17,9,0.05) 31px,rgba(28,17,9,0.05) 32px);border-radius:3px;pointer-events:none}
+    .postcard-dots{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:20px;position:relative;z-index:4}
+    .pc-dot{width:7px;height:7px;border-radius:50%;background:var(--paper3);cursor:pointer;transition:background 0.25s,transform 0.25s}
+    .pc-dot.active{background:var(--amber);transform:scale(1.3)}
+    .pc-nav{position:absolute;top:50%;z-index:5;transform:translateY(-50%);width:32px;height:32px;border-radius:50%;background:rgba(253,250,244,0.92);border:1px solid var(--paper3);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;color:var(--muted);box-shadow:0 2px 8px rgba(28,17,9,0.1);transition:all 0.2s}
+    .pc-nav:hover{border-color:var(--amber);color:var(--amber)}
+    .pc-nav.prev{left:-48px}
+    .pc-nav.next{right:-48px}
+
+    /* ── AIRCRAFT LOG BOOK ── */
+    .fleet-logbook{background:#FDFAF4;border:1px solid var(--paper3);border-radius:4px;overflow:hidden;margin-bottom:48px;position:relative}
+    .fleet-logbook::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent,transparent 63px,rgba(28,17,9,0.04) 63px,rgba(28,17,9,0.04) 64px)}
+    .fleet-log-header{display:grid;grid-template-columns:210px 1fr 80px;padding:10px 24px;border-bottom:1px solid var(--paper3);background:var(--ink)}
+    .fleet-log-col{font-family:var(--mono);font-size:9px;letter-spacing:2.5px;color:rgba(246,241,233,0.3)}
+    .fleet-row{display:grid;grid-template-columns:210px 1fr 80px;align-items:center;padding:0 24px;height:64px;border-bottom:1px solid rgba(28,17,9,0.06);position:relative;z-index:1;transition:background 0.2s}
+    .fleet-row:last-child{border-bottom:none}
+    .fleet-row:hover{background:rgba(46,139,122,0.04)}
+    .fleet-row-id{display:flex;flex-direction:column;gap:2px}
+    .fleet-model-name{font-family:var(--disp);font-size:26px;color:var(--ink);line-height:1;letter-spacing:1px}
+    .fleet-model-nick{font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:var(--amber);font-style:italic}
+    .fleet-bar-track{height:6px;background:var(--paper3);border-radius:3px;overflow:hidden;position:relative}
+    .fleet-bar-fill{position:absolute;left:0;top:0;height:100%;background:linear-gradient(to right,var(--teal),var(--amber));border-radius:3px;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+    .fleet-count-wrap{text-align:right}
+    .fleet-count-num{font-family:var(--disp);font-size:30px;color:var(--ink2);line-height:1}
+    .fleet-count-lbl{font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--muted)}
+
+    /* ── AIRPORTS PASSPORT STAMPS ── */
+    .passport-page{background:#FDFAF4;border:1px solid var(--paper3);border-radius:4px;padding:28px;box-shadow:2px 3px 12px rgba(28,17,9,0.06);position:relative;overflow:hidden}
+    .passport-page::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent,transparent 27px,rgba(28,17,9,0.03) 27px,rgba(28,17,9,0.03) 28px)}
+    .passport-stamps-grid{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start;position:relative;z-index:1}
+    .ap-stamp{display:flex;flex-direction:column;align-items:center;animation:stampDrop 0.45s cubic-bezier(0.34,1.3,0.64,1) both}
+    @keyframes stampDrop{from{opacity:0;transform:scale(0.5) rotate(var(--r,0deg))}to{opacity:1;transform:scale(1) rotate(var(--r,0deg))}}
+    .ap-stamp-ring{width:88px;height:88px;border-radius:50%;border:2.5px solid currentColor;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:transform 0.25s}
+    .ap-stamp:hover .ap-stamp-ring{transform:scale(1.1)}
+    .ap-stamp-ring::before{content:'';position:absolute;inset:4px;border-radius:50%;border:1.5px dashed currentColor;opacity:0.3;pointer-events:none}
+    .ap-stamp-ring::after{content:'';position:absolute;inset:0;border-radius:50%;background:currentColor;opacity:var(--ink-alpha,0.08)}
+    .ap-stamp-iata{font-family:var(--disp);font-size:22px;letter-spacing:2px;line-height:1;position:relative;z-index:1}
+    .ap-stamp-city{font-family:var(--mono);font-size:7px;letter-spacing:2px;line-height:1.3;position:relative;z-index:1;text-align:center;padding:0 5px}
+    .ap-stamp-visits{margin-top:6px;font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:var(--muted)}
+
+    /* ── FLAG WALL ── */
+    .flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:4px;margin-top:28px}
+    .flag-card{position:relative;overflow:hidden;aspect-ratio:3/2;border-radius:2px;cursor:default;transition:transform 0.2s}
+    .flag-card:hover{transform:scale(1.1);z-index:2}
+    .flag-card img{width:100%;height:100%;object-fit:cover;display:block;transition:filter 0.3s}
+    .flag-card.transiting img{filter:grayscale(0.65) opacity(0.65)}
+    .flag-overlay{position:absolute;inset:0;background:rgba(28,17,9,0.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;opacity:0;transition:opacity 0.2s}
+    .flag-card:hover .flag-overlay{opacity:1}
+    .flag-name{font-family:var(--mono);font-size:8px;letter-spacing:1.5px;color:rgba(246,241,233,0.9);text-align:center;padding:0 4px;line-height:1.3}
+    .flag-transit-badge{font-family:var(--mono);font-size:7px;letter-spacing:1px;color:var(--gold);padding:1px 5px;border:1px solid rgba(200,145,58,0.4);border-radius:1px}
+
+    /* ── EXPAND BUTTON ── */
+    .expand-btn{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--muted);background:transparent;border:1px solid var(--faint);padding:8px 20px;border-radius:2px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px}
+    .expand-btn:hover{color:var(--teal);border-color:var(--teal)}
+    .expand-btn-arrow{transition:transform 0.3s;display:inline-block;font-size:11px}
+    .expand-btn-arrow.open{transform:rotate(180deg)}
   </style>
 </head>
+
 <body>
 
-<!-- ══════════════════════════════
-     INTRO — The Awakening
-══════════════════════════════ -->
 <div id="intro">
   <div class="intro-grain"></div>
   <div class="intro-postcard-bg"></div>
   <div class="intro-urdu">تو زندہ ہو تم</div>
   <div class="intro-beam"></div>
-
   <div class="intro-lines">
     <p class="il sm" id="il1">I grew up in a small town in India.</p>
     <p class="il sm" id="il2">Our world was the street, the school, the neighbours.</p>
@@ -1305,24 +963,17 @@
     <p class="il proof" id="il6">TOH ZINDA HO TUM.</p>
     <p class="il tag" id="il7">53 COUNTRIES · 7 CONTINENTS · STILL COUNTING</p>
   </div>
-
   <div class="intro-tear"><div class="tear-paper"></div></div>
   <div class="intro-skip" id="introSkip">TAP ANYWHERE →</div>
 </div>
 
-<!-- ══════════════════════════════
-     PAGE
-══════════════════════════════ -->
 <div id="page">
-
   <nav class="top-nav" id="topNav">
     <a class="nav-logo" href="index.html">AR // NOMAD</a>
     <a class="nav-back" href="index.html">← HOME</a>
   </nav>
 
-  <!-- ── HERO ── -->
   <section class="hero">
-    
     <div class="hero-content">
       <div class="hero-eyebrow">// NOMAD CHRONICLES</div>
       <h1 class="hero-title">
@@ -1332,26 +983,12 @@
       </h1>
       <p class="hero-sub" id="heroSub">From a small town in India to every continent on earth — one stamp, one stranger, one story at a time.</p>
       <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num"><span id="statCountries">—</span><span class="accent">+</span></div>
-          <div class="hero-stat-label">Countries</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num">7</div>
-          <div class="hero-stat-label">Continents</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num"><span id="statFlights">—</span></div>
-          <div class="hero-stat-label">Flights</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="statMilesTotal">—</div>
-          <div class="hero-stat-label">Miles in the air</div>
-        </div>
+        <div class="hero-stat"><div class="hero-stat-num"><span id="statCountries">—</span><span class="accent">+</span></div><div class="hero-stat-label">Countries</div></div>
+        <div class="hero-stat"><div class="hero-stat-num">7</div><div class="hero-stat-label">Continents</div></div>
+        <div class="hero-stat"><div class="hero-stat-num"><span id="statFlights">—</span></div><div class="hero-stat-label">Flights</div></div>
+        <div class="hero-stat"><div class="hero-stat-num" id="statMilesTotal">—</div><div class="hero-stat-label">Miles in the air</div></div>
       </div>
     </div>
-
-    <!-- Thumbtack photo -->
     <div class="hero-avatar-wrap">
       <div class="thumbtack"></div>
       <img class="hero-avatar" src="images/Casual poses.jpg" alt="Anuraag Ravulaparthi">
@@ -1359,15 +996,11 @@
     </div>
   </section>
 
-  <!-- ── GLOBE ── -->
   <section class="globe-section">
     <div class="globe-outer">
       <div class="globe-inner">
         <div class="globe-stamp-row">
-          <div class="globe-stamp">
-            <span>✦</span>
-            <span id="globeStampText">53 COUNTRIES VISITED · EST. 2016</span>
-          </div>
+          <div class="globe-stamp"><span>✦</span><span id="globeStampText">53 COUNTRIES VISITED · EST. 2016</span></div>
           <div class="globe-toggle">
             <button class="gtog active" id="togCountries" onclick="setGlobeMode('countries',this)">COUNTRIES</button>
             <button class="gtog" id="togFlights" onclick="setGlobeMode('flights',this)">FLIGHT ROUTES</button>
@@ -1388,34 +1021,31 @@
     </div>
   </section>
 
-  <!-- ── ORIGIN POSTCARD ── -->
+  <!-- POSTCARD STACK -->
   <section class="origin-section">
     <div class="origin-inner">
-      <div class="section-eyebrow" style="margin-bottom:28px">// LETTER TO THE YOUNGER ME</div>
-      <div class="origin-postcard" id="originPostcard">
-        <div class="postcard-header">
-          <div class="postcard-to">To: Anuraag, age 17<br>Small town, Andhra Pradesh</div>
-          <div class="postcard-stamp-img">
-            <div class="stamp-globe">🌍</div>
-            <div>NOMAD<br>SERIES</div>
+      <div class="section-eyebrow" style="margin-bottom:32px">// LETTERS TO THE YOUNGER ME</div>
+      <div style="position:relative;padding:0 48px">
+        <button class="pc-nav prev" onclick="postcardNav(-1)">&#8249;</button>
+        <button class="pc-nav next" onclick="postcardNav(1)">&#8250;</button>
+        <div class="postcard-stack-wrap">
+          <div class="postcard-ghost postcard-ghost-2"></div>
+          <div class="postcard-ghost postcard-ghost-1"></div>
+          <div class="origin-postcard slide-in" id="originPostcard">
+            <div class="postcard-header">
+              <div class="postcard-to" id="pcTo">To: Anuraag, age 17<br>Small town, Andhra Pradesh</div>
+              <div class="postcard-stamp-img"><div class="stamp-globe">🌍</div><div>NOMAD<br>SERIES</div></div>
+            </div>
+            <div class="postmark" id="pcMark">HYDERABAD<br>INDIA<br>2016</div>
+            <div class="origin-text" id="originText"></div>
+            <div class="origin-cite" id="pcCite">— Anuraag Ravulaparthi</div>
           </div>
         </div>
-        <div class="postmark">
-          HYDERABAD<br>INDIA<br>2016
-        </div>
-        <div class="origin-text" id="originText">
-          Growing up,our world fit inside one town.
-          I watched planes from rooftops and wondered where they were going.
-          I didn't know then that the sky was an invitation —
-          and that the most important education happens when you sit across from someone
-          whose life looks nothing like yours, and realise you are the same.
-        </div>
-        <div class="origin-cite">— Anuraag Ravulaparthi</div>
+        <div class="postcard-dots" id="pcDots"></div>
       </div>
     </div>
   </section>
 
-  <!-- ── FACTS STRIP ── -->
   <div class="facts-strip">
     <div class="fact-item"><div class="fact-num">7<span> continents</span></div><div class="fact-desc">Including Antarctica</div></div>
     <div class="fact-item"><div class="fact-num" id="fCountries">—</div><div class="fact-desc">Countries visited</div></div>
@@ -1424,26 +1054,17 @@
     <div class="fact-item"><div class="fact-num" id="fAirlines">—</div><div class="fact-desc">Airlines flown</div></div>
   </div>
 
-  <!-- ── EXPERIENCES ── -->
   <section class="experiences">
     <div class="section-header">
       <div class="section-eyebrow">// FIELD NOTES</div>
       <div class="section-title">EXPERIENCES.</div>
       <div class="section-poem-line" id="expPoemLine">Nazar mein khwaabon ki bijliyan leke chal rahe ho — the proof.</div>
     </div>
-
     <div class="exp-tabs">
-      <button class="exp-tab active" onclick="switchTab('adventures',this)">
-        <span class="tab-icon">⚡</span>ADVENTURES
-      </button>
-      <button class="exp-tab" onclick="switchTab('people',this)">
-        <span class="tab-icon">👤</span>PEOPLE
-      </button>
-      <button class="exp-tab" onclick="switchTab('moments',this)">
-        <span class="tab-icon">✦</span>MOMENTS
-      </button>
+      <button class="exp-tab active" onclick="switchTab('adventures',this)"><span class="tab-icon">⚡</span>ADVENTURES</button>
+      <button class="exp-tab" onclick="switchTab('people',this)"><span class="tab-icon">👤</span>PEOPLE</button>
+      <button class="exp-tab" onclick="switchTab('moments',this)"><span class="tab-icon">✦</span>MOMENTS</button>
     </div>
-
     <div class="reel-wrap active" id="tab-adventures">
       <div class="tab-poem" id="poem-adventures">// Nazar mein khwaabon ki bijliyan — the adrenaline chapter</div>
       <div class="sprocket-row" id="spr-t-adv"></div>
@@ -1464,7 +1085,6 @@
     </div>
   </section>
 
-  <!-- ── FLIGHTS ── -->
   <section class="flights-section">
     <div class="section-header">
       <div class="section-eyebrow">// THE OBSESSION</div>
@@ -1472,35 +1092,33 @@
       <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
     </div>
     <div class="flight-stats" id="flightStats"></div>
-
-    <!-- AIRCRAFT FLEET -->
-    <div class="section-eyebrow" style="margin-bottom:20px">// AIRCRAFT FLOWN</div>
-    <div class="fleet-grid" id="fleetGrid"></div>
-
-    <!-- BOARDING PASSES — latest 4, rest hidden -->
+    <div class="section-eyebrow" style="margin-bottom:14px">// AIRCRAFT FLOWN</div>
+    <div class="fleet-logbook">
+      <div class="fleet-log-header">
+        <div class="fleet-log-col">AIRCRAFT</div>
+        <div class="fleet-log-col">FLIGHTS</div>
+        <div class="fleet-log-col" style="text-align:right">COUNT</div>
+      </div>
+      <div id="fleetGrid"></div>
+    </div>
     <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
     <div class="bp-stack" id="boardingGrid"></div>
-    <!-- Stacked peek of remaining boarding passes -->
-    <div id="bpMoreWrap" style="margin-bottom:48px;display:none" onclick="expandBoardingPasses()" title="Click to see all boarding passes">
+    <div id="bpMoreWrap" style="margin-bottom:48px;display:none" onclick="expandBoardingPasses()">
       <div class="bp-stack-peek" id="bpStackPeek">
         <div class="bp-peek-card bp-peek-3"></div>
         <div class="bp-peek-card bp-peek-2"></div>
         <div class="bp-peek-card bp-peek-1">
           <div class="bp-peek-face">
-            <div class="bp-peek-label" id="bpMoreLabel">+ 112 MORE BOARDING PASSES</div>
+            <div class="bp-peek-label" id="bpMoreLabel">+ MORE BOARDING PASSES</div>
             <div class="bp-peek-hint">CLICK THE STACK TO EXPAND</div>
             <div class="bp-peek-arrow" id="bpPeekArrow">▾</div>
           </div>
         </div>
       </div>
     </div>
-
-    <!-- FULL FLIGHT LOG — hidden by default -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="section-eyebrow" style="margin:0">// FULL FLIGHT LOG</div>
-      <button class="expand-btn" id="logToggleBtn" onclick="toggleFlightLog()">
-        EXPAND LOG <span class="expand-btn-arrow" id="logArrow">▾</span>
-      </button>
+      <button class="expand-btn" id="logToggleBtn" onclick="toggleFlightLog()">EXPAND LOG <span class="expand-btn-arrow" id="logArrow">▾</span></button>
     </div>
     <div id="flightLogWrap" style="display:none">
       <div class="flight-log-wrap">
@@ -1512,73 +1130,54 @@
     </div>
   </section>
 
-  <!-- ── AIRPORTS ── -->
   <section class="airports-section">
     <div class="section-header">
       <div class="section-eyebrow">// FAVOURITE AIRPORTS</div>
       <div class="section-title">AIRPORTS.</div>
       <div class="section-poem-line">Some cities you enter through their airports. The airport is already the story.</div>
     </div>
-    <div class="airport-grid" id="airportGrid"></div>
+    <div class="passport-page">
+      <div class="passport-stamps-grid" id="airportGrid"></div>
+    </div>
   </section>
 
-  <!-- ── CAFES ── -->
   <section class="cafes-section">
     <div class="section-header">
-      <div class="section-eyebrow">// CAFFEINE & CULTURE</div>
+      <div class="section-eyebrow">// CAFFEINE &amp; CULTURE</div>
       <div class="section-title">CAFES.</div>
       <div class="section-poem-line">Har ek lamhe se tum milo — every cup is a city, every city a cup.</div>
     </div>
     <div class="cafe-grid" id="cafeGrid"></div>
   </section>
 
-  <!-- ── COUNTRIES ── -->
   <section class="countries-section">
-    <div class="section-eyebrow">// EVERY STAMP</div>
+    <div class="section-eyebrow">// EVERY FLAG</div>
     <div class="section-title" style="font-size:clamp(36px,5vw,64px)">COUNTRIES.</div>
-    <div class="stamps-grid" id="stampsGrid"></div>
+    <div class="flags-grid" id="stampsGrid"></div>
   </section>
 
-  <!-- ── CLOSING POEM ── -->
   <section class="closing-section" id="closingSection">
     <div class="closing-poem" id="closingPoem">
-      <div class="poem-couplet" id="pc1">
-        <div class="poem-urdu">دلوں میں تم اپنی بے تابیاں لیے چل رہے ہو</div>
-        <div class="poem-english">Dilon mein tum apni betaabiyan leke chal rahe ho</div>
-      </div>
-      <div class="poem-couplet" id="pc2">
-        <div class="poem-urdu">نظر میں خوابوں کی بجلیاں لیے چل رہے ہو</div>
-        <div class="poem-english">Nazar mein khwaabon ki bijliyan leke chal rahe ho</div>
-      </div>
-      <div class="poem-couplet" id="pc3">
-        <div class="poem-urdu">ہوا کے جھونکوں کے جیسے آزاد ہو تم</div>
-        <div class="poem-english">Hawa ke jhokon ke jaise aazad ho tum</div>
-      </div>
-      <div class="poem-couplet" id="pc4">
-        <div class="poem-urdu">جو اپنی آنکھوں میں حیرانیاں لیے چل رہے ہو</div>
-        <div class="poem-english">Jo apni aankhon mein hairaniyan leke chal rahe ho</div>
-      </div>
+      <div class="poem-couplet" id="pc1"><div class="poem-urdu">دلوں میں تم اپنی بے تابیاں لیے چل رہے ہو</div><div class="poem-english">Dilon mein tum apni betaabiyan leke chal rahe ho</div></div>
+      <div class="poem-couplet" id="pc2"><div class="poem-urdu">نظر میں خوابوں کی بجلیاں لیے چل رہے ہو</div><div class="poem-english">Nazar mein khwaabon ki bijliyan leke chal rahe ho</div></div>
+      <div class="poem-couplet" id="pc3"><div class="poem-urdu">ہوا کے جھونکوں کے جیسے آزاد ہو تم</div><div class="poem-english">Hawa ke jhokon ke jaise aazad ho tum</div></div>
+      <div class="poem-couplet" id="pc4"><div class="poem-urdu">جو اپنی آنکھوں میں حیرانیاں لیے چل رہے ہو</div><div class="poem-english">Jo apni aankhon mein hairaniyan leke chal rahe ho</div></div>
       <div class="poem-final" id="poemFinal">
         <div class="poem-final-line">TOH <span class="gold">ZINDA</span><br>HO TUM.</div>
         <div class="poem-final-sub">— JAVED AKHTAR, ZINDAGI NA MILEGI DOBARA</div>
       </div>
-      <div class="closing-count">
-        <span id="closingCount">53</span> COUNTRIES · 7 CONTINENTS · <span>STILL COUNTING</span>
-      </div>
+      <div class="closing-count"><span id="closingCount">53</span> COUNTRIES · 7 CONTINENTS · <span>STILL COUNTING</span></div>
     </div>
   </section>
 
   <footer class="page-footer">
     <div class="footer-name">ANURAAG RAVULAPARTHI</div>
     <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="Profile.html">Profile</a>
-      <a href="Contact.html">Contact</a>
+      <a href="index.html">Home</a><a href="Profile.html">Profile</a><a href="Contact.html">Contact</a>
     </div>
   </footer>
 </div>
 
-<!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLB(event)">
   <div class="lb-panel">
     <button class="lb-close" onclick="closeLightbox()">ESC / CLOSE ✕</button>
@@ -1600,7 +1199,6 @@
   </div>
 </div>
 
-<!-- Terminal -->
 <button class="term-trigger" id="termTrigger" onclick="openTerm()">
   <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
   <div class="term-trigger-dot"></div>
@@ -1609,8 +1207,7 @@
 <div class="term-backdrop" id="termBackdrop" onclick="closeTerm()"></div>
 <div class="term-drawer" id="termDrawer">
   <div class="term-bar">
-    <div class="td td-r" onclick="closeTerm()"></div>
-    <div class="td td-y"></div><div class="td td-g"></div>
+    <div class="td td-r" onclick="closeTerm()"></div><div class="td td-y"></div><div class="td td-g"></div>
     <span class="t-title">anuraag.sh — nomad</span>
     <span class="t-clock" id="tClock"></span>
   </div>
@@ -1622,7 +1219,6 @@
   </div>
 </div>
 
-<!-- Social bar -->
 <div class="social-bar">
   <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
@@ -1630,16 +1226,13 @@
   <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" aria-label="Polarsteps">
     <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2E8B7A"/><path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/></svg>
   </a>
-  <a href="https://twitter.com/" target="_blank" aria-label="Twitter">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0024 12.5z" fill="#fff"/></svg>
-  </a>
 </div>
+
 <script type="module">
 import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc }
+import { getFirestore, collection, getDocs, doc, getDoc }
                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ── FIREBASE ──────────────────────────────────────────────────────
 const app = initializeApp({
   apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
   authDomain:"nomad-404.firebaseapp.com",
@@ -1648,11 +1241,10 @@ const app = initializeApp({
 });
 const db = getFirestore(app);
 
-// ── STATE ─────────────────────────────────────────────────────────
 let countriesData=[], flightsData=[], cafesData=[], experiencesData=[];
 let globeMode='countries', globeGlobe=null, globeFlightLines=[], globeCamera=null, globeRenderer=null;
 
-// ── INTRO ─────────────────────────────────────────────────────────
+// ── INTRO ──────────────────────────────────────────────────────────
 const introSeq=[
   {el:'il1',d:800},{el:'il2',d:1800},{el:'ir1',d:2600},
   {el:'il3',d:3000},{el:'ir2',d:4000},
@@ -1661,73 +1253,52 @@ const introSeq=[
 ];
 let introDone=false;
 
-function dismissIntro() {
+window.dismissIntro = function() {
   if(introDone) return;
   introDone = true;
   const intro = document.getElementById('intro');
   intro.classList.add('tearing');
-  // Start loading data immediately in background
   loadAllData();
-  // Show page after 1s hold (tear animation + settle)
   setTimeout(() => {
     intro.classList.add('gone');
     document.getElementById('page').classList.add('vis');
-    // Globe needs a painted frame to get real dimensions
     requestAnimationFrame(() => requestAnimationFrame(() => initGlobeWhenReady()));
   }, 1000);
-}
+};
 
 introSeq.forEach(({el,d}) => {
-  setTimeout(() => {
-    const n = document.getElementById(el);
-    if(n) n.classList.add('vis');
-  }, d);
+  setTimeout(() => { const n=document.getElementById(el); if(n) n.classList.add('vis'); }, d);
 });
-setTimeout(dismissIntro, 9000);
-document.getElementById('intro').addEventListener('click', dismissIntro);
-document.getElementById('introSkip').addEventListener('click', e => { e.stopPropagation(); dismissIntro(); });
+setTimeout(window.dismissIntro, 9000);
+document.getElementById('intro').addEventListener('click', window.dismissIntro);
+document.getElementById('introSkip').addEventListener('click', e => { e.stopPropagation(); window.dismissIntro(); });
 
-// ── LOAD ALL FROM FIRESTORE ───────────────────────────────────────
-let dataLoaded = false;
-let globeInitPending = false;
+// ── DATA LOAD ─────────────────────────────────────────────────────
+let dataLoaded=false, globeInitPending=false;
 
 async function loadAllData() {
   try {
-    // Load each collection independently so one failure doesn't break all
     const results = await Promise.allSettled([
       getDocs(collection(db,'countries')),
-      getDocs(collection(db,'flights')),   // no orderBy — avoids index requirement
+      getDocs(collection(db,'flights')),
       getDocs(collection(db,'cafes')),
       getDocs(collection(db,'experiences')),
     ]);
-
     if(results[0].status==='fulfilled') {
-      countriesData = results[0].value.docs.map(d => ({id:d.id,...d.data()}))
-        .filter(c => c.status !== 'wishlist');
+      countriesData = results[0].value.docs.map(d=>({id:d.id,...d.data()})).filter(c=>c.status!=='wishlist');
     }
     if(results[1].status==='fulfilled') {
-      flightsData = results[1].value.docs.map(d => ({id:d.id,...d.data()}));
-      // Sort client-side by date desc
-      flightsData.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+      flightsData = results[1].value.docs.map(d=>({id:d.id,...d.data()}));
+      flightsData.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
     }
-    if(results[2].status==='fulfilled') {
-      cafesData = results[2].value.docs.map(d => ({id:d.id,...d.data()}));
-    }
-    if(results[3].status==='fulfilled') {
-      experiencesData = results[3].value.docs.map(d => ({id:d.id,...d.data()}));
-    }
-
-    // Log any failures with detail
-    const colNames = ['countries','flights','cafes','experiences'];
+    if(results[2].status==='fulfilled') cafesData = results[2].value.docs.map(d=>({id:d.id,...d.data()}));
+    if(results[3].status==='fulfilled') experiencesData = results[3].value.docs.map(d=>({id:d.id,...d.data()}));
+    const colNames=['countries','flights','cafes','experiences'];
     results.forEach((r,i)=>{
-      if(r.status==='rejected') {
-        console.error(`✗ ${colNames[i]} failed:`, r.reason?.code, r.reason?.message);
-      } else {
-        console.log(`✓ ${colNames[i]}: ${r.value.docs.length} docs`);
-      }
+      if(r.status==='rejected') console.error(`✗ ${colNames[i]} failed:`,r.reason?.code,r.reason?.message);
+      else console.log(`✓ ${colNames[i]}: ${r.value.docs.length} docs`);
     });
-
-    dataLoaded = true;
+    dataLoaded=true;
     updateStats();
     revealOriginText();
     buildFlights();
@@ -1736,210 +1307,132 @@ async function loadAllData() {
     buildCafes();
     buildStamps();
     setupClosingPoem();
-    // If globe was waiting for data, init it now
-    if(globeInitPending) { globeInitPending=false; initGlobeWhenReady(); }
-  } catch(e) {
-    console.error('loadAllData failed:', e);
-  }
+    if(globeInitPending){globeInitPending=false;initGlobeWhenReady();}
+  } catch(e) { console.error('loadAllData failed:',e); }
 }
 
 function initGlobeWhenReady() {
-  if(!dataLoaded) { globeInitPending=true; return; } // wait for data
-  const wrap = document.getElementById('globeWrap');
-  if(!wrap || wrap.clientWidth === 0) {
-    // Not painted yet — retry next frame
-    requestAnimationFrame(initGlobeWhenReady);
-    return;
-  }
+  if(!dataLoaded){globeInitPending=true;return;}
+  const wrap=document.getElementById('globeWrap');
+  if(!wrap||wrap.clientWidth===0){requestAnimationFrame(initGlobeWhenReady);return;}
   initGlobe();
 }
 
-// ── STATS ─────────────────────────────────────────────────────────
-function animateCount(el, target, suffix='') {
-  if(!el || !target) return;
-  let current = 0;
-  const step = Math.ceil(target / 40);
-  const timer = setInterval(() => {
-    current = Math.min(current + step, target);
-    el.textContent = current + suffix;
-    if(current >= target) clearInterval(timer);
-  }, 30);
+// ── STATS ────────────────────────────────────────────────────────
+function animateCount(el,target,suffix=''){
+  if(!el||!target) return;
+  let current=0;
+  const step=Math.ceil(target/40);
+  const timer=setInterval(()=>{
+    current=Math.min(current+step,target);
+    el.textContent=current+suffix;
+    if(current>=target) clearInterval(timer);
+  },30);
 }
 
-function updateStats() {
-  const nc = countriesData.length;
-  const nf = flightsData.length;
-  const totalMiles = flightsData.reduce((s,f) => s+(f.distance_miles||0),0);
-  const airlines = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))].length;
-
-  animateCount(document.getElementById('statCountries'), nc);
-  animateCount(document.getElementById('statFlights'), nf);
-  animateCount(document.getElementById('statMiles'), Math.round(totalMiles/1000));
-  const vcEl = document.getElementById('visitCount');
-  if(vcEl) vcEl.innerHTML = `<span>${nc}</span> countries`;
-  const gsEl = document.getElementById('globeStampText');
-  if(gsEl) gsEl.textContent = `${nc} COUNTRIES VISITED · EST. 2016`;
-  const fcEl = document.getElementById('fCountries');
-  if(fcEl) fcEl.innerHTML = `${nc}<span>+</span>`;
-  const ffEl = document.getElementById('fFlights');
-  if(ffEl) ffEl.textContent = nf;
-  const fmEl = document.getElementById('fMiles');
-  if(fmEl) fmEl.innerHTML = `${Math.round(totalMiles/1000)}<span>K+</span>`;
-  const faEl = document.getElementById('fAirlines');
-  if(faEl) faEl.textContent = airlines;
-  const ccEl = document.getElementById('closingCount');
-  if(ccEl) ccEl.textContent = nc;
-  // Hero total miles
-  const hmEl = document.getElementById('statMilesTotal');
-  if(hmEl) hmEl.innerHTML = `${Math.round(totalMiles/1000)}<span class="accent">K</span>`;
+function updateStats(){
+  const nc=countriesData.length, nf=flightsData.length;
+  const totalMiles=flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
+  const airlines=[...new Set(flightsData.map(f=>f.airline).filter(Boolean))].length;
+  animateCount(document.getElementById('statCountries'),nc);
+  animateCount(document.getElementById('statFlights'),nf);
+  const vcEl=document.getElementById('visitCount');
+  if(vcEl) vcEl.innerHTML=`<span>${nc}</span> countries`;
+  const gsEl=document.getElementById('globeStampText');
+  if(gsEl) gsEl.textContent=`${nc} COUNTRIES VISITED · EST. 2016`;
+  const fcEl=document.getElementById('fCountries');
+  if(fcEl) fcEl.innerHTML=`${nc}<span>+</span>`;
+  const ffEl=document.getElementById('fFlights');
+  if(ffEl) ffEl.textContent=nf;
+  const fmEl=document.getElementById('fMiles');
+  if(fmEl) fmEl.innerHTML=`${Math.round(totalMiles/1000)}<span>K+</span>`;
+  const faEl=document.getElementById('fAirlines');
+  if(faEl) faEl.textContent=airlines;
+  const ccEl=document.getElementById('closingCount');
+  if(ccEl) ccEl.textContent=nc;
+  const hmEl=document.getElementById('statMilesTotal');
+  if(hmEl) hmEl.innerHTML=`${Math.round(totalMiles/1000)}<span class="accent">K</span>`;
 }
 
-// ── GLOBE ─────────────────────────────────────────────────────────
-function latLonToVec(lat, lon, r=1.025) {
-  const la = lat*Math.PI/180, lo = lon*Math.PI/180;
-  return new THREE.Vector3(r*Math.cos(la)*Math.cos(lo), r*Math.sin(la), r*Math.cos(la)*Math.sin(lo));
+// ── GLOBE ────────────────────────────────────────────────────────
+function latLonToVec(lat,lon,r=1.025){
+  const la=lat*Math.PI/180,lo=lon*Math.PI/180;
+  return new THREE.Vector3(r*Math.cos(la)*Math.cos(lo),r*Math.sin(la),r*Math.cos(la)*Math.sin(lo));
 }
 
-function initGlobe() {
-  const wrap = document.getElementById('globeWrap');
-  const canvas = document.getElementById('globeCanvas');
-  const W = wrap.clientWidth, H = wrap.clientHeight;
-
-  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+function initGlobe(){
+  const wrap=document.getElementById('globeWrap');
+  const canvas=document.getElementById('globeCanvas');
+  const W=wrap.clientWidth,H=wrap.clientHeight;
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  renderer.setSize(W,H);
-  renderer.setClearColor(0x030608,1);
-  globeRenderer = renderer;
-
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(45,W/H,0.1,1000);
-  camera.position.z = 2.8;
-  globeCamera = camera;
-
+  renderer.setSize(W,H); renderer.setClearColor(0x030608,1);
+  globeRenderer=renderer;
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(45,W/H,0.1,1000);
+  camera.position.z=2.8; globeCamera=camera;
   // Stars
   const sv=[];
-  for(let i=0;i<3000;i++){
-    const t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1),r=6+Math.random()*4;
-    sv.push(r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));
-  }
+  for(let i=0;i<3000;i++){const t=Math.random()*Math.PI*2,p=Math.acos(2*Math.random()-1),r=6+Math.random()*4;sv.push(r*Math.sin(p)*Math.cos(t),r*Math.cos(p),r*Math.sin(p)*Math.sin(t));}
   const sGeo=new THREE.BufferGeometry();
   sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
   scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:0.011,transparent:true,opacity:0.5})));
-
-  // Globe texture
+  // Globe
   const tc=document.createElement('canvas'); tc.width=2048; tc.height=1024;
   const cx=tc.getContext('2d');
-  const oceanG=cx.createLinearGradient(0,0,0,1024);
-  oceanG.addColorStop(0,'#020c1a'); oceanG.addColorStop(0.5,'#052038'); oceanG.addColorStop(1,'#020c1a');
-  cx.fillStyle=oceanG; cx.fillRect(0,0,2048,1024);
-
-  const continents=[
-    [[490,120],[780,100],[900,110],[980,140],[1050,130],[1120,150],[1180,130],[1260,140],[1350,120],[1420,130],[1480,120],[1520,140],[1540,160],[1560,190],[1500,220],[1450,240],[1400,260],[1350,280],[1280,300],[1200,310],[1140,330],[1100,320],[1050,340],[1000,360],[940,370],[880,350],[820,330],[760,310],[700,300],[640,280],[590,260],[540,240],[500,210],[480,180],[470,160]],
-    [[620,310],[680,290],[730,300],[760,320],[780,360],[790,410],[800,460],[810,510],[800,560],[780,610],[750,640],[720,660],[690,650],[660,630],[640,600],[620,560],[600,510],[590,460],[580,410],[590,360],[600,330]],
-    [[80,120],[140,100],[200,110],[250,130],[290,150],[310,180],[320,220],[310,260],[290,300],[260,330],[230,350],[200,370],[160,380],[120,360],[90,330],[70,290],[60,250],[65,200],[70,160],[75,130]],
-    [[220,420],[260,400],[290,410],[310,440],[320,480],[315,530],[300,580],[280,630],[260,670],[240,700],[210,710],[190,690],[170,660],[160,620],[155,570],[160,520],[175,470],[195,440]],
-    [[1580,530],[1650,510],[1720,520],[1770,540],[1800,570],[1810,610],[1800,650],[1770,680],[1720,690],[1660,680],[1610,660],[1580,630],[1565,590],[1568,555]],
-    [[260,50],[310,40],[360,45],[390,60],[400,80],[390,100],[360,110],[320,115],[280,105],[255,85],[250,65]],
-    [[0,900],[2048,900],[2048,1024],[0,1024]],
-    [[950,310],[1000,300],[1040,310],[1060,340],[1070,380],[1060,420],[1040,450],[1010,470],[980,460],[960,430],[945,390],[940,350]],
-  ];
-  continents.forEach(pts=>{
-    cx.beginPath(); cx.moveTo(pts[0][0],pts[0][1]);
-    pts.slice(1).forEach(([x,y])=>cx.lineTo(x,y)); cx.closePath();
-    const lg=cx.createLinearGradient(0,200,0,700);
-    lg.addColorStop(0,'rgba(40,65,33,0.92)'); lg.addColorStop(0.5,'rgba(34,55,28,0.88)'); lg.addColorStop(1,'rgba(45,70,37,0.9)');
-    cx.fillStyle=lg; cx.fill();
-  });
-  // Ice caps
-  const iceN=cx.createRadialGradient(1024,0,0,1024,0,200);
-  iceN.addColorStop(0,'rgba(210,230,245,0.95)'); iceN.addColorStop(1,'rgba(150,190,220,0)');
-  cx.fillStyle=iceN; cx.fillRect(0,0,2048,160);
-  const iceS=cx.createRadialGradient(1024,1024,0,1024,1024,220);
-  iceS.addColorStop(0,'rgba(225,240,250,0.98)'); iceS.addColorStop(1,'rgba(160,200,225,0)');
-  cx.fillStyle=iceS; cx.fillRect(0,850,2048,174);
-
-  const globeTex=new THREE.CanvasTexture(tc);
-  globeTex.anisotropy=4;
+  const og=cx.createLinearGradient(0,0,0,1024);
+  og.addColorStop(0,'#020c1a'); og.addColorStop(0.5,'#052038'); og.addColorStop(1,'#020c1a');
+  cx.fillStyle=og; cx.fillRect(0,0,2048,1024);
+  const continents=[[[490,120],[780,100],[900,110],[980,140],[1050,130],[1120,150],[1180,130],[1260,140],[1350,120],[1420,130],[1480,120],[1520,140],[1540,160],[1560,190],[1500,220],[1450,240],[1400,260],[1350,280],[1280,300],[1200,310],[1140,330],[1100,320],[1050,340],[1000,360],[940,370],[880,350],[820,330],[760,310],[700,300],[640,280],[590,260],[540,240],[500,210],[480,180],[470,160]],[[620,310],[680,290],[730,300],[760,320],[780,360],[790,410],[800,460],[810,510],[800,560],[780,610],[750,640],[720,660],[690,650],[660,630],[640,600],[620,560],[600,510],[590,460],[580,410],[590,360],[600,330]],[[80,120],[140,100],[200,110],[250,130],[290,150],[310,180],[320,220],[310,260],[290,300],[260,330],[230,350],[200,370],[160,380],[120,360],[90,330],[70,290],[60,250],[65,200],[70,160],[75,130]],[[220,420],[260,400],[290,410],[310,440],[320,480],[315,530],[300,580],[280,630],[260,670],[240,700],[210,710],[190,690],[170,660],[160,620],[155,570],[160,520],[175,470],[195,440]],[[1580,530],[1650,510],[1720,520],[1770,540],[1800,570],[1810,610],[1800,650],[1770,680],[1720,690],[1660,680],[1610,660],[1580,630],[1565,590],[1568,555]],[[260,50],[310,40],[360,45],[390,60],[400,80],[390,100],[360,110],[320,115],[280,105],[255,85],[250,65]],[[0,900],[2048,900],[2048,1024],[0,1024]],[[950,310],[1000,300],[1040,310],[1060,340],[1070,380],[1060,420],[1040,450],[1010,470],[980,460],[960,430],[945,390],[940,350]]];
+  continents.forEach(pts=>{cx.beginPath();cx.moveTo(pts[0][0],pts[0][1]);pts.slice(1).forEach(([x,y])=>cx.lineTo(x,y));cx.closePath();const lg=cx.createLinearGradient(0,200,0,700);lg.addColorStop(0,'rgba(40,65,33,0.92)');lg.addColorStop(0.5,'rgba(34,55,28,0.88)');lg.addColorStop(1,'rgba(45,70,37,0.9)');cx.fillStyle=lg;cx.fill();});
+  const iN=cx.createRadialGradient(1024,0,0,1024,0,200);iN.addColorStop(0,'rgba(210,230,245,0.95)');iN.addColorStop(1,'rgba(150,190,220,0)');cx.fillStyle=iN;cx.fillRect(0,0,2048,160);
+  const iS=cx.createRadialGradient(1024,1024,0,1024,1024,220);iS.addColorStop(0,'rgba(225,240,250,0.98)');iS.addColorStop(1,'rgba(160,200,225,0)');cx.fillStyle=iS;cx.fillRect(0,850,2048,174);
+  const gTex=new THREE.CanvasTexture(tc); gTex.anisotropy=4;
   const gGeo=new THREE.SphereGeometry(1,72,72);
-  const gMat=new THREE.MeshPhongMaterial({map:globeTex,shininess:80,specular:new THREE.Color(0x223344)});
-  const globe=new THREE.Mesh(gGeo,gMat);
-  scene.add(globe);
-  globeGlobe=globe;
-
-  // Try NASA texture
-  new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
-    tex=>{tex.anisotropy=4;gMat.map=tex;gMat.needsUpdate=true;});
-
-  // Atmosphere
+  const gMat=new THREE.MeshPhongMaterial({map:gTex,shininess:80,specular:new THREE.Color(0x223344)});
+  const globe=new THREE.Mesh(gGeo,gMat); scene.add(globe); globeGlobe=globe;
+  new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',tex=>{tex.anisotropy=4;gMat.map=tex;gMat.needsUpdate=true;});
   const aGeo=new THREE.SphereGeometry(1.12,64,64);
-  const aMat=new THREE.ShaderMaterial({
-    uniforms:{},transparent:true,depthWrite:false,side:THREE.BackSide,blending:THREE.AdditiveBlending,
-    vertexShader:'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',
-    fragmentShader:'varying vec3 vN;void main(){float i=pow(0.72-dot(vN,vec3(0,0,1)),4.);gl_FragColor=vec4(0.15,0.5,0.85,1.)*i;}'
-  });
+  const aMat=new THREE.ShaderMaterial({uniforms:{},transparent:true,depthWrite:false,side:THREE.BackSide,blending:THREE.AdditiveBlending,vertexShader:'varying vec3 vN;void main(){vN=normalize(normalMatrix*normal);gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}',fragmentShader:'varying vec3 vN;void main(){float i=pow(0.72-dot(vN,vec3(0,0,1)),4.);gl_FragColor=vec4(0.15,0.5,0.85,1.)*i;}'});
   scene.add(new THREE.Mesh(aGeo,aMat));
-
-  // Wireframe grid
-  globe.add(new THREE.Mesh(
-    new THREE.SphereGeometry(1.002,24,24),
-    new THREE.MeshBasicMaterial({color:0x2E8B7A,wireframe:true,transparent:true,opacity:0.05})
-  ));
-
-  // Lights
+  globe.add(new THREE.Mesh(new THREE.SphereGeometry(1.002,24,24),new THREE.MeshBasicMaterial({color:0x2E8B7A,wireframe:true,transparent:true,opacity:0.05})));
   scene.add(new THREE.AmbientLight(0x334455,1.6));
   const sun=new THREE.DirectionalLight(0x88aacc,1.4); sun.position.set(4,2,5); scene.add(sun);
-
-  // Country dots — amber ember glow
+  // Country dots
   const dotGeo=new THREE.SphereGeometry(0.02,10,10);
   const dotMat=new THREE.MeshBasicMaterial({color:0xD4792A});
   const pulseMat=new THREE.MeshBasicMaterial({color:0xD4792A,transparent:true,opacity:0.25});
   const pulseGeo=new THREE.SphereGeometry(0.032,10,10);
-
-  const dotCount = Math.max(1, countriesData.length); // InstancedMesh needs at least 1
+  const dotCount=Math.max(1,countriesData.length);
   const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,dotCount);
-  const dotData=[];
-  const dummy=new THREE.Object3D();
+  const dotData=[]; const dummy=new THREE.Object3D();
   countriesData.forEach((c,i)=>{
     const pos=latLonToVec(c.lat||0,c.lon||0);
     dummy.position.copy(pos); dummy.updateMatrix();
     dotMesh.setMatrixAt(i,dummy.matrix);
     dotData.push({name:c.name,id:c.id,pos,status:c.status});
   });
-  dotMesh.instanceMatrix.needsUpdate=true;
-  globe.add(dotMesh);
-
-  // Pulse rings for first 10
+  dotMesh.instanceMatrix.needsUpdate=true; globe.add(dotMesh);
   const rings=[];
   countriesData.slice(0,10).forEach((c,i)=>{
     const r=new THREE.Mesh(pulseGeo,pulseMat.clone());
-    const p=latLonToVec(c.lat,c.lon);
+    const p=latLonToVec(c.lat||0,c.lon||0);
     r.position.copy(p); r._phase=i*0.7;
     globe.add(r); rings.push(r);
   });
-
-  // Drag
   const tip=document.getElementById('globeTip');
   let isDragging=false,prevX=0,prevY=0,autoRotate=true,hintHidden=false;
   const wrap2=document.getElementById('globeWrap');
   wrap2.addEventListener('mousedown',e=>{isDragging=true;autoRotate=false;prevX=e.clientX;prevY=e.clientY;if(!hintHidden){document.getElementById('globeHint').style.opacity='0';hintHidden=true;}});
   window.addEventListener('mouseup',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2500);});
   wrap2.addEventListener('mousemove',e=>{
-    if(isDragging){
-      globe.rotation.y+=(e.clientX-prevX)*0.005;
-      globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.clientY-prevY)*0.003));
-      prevX=e.clientX;prevY=e.clientY;
-    }
+    if(isDragging){globe.rotation.y+=(e.clientX-prevX)*0.005;globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.clientY-prevY)*0.003));prevX=e.clientX;prevY=e.clientY;}
     const rect=wrap2.getBoundingClientRect();
     const mx=((e.clientX-rect.left)/W)*2-1,my=-((e.clientY-rect.top)/H)*2+1;
     const ray=new THREE.Raycaster(); ray.setFromCamera({x:mx,y:my},camera);
     const hits=ray.intersectObject(dotMesh);
-    if(hits.length>0&&dotData[hits[0].instanceId]){
-      const d=dotData[hits[0].instanceId];
-      tip.textContent=d.name+(d.status==='transiting'?' *':'');
-      tip.style.left=(e.clientX-rect.left+14)+'px';
-      tip.style.top=(e.clientY-rect.top-32)+'px';
-      tip.style.opacity='1';
-    } else tip.style.opacity='0';
+    if(hits.length>0&&dotData[hits[0].instanceId]){const d=dotData[hits[0].instanceId];tip.textContent=d.name+(d.status==='transiting'?' *':'');tip.style.left=(e.clientX-rect.left+14)+'px';tip.style.top=(e.clientY-rect.top-32)+'px';tip.style.opacity='1';}
+    else tip.style.opacity='0';
   });
   wrap2.addEventListener('mouseleave',()=>tip.style.opacity='0');
   wrap2.addEventListener('wheel',e=>{e.preventDefault();camera.position.z=Math.max(1.5,Math.min(5,camera.position.z+e.deltaY*0.003));},{passive:false});
@@ -1947,75 +1440,36 @@ function initGlobe() {
   wrap2.addEventListener('touchend',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2000);});
   wrap2.addEventListener('touchmove',e=>{if(!isDragging)return;globe.rotation.y+=(e.touches[0].clientX-prevX)*0.005;globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.touches[0].clientY-prevY)*0.003));prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
   window.addEventListener('resize',()=>{const nW=wrap2.clientWidth,nH=wrap2.clientHeight;camera.aspect=nW/nH;camera.updateProjectionMatrix();renderer.setSize(nW,nH);});
-
   buildFlightLines(globe);
-
   let clock=0;
   (function animate(){
-    requestAnimationFrame(animate);
-    clock+=0.016;
+    requestAnimationFrame(animate); clock+=0.016;
     if(autoRotate&&!isDragging) globe.rotation.y+=0.0015;
-    rings.forEach(r=>{
-      const s=1+Math.sin(clock*1.4+r._phase)*0.28;
-      r.scale.setScalar(s);
-      r.material.opacity=0.2*(1-Math.abs(Math.sin(clock*1.4+r._phase))*0.75);
-    });
-    globeFlightLines.forEach(fl=>{
-      if(fl.userData.animate){
-        fl.userData.dashOffset=(fl.userData.dashOffset||0)-0.007;
-        fl.material.dashOffset=fl.userData.dashOffset;
-      }
-    });
+    rings.forEach(r=>{const s=1+Math.sin(clock*1.4+r._phase)*0.28;r.scale.setScalar(s);r.material.opacity=0.2*(1-Math.abs(Math.sin(clock*1.4+r._phase))*0.75);});
+    globeFlightLines.forEach(fl=>{if(fl.userData.animate){fl.userData.dashOffset=(fl.userData.dashOffset||0)-0.007;fl.material.dashOffset=fl.userData.dashOffset;}});
     renderer.render(scene,camera);
   })();
 }
 
-function buildFlightLines(globe) {
+function buildFlightLines(globe){
+  const AC={DEL:[28.5562,77.1],BOM:[19.09,72.87],HYD:[17.24,78.43],MAA:[12.99,80.17],BLR:[13.20,77.71],DXB:[25.25,55.37],AUH:[24.43,54.65],DOH:[25.26,51.61],SIN:[1.36,103.99],BKK:[13.68,100.75],HKG:[22.31,113.92],NRT:[35.77,140.39],HND:[35.55,139.78],ICN:[37.46,126.44],SYD:[-33.94,151.18],MEL:[-37.67,144.84],LHR:[51.47,-0.45],LGW:[51.15,-0.18],CDG:[49.01,2.55],AMS:[52.31,4.76],FRA:[50.04,8.56],MUC:[48.35,11.78],MAD:[40.49,-3.57],BCN:[41.30,2.08],FCO:[41.80,12.24],ZRH:[47.46,8.55],VIE:[48.11,16.57],IST:[41.28,28.75],JFK:[40.64,-73.78],EWR:[40.69,-74.17],LAX:[33.94,-118.41],ORD:[41.97,-87.91],DFW:[32.90,-97.04],MIA:[25.80,-80.29],SFO:[37.62,-122.38],IAH:[29.99,-95.34],BOS:[42.37,-71.01],ATL:[33.64,-84.43],SEA:[47.45,-122.31],GRU:[-23.44,-46.47],EZE:[-34.82,-58.54],LIM:[-12.02,-77.11],SCL:[-33.39,-70.79],BOG:[4.70,-74.15],MEX:[19.44,-99.07],GIG:[-22.81,-43.25],NBO:[-1.32,36.93],JNB:[-26.14,28.25],CAI:[30.12,31.41],ADD:[8.98,38.80],BEG:[44.82,20.31],ZAG:[45.74,16.07],ORY:[48.72,2.38]};
   flightsData.forEach(f=>{
     if(!f.from||!f.to) return;
-    // Use adsb_track if available, otherwise use coordinates from airport data
-    const AIRPORT_COORDS={
-      DEL:[28.5562,77.1],BOM:[19.09,72.87],HYD:[17.24,78.43],MAA:[12.99,80.17],BLR:[13.20,77.71],
-      DXB:[25.25,55.37],AUH:[24.43,54.65],DOH:[25.26,51.61],SIN:[1.36,103.99],BKK:[13.68,100.75],
-      HKG:[22.31,113.92],NRT:[35.77,140.39],HND:[35.55,139.78],ICN:[37.46,126.44],SYD:[-33.94,151.18],
-      MEL:[-37.67,144.84],LHR:[51.47,-0.45],LGW:[51.15,-0.18],CDG:[49.01,2.55],AMS:[52.31,4.76],
-      FRA:[50.04,8.56],MUC:[48.35,11.78],MAD:[40.49,-3.57],BCN:[41.30,2.08],FCO:[41.80,12.24],
-      ZRH:[47.46,8.55],VIE:[48.11,16.57],IST:[41.28,28.75],JFK:[40.64,-73.78],EWR:[40.69,-74.17],
-      LAX:[33.94,-118.41],ORD:[41.97,-87.91],DFW:[32.90,-97.04],MIA:[25.80,-80.29],SFO:[37.62,-122.38],
-      IAH:[29.99,-95.34],BOS:[42.37,-71.01],ATL:[33.64,-84.43],SEA:[47.45,-122.31],
-      GRU:[-23.44,-46.47],EZE:[-34.82,-58.54],LIM:[-12.02,-77.11],SCL:[-33.39,-70.79],
-      BOG:[4.70,-74.15],MEX:[19.44,-99.07],GIG:[-22.81,-43.25],
-      NBO:[-1.32,36.93],JNB:[-26.14,28.25],CPT:[-33.96,18.60],CAI:[30.12,31.41],ADD:[8.98,38.80],
-      BEG:[44.82,20.31],ZAG:[45.74,16.07],SJJ:[43.82,18.33],OMO:[43.28,17.85],BVA:[49.45,2.11],
-      ORY:[48.72,2.38],MCI:[39.30,-94.71],DTW:[42.21,-83.35],IAD:[38.95,-77.46],
-      YYZ:[43.68,-79.62],YVR:[49.20,-123.18],
-    };
-    const fc=AIRPORT_COORDS[f.from], tc2=AIRPORT_COORDS[f.to];
-    if(!fc||!tc2) return;
-
-    // Use stored flight_path if available (real ADS-B track)
+    const fc=AC[f.from],tc2=AC[f.to]; if(!fc||!tc2) return;
     let points;
     if(f.flight_path&&Array.isArray(f.flight_path)&&f.flight_path.length>2){
       points=f.flight_path.map(p=>latLonToVec(p.lat,p.lon,1.025));
     } else {
-      const start=latLonToVec(fc[0],fc[1]);
-      const end=latLonToVec(tc2[0],tc2[1]);
+      const start=latLonToVec(fc[0],fc[1]),end=latLonToVec(tc2[0],tc2[1]);
       const mid=new THREE.Vector3().addVectors(start,end).multiplyScalar(0.5);
-      const dist=start.distanceTo(end);
-      mid.normalize().multiplyScalar(1.025+dist*0.35);
-      const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
-      points=curve.getPoints(50);
+      mid.normalize().multiplyScalar(1.025+start.distanceTo(end)*0.35);
+      points=new THREE.QuadraticBezierCurve3(start,mid,end).getPoints(50);
     }
-
     const geo=new THREE.BufferGeometry().setFromPoints(points);
     const mat=new THREE.LineDashedMaterial({color:0xC8913A,dashSize:0.04,gapSize:0.03,transparent:true,opacity:0.65});
-    const line=new THREE.Line(geo,mat);
-    line.computeLineDistances();
-    line.userData.animate=true;
-    line.userData.dashOffset=0;
-    line.visible=false;
-    globe.add(line);
-    globeFlightLines.push(line);
+    const line=new THREE.Line(geo,mat); line.computeLineDistances();
+    line.userData.animate=true; line.userData.dashOffset=0; line.visible=false;
+    globe.add(line); globeFlightLines.push(line);
   });
 }
 
@@ -2026,592 +1480,351 @@ window.setGlobeMode=function(mode,btn){
   const showFlights=(mode==='flights');
   globeFlightLines.forEach(l=>l.visible=showFlights);
   const leg=document.getElementById('globeLegend');
-  if(showFlights){
-    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#C8913A"></div>FLIGHT ROUTE</div><div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>COUNTRY</div>';
-  } else {
-    leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div><div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>';
-  }
+  if(showFlights) leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#C8913A"></div>FLIGHT ROUTE</div><div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>COUNTRY</div>';
+  else leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div><div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>';
 };
 
-// ── ORIGIN TEXT REVEAL ─────────────────────────────────────────────
-function revealOriginText() {
-  const el = document.getElementById('originText');
-  if(!el) return;
-  const obs = new IntersectionObserver(entries=>{
-    if(entries[0].isIntersecting) {
-      el.style.opacity='1';
-      obs.disconnect();
-    }
-  },{threshold:0.4});
-  obs.observe(el);
+// ── POSTCARD STACK ───────────────────────────────────────────────
+const POSTCARDS = [
+  {
+    to:'To: Anuraag, age 17\nSmall town, Andhra Pradesh',
+    mark:'HYDERABAD\nINDIA\n2016',
+    text:`Growing up, our world fit inside one town. I watched planes from rooftops and wondered where they were going. The sky was an invitation I didn't know how to accept yet. The most important education happens when you sit across from someone whose life looks nothing like yours, and realise you are the same.`,
+    cite:'— Anuraag Ravulaparthi, Age 17'
+  },
+  {
+    to:'To: Anuraag, age 21\nFirst passport, first flight',
+    mark:'DUBAI\nUAE\n2019',
+    text:`You are going to land somewhere and not know the language, the currency, or a single face in the crowd. And you are going to be okay. Better than okay. The fear you feel boarding that first long-haul flight is not danger. It is the feeling of your world getting larger. Let it.`,
+    cite:'— Anuraag Ravulaparthi, Age 21'
+  },
+  {
+    to:'To: Anuraag, age 24\nSomewhere over the Pacific',
+    mark:'TOKYO\nJAPAN\n2022',
+    text:`You have now stood on six continents. You have eaten alone in restaurants where no one spoke your language and felt, inexplicably, at home. Every stranger is carrying a whole world. Ask them about it. They will tell you, if you ask the right way.`,
+    cite:'— Anuraag Ravulaparthi, Age 24'
+  },
+  {
+    to:'To: Anuraag, still counting\nAnywhere on Earth',
+    mark:'STILL\nCOUNTING\n2025',
+    text:`The number of countries is not the point. You knew that from the beginning. The point is the moment the plane lifted off from Hyderabad for the first time and you looked down at the city getting smaller and thought — I can go anywhere. That feeling. That is the whole thing.`,
+    cite:'— Anuraag Ravulaparthi, Still Going'
+  },
+];
+
+let pcIdx=0;
+
+function buildPostcardDots(){
+  const dots=document.getElementById('pcDots'); if(!dots) return;
+  dots.innerHTML='';
+  POSTCARDS.forEach((_,i)=>{
+    const d=document.createElement('div');
+    d.className='pc-dot'+(i===pcIdx?' active':'');
+    d.onclick=()=>goToCard(i,i>pcIdx?1:-1);
+    dots.appendChild(d);
+  });
 }
 
-// ── FLIGHTS ───────────────────────────────────────────────────────
-function buildFlights() {
-  const totalMiles = flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
-  const airlines   = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))];
-  const airports   = [...new Set([...flightsData.map(f=>f.from),...flightsData.map(f=>f.to)].filter(Boolean))];
-  const topAirline = airlines.reduce((best,a)=>{
-    const cnt=flightsData.filter(f=>f.airline===a).length;
-    return cnt>(best.count||0)?{name:a,count:cnt}:best;
-  },{});
+function renderCard(){
+  const p=POSTCARDS[pcIdx];
+  const toEl=document.getElementById('pcTo');
+  const markEl=document.getElementById('pcMark');
+  const textEl=document.getElementById('originText');
+  const citeEl=document.getElementById('pcCite');
+  if(toEl) toEl.innerHTML=p.to.replace('\n','<br>');
+  if(markEl) markEl.innerHTML=p.mark.replace(/\n/g,'<br>');
+  if(textEl){textEl.textContent=p.text;textEl.style.opacity='1';}
+  if(citeEl) citeEl.textContent=p.cite;
+  buildPostcardDots();
+}
 
-  // Stats blocks
+function goToCard(idx,dir){
+  const card=document.getElementById('originPostcard'); if(!card) return;
+  card.classList.remove('slide-in');
+  card.classList.add(dir>=0?'slide-out-left':'slide-out-right');
+  setTimeout(()=>{
+    pcIdx=idx; renderCard();
+    card.classList.remove('slide-out-left','slide-out-right');
+    void card.offsetWidth;
+    card.classList.add('slide-in');
+  },280);
+}
+
+window.postcardNav=function(dir){
+  goToCard((pcIdx+dir+POSTCARDS.length)%POSTCARDS.length,dir);
+};
+
+function revealOriginText(){ renderCard(); }
+
+// ── FLIGHTS ──────────────────────────────────────────────────────
+function buildFlights(){
+  const totalMiles=flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
+  const airlines=[...new Set(flightsData.map(f=>f.airline).filter(Boolean))];
+  const airports=[...new Set([...flightsData.map(f=>f.from),...flightsData.map(f=>f.to)].filter(Boolean))];
+  const topAirline=airlines.reduce((best,a)=>{const cnt=flightsData.filter(f=>f.airline===a).length;return cnt>(best.count||0)?{name:a,count:cnt}:best;},{});
   const statsEl=document.getElementById('flightStats');
-  if(statsEl) [
-    {num:flightsData.length,     label:'TOTAL FLIGHTS'},
-    {num:Math.round(totalMiles).toLocaleString()+' MI', label:'TOTAL MILES'},
-    {num:Math.round(totalMiles*1.60934).toLocaleString()+' KM', label:'TOTAL KM'},
-    {num:airlines.length,        label:'AIRLINES'},
-    {num:airports.length,        label:'AIRPORTS'},
-    {num:topAirline.name||'—',   label:'MOST FLOWN'},
-  ].forEach(b=>{
-    const el=document.createElement('div'); el.className='fs-block';
-    el.innerHTML=`<div class="fs-num">${b.num}</div><div class="fs-label">${b.label}</div>`;
-    statsEl.appendChild(el);
-  });
+  if(statsEl)[
+    {num:flightsData.length,label:'TOTAL FLIGHTS'},
+    {num:Math.round(totalMiles).toLocaleString()+' MI',label:'TOTAL MILES'},
+    {num:Math.round(totalMiles*1.60934).toLocaleString()+' KM',label:'TOTAL KM'},
+    {num:airlines.length,label:'AIRLINES'},
+    {num:airports.length,label:'AIRPORTS'},
+    {num:topAirline.name||'—',label:'MOST FLOWN'},
+  ].forEach(b=>{const el=document.createElement('div');el.className='fs-block';el.innerHTML=`<div class="fs-num">${b.num}</div><div class="fs-label">${b.label}</div>`;statsEl.appendChild(el);});
 
   buildFleet();
 
-  // ── BOARDING PASSES — show only latest 4, rest hidden ──────────
-  const grid=document.getElementById('boardingGrid');
-  if(!grid) return;
-  const INITIAL_BP = 4;
-
+  // Boarding passes
+  const grid=document.getElementById('boardingGrid'); if(!grid) return;
+  const INITIAL_BP=4;
   flightsData.forEach((f,idx)=>{
-    const card=document.createElement('div');
-    card.className='bp-card';
-    if(idx >= INITIAL_BP) { card.classList.add('bp-hidden'); card.style.display='none'; }
-
+    const card=document.createElement('div'); card.className='bp-card';
+    if(idx>=INITIAL_BP){card.classList.add('bp-hidden');card.style.display='none';}
     const miles=f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—';
     const km=f.distance_miles?Math.round(f.distance_miles*1.60934).toLocaleString():'—';
-
     card.innerHTML=`
       <div class="bp-bar"></div>
       <div class="bp-face">
-        <div class="bp-header">
-          <div class="bp-flight-no">${f.flight_number||'—'}</div>
-          <div class="bp-date-badge">${f.date||'—'}</div>
-        </div>
+        <div class="bp-header"><div class="bp-flight-no">${f.flight_number||'—'}</div><div class="bp-date-badge">${f.date||'—'}</div></div>
         <div class="bp-route-row">
-          <div>
-            <div class="bp-iata-big">${f.from||'???'}</div>
-            <div class="bp-city-name" style="text-align:left">${f.from_city||''}</div>
-          </div>
-          <div class="bp-route-mid">
-            <div class="bp-route-plane">✈</div>
-            <div class="bp-route-line"></div>
-          </div>
-          <div>
-            <div class="bp-iata-big" style="text-align:right">${f.to||'???'}</div>
-            <div class="bp-city-name" style="text-align:right">${f.to_city||''}</div>
-          </div>
+          <div><div class="bp-iata-big">${f.from||'???'}</div><div class="bp-city-name" style="text-align:left">${f.from_city||''}</div></div>
+          <div class="bp-route-mid"><div class="bp-route-plane">✈</div><div class="bp-route-line"></div></div>
+          <div><div class="bp-iata-big" style="text-align:right">${f.to||'???'}</div><div class="bp-city-name" style="text-align:right">${f.to_city||''}</div></div>
         </div>
         <div class="bp-meta-strip">
-          <div class="bp-meta-cell">
-            <span class="bp-meta-label">CARRIER</span>
-            <span class="bp-meta-val">${f.airline||'—'}</span>
-          </div>
-          <div class="bp-meta-cell">
-            <span class="bp-meta-label">TIME</span>
-            <span class="bp-meta-val">${f.time||'—'}</span>
-          </div>
-          <div class="bp-meta-cell">
-            <span class="bp-meta-label">MILES</span>
-            <span class="bp-meta-val teal">${miles}</span>
-          </div>
+          <div class="bp-meta-cell"><span class="bp-meta-label">CARRIER</span><span class="bp-meta-val">${f.airline||'—'}</span></div>
+          <div class="bp-meta-cell"><span class="bp-meta-label">TIME</span><span class="bp-meta-val">${f.time||'—'}</span></div>
+          <div class="bp-meta-cell"><span class="bp-meta-label">MILES</span><span class="bp-meta-val teal">${miles}</span></div>
         </div>
       </div>
       <hr class="bp-perf">
-      <div class="bp-toggle">
-        FLIGHT DETAILS <span class="bp-toggle-arrow">▾</span>
-      </div>
-      <div class="bp-detail">
-        <div class="bp-detail-inner">
-          <div class="bp-detail-title">// FULL FLIGHT DATA</div>
-          <div class="bp-detail-grid">
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">AIRCRAFT TYPE</span>
-              <span class="bp-detail-value">${f.aircraft_type||'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">TAIL NUMBER</span>
-              <span class="bp-detail-value mono">${f.tail_number||'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">DURATION</span>
-              <span class="bp-detail-value">${f.duration_mins?Math.floor(f.duration_mins/60)+'h '+f.duration_mins%60+'m':'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">DISTANCE</span>
-              <span class="bp-detail-value">${miles} mi · ${km} km</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">DEP TERMINAL</span>
-              <span class="bp-detail-value">${f.dep_terminal?'T'+f.dep_terminal:'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">DEP GATE</span>
-              <span class="bp-detail-value">${f.dep_gate?'G'+f.dep_gate:'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">SCHEDULED</span>
-              <span class="bp-detail-value">${f.dep_scheduled||f.time||'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">ACTUAL</span>
-              <span class="bp-detail-value">${f.dep_actual||'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">ARR TERMINAL</span>
-              <span class="bp-detail-value">${f.arr_terminal?'T'+f.arr_terminal:'—'}</span>
-            </div>
-            <div class="bp-detail-item">
-              <span class="bp-detail-label">RUNWAY DEP</span>
-              <span class="bp-detail-value mono">${f.runway_dep||'—'}</span>
-            </div>
-          </div>
-          <div class="bp-route-mini">
-            <div class="bp-route-mini-dot"></div>
-            <div class="bp-route-mini-line"></div>
-            <span style="color:var(--ink);font-size:11px">${f.from||'?'} → ${f.to||'?'}</span>
-            <div class="bp-route-mini-line"></div>
-            <div class="bp-route-mini-dot"></div>
-          </div>
-          ${f.notes?`<div class="bp-notes">"${f.notes}"</div>`:''}
-          ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft" loading="lazy">`:''}
+      <div class="bp-toggle">FLIGHT DETAILS <span class="bp-toggle-arrow">▾</span></div>
+      <div class="bp-detail"><div class="bp-detail-inner">
+        <div class="bp-detail-title">// FULL FLIGHT DATA</div>
+        <div class="bp-detail-grid">
+          <div class="bp-detail-item"><span class="bp-detail-label">AIRCRAFT TYPE</span><span class="bp-detail-value">${f.aircraft_type||'—'}</span></div>
+          <div class="bp-detail-item"><span class="bp-detail-label">TAIL NUMBER</span><span class="bp-detail-value mono">${f.tail_number||'—'}</span></div>
+          <div class="bp-detail-item"><span class="bp-detail-label">DURATION</span><span class="bp-detail-value">${f.duration_mins?Math.floor(f.duration_mins/60)+'h '+f.duration_mins%60+'m':'—'}</span></div>
+          <div class="bp-detail-item"><span class="bp-detail-label">DISTANCE</span><span class="bp-detail-value">${miles} mi · ${km} km</span></div>
+          <div class="bp-detail-item"><span class="bp-detail-label">DEP TERMINAL</span><span class="bp-detail-value">${f.dep_terminal?'T'+f.dep_terminal:'—'}</span></div>
+          <div class="bp-detail-item"><span class="bp-detail-label">DEP GATE</span><span class="bp-detail-value">${f.dep_gate?'G'+f.dep_gate:'—'}</span></div>
         </div>
-      </div>`;
-
-    card.addEventListener('click',()=>{ card.classList.toggle('open'); });
+        <div class="bp-route-mini"><div class="bp-route-mini-dot"></div><div class="bp-route-mini-line"></div><span style="color:var(--ink);font-size:11px">${f.from||'?'} → ${f.to||'?'}</span><div class="bp-route-mini-line"></div><div class="bp-route-mini-dot"></div></div>
+        ${f.notes?`<div class="bp-notes">"${f.notes}"</div>`:''}
+        ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft" loading="lazy">`:''}
+      </div></div>`;
+    card.addEventListener('click',()=>card.classList.toggle('open'));
     grid.appendChild(card);
   });
 
-  // Show "View All" button if more than 4 flights
-  if(flightsData.length > INITIAL_BP) {
-    const wrap = document.getElementById('bpMoreWrap');
-    const btn  = document.getElementById('bpMoreLabel');
-    if(wrap){ wrap.style.display='block'; }
-    const hidden = flightsData.length - INITIAL_BP;
-    const lbl = document.getElementById('bpMoreLabel');
-    if(lbl)  lbl.textContent=`+ ${hidden} MORE BOARDING PASSES`;
+  if(flightsData.length>INITIAL_BP){
+    const w=document.getElementById('bpMoreWrap');
+    if(w) w.style.display='block';
+    const lbl=document.getElementById('bpMoreLabel');
+    if(lbl) lbl.textContent=`+ ${flightsData.length-INITIAL_BP} MORE BOARDING PASSES`;
   }
 
-  // Full flight log table
-  const tbody=document.getElementById('flightLog');
-  if(!tbody) return;
+  const tbody=document.getElementById('flightLog'); if(!tbody) return;
   flightsData.forEach(f=>{
     const tr=document.createElement('tr');
-    tr.innerHTML=`
-      <td class="route">${f.from||'?'} → ${f.to||'?'}<br>
-        <span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city||''} → ${f.to_city||''}</span>
-      </td>
-      <td class="airline">${f.airline||'—'}</td>
-      <td class="date">${f.date||'—'}</td>
-      <td class="aircraft">${f.aircraft_type||'—'}</td>
-      <td class="miles">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>`;
+    tr.innerHTML=`<td class="route">${f.from||'?'} → ${f.to||'?'}<br><span style="font-size:10px;color:var(--muted);font-family:var(--serif)">${f.from_city||''} → ${f.to_city||''}</span></td><td class="airline">${f.airline||'—'}</td><td class="date">${f.date||'—'}</td><td class="aircraft">${f.aircraft_type||'—'}</td><td class="miles">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>`;
     tbody.appendChild(tr);
   });
 }
 
-// ── EXPAND / COLLAPSE CONTROLS ────────────────────────────────────
-let bpExpanded = false;
-window.expandBoardingPasses = function() {
-  bpExpanded = !bpExpanded;
-  document.querySelectorAll('.bp-hidden').forEach(el=>{
-    el.style.display = bpExpanded ? '' : 'none';
-    if(bpExpanded) el.classList.remove('bp-hidden-state');
-  });
-  const label = document.getElementById('bpMoreLabel');
-  const arrow = document.getElementById('bpPeekArrow');
-  const peek  = document.getElementById('bpStackPeek');
-  const hidden = flightsData.length - 4;
-  if(label) label.textContent = bpExpanded
-    ? '▴  SHOW LESS'
-    : `+ ${hidden} MORE BOARDING PASSES`;
-  if(arrow) arrow.classList.toggle('open', bpExpanded);
-  // When expanded hide the peek stack itself (passes are now visible above it)
-  if(peek) peek.style.opacity = bpExpanded ? '0' : '1';
-  if(peek) peek.style.pointerEvents = bpExpanded ? 'none' : 'auto';
+// Boarding pass expand/collapse
+let bpExpanded=false;
+window.expandBoardingPasses=function(){
+  bpExpanded=!bpExpanded;
+  document.querySelectorAll('.bp-hidden').forEach(el=>{el.style.display=bpExpanded?'':'none';});
+  const lbl=document.getElementById('bpMoreLabel');
+  const arrow=document.getElementById('bpPeekArrow');
+  const peek=document.getElementById('bpStackPeek');
+  if(lbl) lbl.textContent=bpExpanded?'▴  SHOW LESS':`+ ${flightsData.length-4} MORE BOARDING PASSES`;
+  if(arrow) arrow.classList.toggle('open',bpExpanded);
+  if(peek){peek.style.opacity=bpExpanded?'0':'1';peek.style.pointerEvents=bpExpanded?'none':'auto';}
 };
 
-let logExpanded = false;
-window.toggleFlightLog = function() {
-  logExpanded = !logExpanded;
-  const wrap  = document.getElementById('flightLogWrap');
-  const arrow = document.getElementById('logArrow');
-  const btn   = document.getElementById('logToggleBtn');
-  if(wrap)  wrap.style.display = logExpanded ? 'block' : 'none';
-  if(arrow) arrow.classList.toggle('open', logExpanded);
-  if(btn)   btn.querySelector('span:first-child').textContent = logExpanded ? 'COLLAPSE LOG ' : 'EXPAND LOG ';
+let logExpanded=false;
+window.toggleFlightLog=function(){
+  logExpanded=!logExpanded;
+  const wrap=document.getElementById('flightLogWrap');
+  const arrow=document.getElementById('logArrow');
+  const btn=document.getElementById('logToggleBtn');
+  if(wrap) wrap.style.display=logExpanded?'block':'none';
+  if(arrow) arrow.classList.toggle('open',logExpanded);
+  if(btn) btn.querySelector('span:first-child').textContent=logExpanded?'COLLAPSE LOG ':'EXPAND LOG ';
 };
 
-// ── AIRCRAFT FLEET ────────────────────────────────────────────────
-// Permanent Unsplash CDN URLs — no-branding cockpit/exterior shots
-const AIRCRAFT_META = {
-  'Boeing 777': {
-    nickname:'Triple Seven',
-    photo:'https://images.unsplash.com/photo-1587019158091-1a103c5dd17f?w=900&q=80&fit=crop',
-    story:`Two massive GE90 engines — the largest turbofans ever built, wider than a 737 fuselage. The 777 can carry 400 passengers non-stop for 8,000 miles. That distinctive raked wingtip, the six-wheel main landing gear bogies. When you hear that low engine rumble on pushback, you know you're going somewhere far.`
-  },
-  'Boeing 777-300ER': {
-    nickname:'Triple Seven ER',
-    photo:'https://images.unsplash.com/photo-1587019158091-1a103c5dd17f?w=900&q=80&fit=crop',
-    story:`The ER — Extended Range — is the backbone of ultra-long-haul. 13,000 km non-stop without breaking a sweat. Fly-by-wire, six-wheel main bogies, raked wingtip that cuts fuel burn by 1.5%. If you've flown Emirates, Qatar, or Singapore long-haul, this is likely what carried you.`
-  },
-  'Airbus A380': {
-    nickname:'The Superjumbo',
-    photo:'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=900&q=80&fit=crop',
-    story:`The only double-deck, four-engine commercial aircraft ever mass-produced. 853 passengers in full economy. A bar on the upper deck, a staircase, showers in first class. The A380 is so large it needs special reinforced stands at most airports. You don't board it — you enter it.`
-  },
-  'Airbus A350': {
-    nickname:'Xtra Wide Body',
-    photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop',
-    story:`53% composite materials — the most of any commercial aircraft at launch. The curved wingtips curve upward 3.5 metres. Cabin pressure at 6,000 feet instead of 8,000, higher humidity. You land after 14 hours feeling genuinely rested. The A350 is the first aircraft I've noticed caring about its passengers as much as its range.`
-  },
-  'Airbus A350-900': {
-    nickname:'Xtra Wide Body',
-    photo:'https://images.unsplash.com/photo-1529074963764-98f45c47344b?w=900&q=80&fit=crop',
-    story:`The base variant of Airbus's masterpiece. 15,000 km range. Carbon-fibre reinforced polymer from nose to tail. Those distinctive curved wingtips. Qatar Airways and Singapore Airlines fly these on their longest routes — and you feel the engineering on every long night flight.`
-  },
-  'Boeing 787': {
-    nickname:'Dreamliner',
-    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop',
-    story:`No metal window shades — electronically dimmable glass windows, 65% larger than the 767. Carbon fibre fuselage means it can hold higher humidity without corroding. The cabin feels more spacious than its capacity suggests. Boeing's most innovative aircraft and arguably their most passenger-friendly.`
-  },
-  'Boeing 787-9': {
-    nickname:'Dreamliner',
-    photo:'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop',
-    story:`Stretched 6 metres over the base 787-8. The sweet spot of the Dreamliner family — more seats, more range, same revolutionary passenger experience. Those swept raked wingtips are unmistakable on approach. Singapore to Tokyo in one, the South Pacific looking oceanic and endless through that electrochromic glass.`
-  },
-  'Airbus A330': {
-    nickname:'The Medium Hauler',
-    photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop',
-    story:`Two engines, wide body, 13,000 km range. The A330 has an analogue warmth the newer jets lack — slightly lower cabin, a hum you can feel in the floor on cruise. Shares its fuselage cross-section with the A340. The variant that crosses the Atlantic in the middle of the night with you sleeping three across.`
-  },
-  'Airbus A330-200': {
-    nickname:'The Medium Hauler',
-    photo:'https://images.unsplash.com/photo-1474302770737-173ee21bab63?w=900&q=80&fit=crop',
-    story:`The shorter-range, higher-capacity member of the A330 family. Distinctive for its blended winglets — upswept and downswept simultaneously. 253 passengers, 13,400 km range. Workhorse of transatlantic routes for Air France, Delta, and Gulf carriers. Reliable in a way that quietly earns your trust.`
-  },
-  'Airbus A320': {
-    nickname:'The Narrowbody',
-    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
-    story:`The aircraft that introduced fly-by-wire sidestick controls to commercial aviation. No mechanical linkage from cockpit to control surfaces — pure electrical signal. Wingtip fences instead of winglets. 180 seats, 6,100 km range. The most ordered commercial aircraft family in history. Everywhere you want to go for under 4 hours.`
-  },
-  'Airbus A320neo': {
-    nickname:'New Engine Option',
-    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
-    story:`The neo suffix means New Engine Option — CFM LEAP or Pratt Whitney geared turbofan, 20% better fuel burn than the ceo. Sharklet wingtip devices instead of the old fences. The cabin is quieter on cruise. Same cramped middle seat, fundamentally better machine underneath. Flying IndiGo or Indigo anywhere in India, this is your aircraft.`
-  },
-  'Airbus A321': {
-    nickname:'The Stretched Narrowbody',
-    photo:'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
-    story:`7 metres longer than the A320, 220 seats. The XLR variant has enough range for transatlantic. You can spot the A321 by its additional over-wing emergency exits — four doors instead of two. JetBlue uses these for transatlantic routes in a proper Mint business class. The narrowbody that refuses to accept it has limits.`
-  },
-  'Boeing 737': {
-    nickname:'The Bus',
-    photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop',
-    story:`First flew in 1967. Still the most produced commercial aircraft in history — over 10,000 delivered. You can identify it by the flat-bottomed engine nacelles — the engines sit so low they had to be oval-shaped to clear the ground. The aircraft that democratised air travel. I have a complicated relationship with the 737. It goes everywhere. That's the point.`
-  },
-  'Boeing 737-800': {
-    nickname:'The Bus',
-    photo:'https://images.unsplash.com/photo-1540974695-0b6a73c7e3a4?w=900&q=80&fit=crop',
-    story:`The workhorse of the Next Generation 737 family. 162-189 seats, blended winglets, CFM56 engines. Ryanair's entire fleet is 737-800s. Southwest's backbone. IndiGo used to fly them before the neos. The overhead bin is too small, the legroom is insufficient, and it has taken me to more places than any other aircraft.`
-  },
-  'ATR 72': {
-    nickname:'The Turboprop',
-    photo:'https://images.unsplash.com/photo-1572979926960-c5b685fc1fc7?w=900&q=80&fit=crop',
-    story:`Two Pratt & Whitney Canada turboprop engines turning six-bladed propellers. Flies at 450 km/h, 7,600 metres altitude — low enough to see everything. The cabin vibrates with the propellers, the windows are smaller, you can hear the countryside passing below. The ATR 72 goes to the airports jets cannot. It's the most honest flying there is.`
-  },
-  'Bombardier CRJ': {
-    nickname:'The Regional Jet',
-    photo:'https://images.unsplash.com/photo-1523633589114-88eaf4b4f1a8?w=900&q=80&fit=crop',
-    story:`Rear-mounted engines, T-tail, no overhead bin space for carry-ons. The CRJ series fills the gap between turboprops and narrowbodies. Single-class cabin, 2-2 seating, low windows. What it lacks in comfort it compensates in access — CRJs go to cities with runways too short for an A320. The aircraft that gets you to the interesting places.`
-  },
-  'Embraer E175': {
-    nickname:'The E-Jet',
-    photo:'https://images.unsplash.com/photo-1565195266978-1c4b05f7b88b?w=900&q=80&fit=crop',
-    story:`2-2 seating across the entire cabin — no middle seat, ever. Slightly curved ceiling over every row. Overwing engines on a clean swept wing. The E175 is what regional aviation should look like: genuinely comfortable at 80 seats. Delta Connection and United Express use these where the CRJ goes to die. Boarding one feels deliberate, not grudging.`
-  },
-  'Boeing 767': {
-    nickname:'The Warhorse',
-    photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop',
-    story:`First flew 1981. The aircraft that made twin-engine transoceanic flight commercially viable. Two engines, wide body, 2-3-2 seating. Distinctive flat-bottomed fuselage. Still flying — FedEx operates hundreds as freighters. Some airlines keep them for their range-efficiency. Old school in the best sense: over-engineered, under-appreciated, absolutely reliable.`
-  },
+// ── AIRCRAFT LOGBOOK ─────────────────────────────────────────────
+const AIRCRAFT_META={
+  'Boeing 777':{nickname:'Triple Seven',story:`Two massive GE90 engines — the largest turbofans ever built, wider than a 737 fuselage. The 777 can carry 400 passengers non-stop for 8,000 miles. Six-wheel main landing gear bogies. That low engine rumble on pushback means you are going somewhere far.`},
+  'Boeing 777-300ER':{nickname:'Triple Seven ER',story:`The backbone of ultra-long-haul. 13,000 km non-stop without breaking a sweat. Fly-by-wire, six-wheel main bogies, raked wingtip cuts fuel burn by 1.5%. Emirates, Qatar, Singapore — this is what carries you.`},
+  'Airbus A380':{nickname:'The Superjumbo',story:`The only double-deck, four-engine commercial aircraft ever mass-produced. 853 passengers. A bar on the upper deck, a staircase, showers in first. It needs special reinforced stands at most airports. You don't board it — you enter it.`},
+  'Airbus A350':{nickname:'Xtra Wide Body',story:`53% composite materials. Cabin pressure at 6,000 feet instead of 8,000. Higher humidity. You land after 14 hours feeling genuinely rested. The first aircraft I've noticed caring about passengers as much as its range.`},
+  'Airbus A350-900':{nickname:'Xtra Wide Body',story:`15,000 km range. Carbon-fibre from nose to tail. Those curved upswept wingtips. Qatar and Singapore fly these on their longest routes — and you feel the engineering on every long night flight.`},
+  'Boeing 787':{nickname:'Dreamliner',story:`No metal window shades — electronically dimmable glass, 65% larger than the 767. Carbon fibre fuselage holds higher humidity. Boeing's most innovative aircraft and arguably their most passenger-friendly.`},
+  'Boeing 787-9':{nickname:'Dreamliner',story:`Stretched 6 metres over the base. More seats, more range, same brilliant windows. Those swept raked wingtips are unmistakable on approach. The South Pacific through that electrochromic glass is something else.`},
+  'Airbus A330':{nickname:'The Medium Hauler',story:`Two engines, wide body, 13,000 km range. A hum you can feel in the floor on cruise. The aircraft that crosses the Atlantic in the middle of the night with you sleeping three across.`},
+  'Airbus A330-200':{nickname:'The Medium Hauler',story:`Blended winglets — upswept and downswept simultaneously. Workhorse of transatlantic routes for Air France, Delta, and Gulf carriers. Reliable in a way that quietly earns your trust.`},
+  'Airbus A320':{nickname:'The Narrowbody',story:`Introduced fly-by-wire sidestick controls to commercial aviation. No mechanical linkage — pure electrical signal. The most ordered commercial aircraft family in history. Everywhere you want to go for under 4 hours.`},
+  'Airbus A320neo':{nickname:'New Engine Option',story:`20% better fuel burn. Sharklet wingtip devices. The cabin is quieter on cruise. Same cramped middle seat, fundamentally better machine. Flying IndiGo anywhere in India, this is your aircraft.`},
+  'Airbus A321':{nickname:'The Stretched Narrowbody',story:`7 metres longer than the A320, 220 seats. You can spot it by the additional over-wing emergency exits — four doors instead of two. The narrowbody that refuses to accept it has limits.`},
+  'Boeing 737':{nickname:'The Bus',story:`First flew in 1967. Over 10,000 delivered. Flat-bottomed engine nacelles — the engines sit so low they had to be oval-shaped to clear the ground. The aircraft that democratised air travel.`},
+  'Boeing 737-800':{nickname:'The Bus',story:`162-189 seats, blended winglets, CFM56 engines. Ryanair's entire fleet. The overhead bin is too small, the legroom insufficient, and it has taken me to more places than any other aircraft.`},
+  'ATR 72':{nickname:'The Turboprop',story:`Two Pratt and Whitney Canada engines turning six-bladed propellers. 450 km/h, 7,600 metres altitude. The cabin vibrates, the windows are smaller, you can hear the countryside below. The most honest flying there is.`},
+  'Bombardier CRJ':{nickname:'The Regional Jet',story:`Rear-mounted engines, T-tail. No overhead bin space. What it lacks in comfort it compensates in access — CRJs go to cities with runways too short for an A320. The aircraft that gets you to the interesting places.`},
+  'Embraer E175':{nickname:'The E-Jet',story:`2-2 seating across the entire cabin — no middle seat, ever. The E175 is what regional aviation should look like: genuinely comfortable at 80 seats. Boarding one feels deliberate, not grudging.`},
+  'Boeing 767':{nickname:'The Warhorse',story:`First flew 1981. Made twin-engine transoceanic flight commercially viable. 2-3-2 seating. Still flying — FedEx operates hundreds as freighters. Over-engineered, under-appreciated, absolutely reliable.`},
 };
 
-// Normalise aircraft type string to a key
-function normaliseAircraft(type) {
+function normaliseAircraft(type){
   if(!type) return null;
-  const t = type.trim();
-  // Try exact match first
+  const t=type.trim();
   if(AIRCRAFT_META[t]) return t;
-  // Try prefix matches
-  for(const key of Object.keys(AIRCRAFT_META)) {
-    if(t.startsWith(key) || key.startsWith(t)) return key;
-    // fuzzy: "B777" → "Boeing 777"
-    const stripped = t.replace(/[-\s]/g,'').toUpperCase();
-    const keyStripped = key.replace(/[-\s]/g,'').toUpperCase();
-    if(stripped.includes(keyStripped) || keyStripped.includes(stripped)) return key;
+  for(const key of Object.keys(AIRCRAFT_META)){
+    if(t.startsWith(key)||key.startsWith(t)) return key;
+    const s=t.replace(/[-\s]/g,'').toUpperCase(),ks=key.replace(/[-\s]/g,'').toUpperCase();
+    if(s.includes(ks)||ks.includes(s)) return key;
   }
   return null;
 }
 
-function buildFleet() {
-  const grid = document.getElementById('fleetGrid');
-  if(!grid) return;
+function buildFleet(){
+  const grid=document.getElementById('fleetGrid'); if(!grid) return;
+  const counts={};
+  flightsData.forEach(f=>{if(!f.aircraft_type) return;const key=normaliseAircraft(f.aircraft_type);if(key) counts[key]=(counts[key]||0)+1;});
+  const ranked=Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxCount=ranked.length?ranked[0][1]:1;
 
-  // Count unique aircraft types from flight data
-  const counts = {};
-  flightsData.forEach(f => {
-    if(!f.aircraft_type) return;
-    const key = normaliseAircraft(f.aircraft_type);
-    if(key) counts[key] = (counts[key]||0) + 1;
-  });
-
-  // Sort by flight count desc, take top 6
-  const ranked = Object.entries(counts)
-    .sort((a,b) => b[1]-a[1])
-    .slice(0, 6);
-
-  if(!ranked.length) {
-    // No aircraft data yet — show placeholder from meta list
-    Object.entries(AIRCRAFT_META).slice(0,6).forEach(([key,meta]) => {
-      renderFleetCard(grid, key, meta, 0);
-    });
+  if(!ranked.length){
+    Object.entries(AIRCRAFT_META).slice(0,6).forEach(([key,meta])=>renderFleetRow(grid,key,meta,0,1));
     return;
   }
-
-  ranked.forEach(([key, count]) => {
-    const meta = AIRCRAFT_META[key];
-    if(meta) renderFleetCard(grid, key, meta, count);
-  });
-
-  // If fewer than 6 matched, fill with next most common
-  const used = new Set(ranked.map(([k])=>k));
-  if(ranked.length < 6) {
-    Object.entries(AIRCRAFT_META)
-      .filter(([k]) => !used.has(k))
-      .slice(0, 6 - ranked.length)
-      .forEach(([k, meta]) => renderFleetCard(grid, k, meta, 0));
-  }
+  ranked.forEach(([key,count])=>{const meta=AIRCRAFT_META[key];if(meta) renderFleetRow(grid,key,meta,count,maxCount);});
+  const used=new Set(ranked.map(([k])=>k));
+  if(ranked.length<6){Object.entries(AIRCRAFT_META).filter(([k])=>!used.has(k)).slice(0,6-ranked.length).forEach(([k,meta])=>renderFleetRow(grid,k,meta,0,maxCount));}
 }
 
-function renderFleetCard(grid, model, meta, count) {
-  const card = document.createElement('div');
-  card.className = 'fleet-card';
-  card.innerHTML = `
-    <div class="fleet-photo" style="background-image:url('${meta.photo}')"></div>
-    <div class="fleet-vignette"></div>
-    <div class="fleet-content">
-      <div class="fleet-iata">${model.toUpperCase()}</div>
-      <div class="fleet-model">${model.split(' ').pop()}</div>
-      <div class="fleet-nickname">"${meta.nickname}"</div>
-      ${count>0?`<div class="fleet-count">${count} FLIGHT${count!==1?'S':''}</div>`:''}
-      <div class="fleet-story">${meta.story}</div>
+function renderFleetRow(grid,model,meta,count,maxCount){
+  const row=document.createElement('div'); row.className='fleet-row';
+  const barPct=maxCount>0&&count>0?Math.max(4,Math.round((count/maxCount)*100)):4;
+  row.innerHTML=`
+    <div class="fleet-row-id">
+      <div class="fleet-model-name">${model}</div>
+      <div class="fleet-model-nick">"${meta.nickname}"</div>
+    </div>
+    <div class="fleet-bar-track">
+      <div class="fleet-bar-fill" style="width:0%" data-w="${barPct}%"></div>
+    </div>
+    <div class="fleet-count-wrap">
+      <div class="fleet-count-num">${count>0?count:'—'}</div>
+      <div class="fleet-count-lbl">${count===1?'FLIGHT':'FLIGHTS'}</div>
     </div>`;
-  grid.appendChild(card);
+  grid.appendChild(row);
+  requestAnimationFrame(()=>{const bar=row.querySelector('.fleet-bar-fill');if(bar) bar.style.width=bar.dataset.w;});
 }
 
-
-// ── AIRPORTS ─────────────────────────────────────────────────────
-// Airport metadata — enriched stories for key hubs
-// Permanent Unsplash CDN URLs — no API key needed, never expire
-const AIRPORT_META = {
-  DXB:{
-    name:'Dubai International', city:'Dubai', country:'UAE',
-    photo:'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=80&fit=crop',
-    story:`If airports had personalities, DXB would be that impossibly well-dressed friend who somehow makes a 3am layover feel like a luxury event. I've spent more nights here than in some cities I call visited. Terminal 3 at 2am — the whole world is passing through, and somehow it still feels like mine.`
-  },
-  HND:{
-    name:'Haneda Airport', city:'Tokyo', country:'Japan',
-    photo:'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=900&q=80&fit=crop',
-    story:`Haneda is what airports dream of being. Clean enough to eat off the floor. Staff who bow when you board. A ramen shop at gate 52 that made me miss my connection on purpose, or at least that's my story. Tokyo starts the moment you land.`
-  },
-  SIN:{
-    name:'Changi Airport', city:'Singapore', country:'Singapore',
-    photo:'https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=900&q=80&fit=crop',
-    story:`Changi has a waterfall. A seven-story indoor waterfall. I've seen it four times and it still stops me cold. The kind of airport that makes you wish your layover was longer.`
-  },
-  DEL:{
-    name:'Indira Gandhi International', city:'New Delhi', country:'India',
-    photo:'https://images.unsplash.com/photo-1597075687490-8f673c6c17f6?w=900&q=80&fit=crop',
-    story:`Terminal 3 is the airport I grew up through. Every time I land here I remember being seventeen, watching planes take off from a rooftop in my town, wondering where they were going. Now I'm on them.`
-  },
-  LHR:{
-    name:'London Heathrow', city:'London', country:'UK',
-    photo:'https://images.unsplash.com/photo-1513635269975-59663e0ac1ad?w=900&q=80&fit=crop',
-    story:`Heathrow is the airport equivalent of a commuter train — efficient, slightly tired, everyone has somewhere else to be. But Terminal 5 at dawn, coffee in hand, there's a quiet dignity to it.`
-  },
-  JFK:{
-    name:'JFK International', city:'New York', country:'USA',
-    photo:'https://images.unsplash.com/photo-1483450388369-9ed95738483c?w=900&q=80&fit=crop',
-    story:`JFK is barely functional and somehow still iconic. The chaos, the accents, the taxi line that tests your patience — and then you're in Manhattan 45 minutes later and you forget all of it.`
-  },
-  CDG:{
-    name:'Charles de Gaulle', city:'Paris', country:'France',
-    photo:'https://images.unsplash.com/photo-1499856871958-5b9627545d1a?w=900&q=80&fit=crop',
-    story:`CDG at 6am. The smell of coffee and croissants drifts past baggage claim. Terminal 2E in the early morning light feels like the opening shot of a French film. Which is exactly what Paris deserves.`
-  },
-  GRU:{
-    name:'Guarulhos International', city:'São Paulo', country:'Brazil',
-    photo:'https://images.unsplash.com/photo-1483729558449-99ef09a8c325?w=900&q=80&fit=crop',
-    story:`The gateway to South America. I've arrived here more disoriented than anywhere else — and left more alive. Something about Brazil resets you.`
-  },
-  ORD:{
-    name:"O'Hare International", city:'Chicago', country:'USA',
-    photo:'https://images.unsplash.com/photo-1494522855154-9297ac14b55f?w=900&q=80&fit=crop',
-    story:`The great American hub. I've had long layovers here more times than I can count. The deep-dish pizza in Terminal F is not a myth.`
-  },
-  AUH:{
-    name:'Zayed International', city:'Abu Dhabi', country:'UAE',
-    photo:'https://images.unsplash.com/photo-1548407260-da850faa41e3?w=900&q=80&fit=crop',
-    story:`The quieter, more composed sibling of DXB across the water. Zayed International opened with ambitions to outshine everyone. The architecture alone is worth the connection.`
-  },
-  DOH:{
-    name:'Hamad International', city:'Doha', country:'Qatar',
-    photo:'https://images.unsplash.com/photo-1569427572956-a7e41a9e1f46?w=900&q=80&fit=crop',
-    story:`Hamad is the world's best airport for good reason. The lamp bear. The indoor gardens. The sleeping pods. If you have to be stuck somewhere, let it be here.`
-  },
-  IAH:{
-    name:'George Bush Intercontinental', city:'Houston', country:'USA',
-    photo:'https://images.unsplash.com/photo-1464037866556-6812c9d1c72e?w=900&q=80&fit=crop',
-    story:`Houston's gateway to the world. The international terminal at night when everything is quiet — there's something about the Texas scale of it that gets you.`
-  },
+// ── AIRPORTS — PASSPORT STAMPS ────────────────────────────────────
+const AIRPORT_META={
+  DXB:{name:'Dubai International',city:'Dubai',country:'UAE'},
+  HND:{name:'Haneda Airport',city:'Tokyo',country:'Japan'},
+  SIN:{name:'Changi Airport',city:'Singapore',country:'Singapore'},
+  DEL:{name:'Indira Gandhi International',city:'New Delhi',country:'India'},
+  LHR:{name:'London Heathrow',city:'London',country:'UK'},
+  JFK:{name:'JFK International',city:'New York',country:'USA'},
+  CDG:{name:'Charles de Gaulle',city:'Paris',country:'France'},
+  GRU:{name:'Guarulhos International',city:'São Paulo',country:'Brazil'},
+  ORD:{name:"O'Hare International",city:'Chicago',country:'USA'},
+  AUH:{name:'Zayed International',city:'Abu Dhabi',country:'UAE'},
+  DOH:{name:'Hamad International',city:'Doha',country:'Qatar'},
+  IAH:{name:'George Bush Intercontinental',city:'Houston',country:'USA'},
+  BOM:{name:'Chhatrapati Shivaji',city:'Mumbai',country:'India'},
+  SYD:{name:'Kingsford Smith',city:'Sydney',country:'Australia'},
+  NRT:{name:'Narita International',city:'Tokyo',country:'Japan'},
+  ICN:{name:'Incheon International',city:'Seoul',country:'South Korea'},
 };
 
-function buildAirports() {
-  const visitCounts = {};
-  flightsData.forEach(f => {
-    if(f.from) visitCounts[f.from] = (visitCounts[f.from]||0) + 1;
-    if(f.to)   visitCounts[f.to]   = (visitCounts[f.to]  ||0) + 1;
-  });
-
-  // Top airports that have metadata, sorted by visit count
-  const topAirports = Object.entries(visitCounts)
-    .filter(([code]) => AIRPORT_META[code])
-    .sort((a,b) => b[1]-a[1])
-    .slice(0,6);
-
-  const grid = document.getElementById('airportGrid');
-  if(!grid) return;
-
-  // Fallback if no matches yet
-  const toRender = topAirports.length
-    ? topAirports
-    : Object.entries(AIRPORT_META).slice(0,6).map(([code,meta]) => [code,0]);
-
-  toRender.forEach(([code, visits]) => {
-    const meta = AIRPORT_META[code];
-    if(!meta) return;
-    const card = document.createElement('div');
-    card.className = 'airport-card';
-
-    card.innerHTML = `
-      <div class="airport-photo" style="background-image:url('${meta.photo}')"></div>
-      <div class="airport-vignette"></div>
-      <div class="airport-hint">HOVER TO READ</div>
-      <div class="airport-content">
-        <div class="airport-code">${code}</div>
-        <div class="airport-name">${meta.name} · ${meta.city}</div>
-        ${visits>0?`<div class="airport-visits">${visits} VISIT${visits!==1?'S':''}</div>`:''}
-        <div class="airport-story-text">${meta.story}</div>
+function buildAirports(){
+  const visitCounts={};
+  flightsData.forEach(f=>{if(f.from) visitCounts[f.from]=(visitCounts[f.from]||0)+1;if(f.to) visitCounts[f.to]=(visitCounts[f.to]||0)+1;});
+  const topAirports=Object.entries(visitCounts).filter(([code])=>AIRPORT_META[code]).sort((a,b)=>b[1]-a[1]).slice(0,12);
+  const grid=document.getElementById('airportGrid'); if(!grid) return;
+  const toRender=topAirports.length?topAirports:Object.entries(AIRPORT_META).slice(0,8).map(([code])=>[code,0]);
+  const maxVisits=toRender.reduce((m,[,v])=>Math.max(m,v),1);
+  const STAMP_COLORS=['#2E8B7A','#8B2020','#1C4A7A','#5A3A1A','#3A5A1A','#5A1A5A','#2E5A8B','#8B5A1A','#1A5A5A','#5A2E8B','#8B1A5A','#2E8B4A'];
+  toRender.forEach(([code,visits],i)=>{
+    const meta=AIRPORT_META[code]; if(!meta) return;
+    const color=STAMP_COLORS[i%STAMP_COLORS.length];
+    const inkAlpha=visits>0?(0.10+(visits/maxVisits)*0.28).toFixed(2):0.12;
+    const rots=[-3.5,-1.8,2.2,-0.5,3.1,-2.8,1.5,-3,2.5,-1.2,3.5,-2.2];
+    const rot=rots[i%rots.length]+'deg';
+    const stamp=document.createElement('div');
+    stamp.className='ap-stamp';
+    stamp.style.setProperty('--r',rot);
+    stamp.style.animationDelay=(i*0.06)+'s';
+    stamp.innerHTML=`
+      <div class="ap-stamp-ring" style="color:${color};--ink-alpha:${inkAlpha}">
+        <div class="ap-stamp-iata" style="color:${color}">${code}</div>
+        <div class="ap-stamp-city" style="color:${color}">${meta.city}</div>
       </div>
-      <div class="airport-credit">Photo via Unsplash</div>`;
-    grid.appendChild(card);
+      <div class="ap-stamp-visits" style="color:${color}">${visits>0?visits+' visit'+(visits>1?'s':''):meta.country}</div>`;
+    grid.appendChild(stamp);
   });
 }
 
 // ── FILM REELS ────────────────────────────────────────────────────
 function makeSprockets(id,n){
   const row=document.getElementById(id); if(!row) return;
-  for(let i=0;i<n+2;i++){
-    const s=document.createElement('div'); s.className='sprocket';
-    const h=document.createElement('div'); h.className='sprocket-hole';
-    s.appendChild(h); row.appendChild(s);
-  }
+  for(let i=0;i<n+2;i++){const s=document.createElement('div');s.className='sprocket';const h=document.createElement('div');h.className='sprocket-hole';s.appendChild(h);row.appendChild(s);}
 }
 
-function buildReel(tab) {
-  const data = experiencesData.filter(e=>e.tab===tab);
-  const reel  = document.getElementById('reel-'+tab);
-  const track = document.getElementById('track-'+tab);
+function buildReel(tab){
+  const data=experiencesData.filter(e=>e.tab===tab);
+  const reel=document.getElementById('reel-'+tab);
+  const track=document.getElementById('track-'+tab);
   if(!reel) return;
   const pfx={adventures:'adv',people:'ppl',moments:'mom'}[tab];
-  makeSprockets('spr-t-'+pfx, data.length);
-  makeSprockets('spr-b-'+pfx, data.length);
-
+  makeSprockets('spr-t-'+pfx,data.length);
+  makeSprockets('spr-b-'+pfx,data.length);
   data.forEach((item,i)=>{
-    const frame=document.createElement('div');
-    frame.className='film-frame';
-    frame.style.setProperty('--stamp-rot','0deg');
-
+    const frame=document.createElement('div'); frame.className='film-frame';
     const print=document.createElement('div'); print.className='film-print';
     const iw=document.createElement('div'); iw.className='film-img-wrap';
-
-    if(item.img){
-      const img=document.createElement('img'); img.src=item.img; img.alt=item.label||''; img.loading='lazy';
-      iw.appendChild(img);
-    } else {
-      iw.classList.add('film-placeholder');
-      const ph=document.createElement('div'); ph.className='film-ph-text';
-      ph.innerHTML='✦<br>'+(item.label||tab.toUpperCase());
-      iw.appendChild(ph);
-    }
-    const grain=document.createElement('div'); grain.className='film-grain';
-    const ov=document.createElement('div'); ov.className='film-overlay';
-    const lc=document.createElement('div'); lc.className='film-loc'; lc.textContent=item.loc||'';
-    iw.appendChild(grain); iw.appendChild(ov); iw.appendChild(lc);
+    if(item.img){const img=document.createElement('img');img.src=item.img;img.alt=item.label||'';img.loading='lazy';iw.appendChild(img);}
+    else{iw.classList.add('film-placeholder');const ph=document.createElement('div');ph.className='film-ph-text';ph.innerHTML='✦<br>'+(item.label||tab.toUpperCase());iw.appendChild(ph);}
+    const grain=document.createElement('div');grain.className='film-grain';
+    const ov=document.createElement('div');ov.className='film-overlay';
+    const lc=document.createElement('div');lc.className='film-loc';lc.textContent=item.loc||'';
+    iw.appendChild(grain);iw.appendChild(ov);iw.appendChild(lc);
     print.appendChild(iw);
-
-    const cap=document.createElement('div'); cap.className='film-caption';
-    cap.textContent=item.label||'';
-    print.appendChild(cap);
-    frame.appendChild(print);
+    const cap=document.createElement('div');cap.className='film-caption';cap.textContent=item.label||'';
+    print.appendChild(cap); frame.appendChild(print);
     frame.addEventListener('click',()=>openLightbox(tab,i));
     reel.appendChild(frame);
   });
-
-  // Drag scroll
   let isDown=false,startX=0,sl=0;
   track.addEventListener('mousedown',e=>{isDown=true;startX=e.pageX-track.offsetLeft;sl=track.scrollLeft;});
   window.addEventListener('mouseup',()=>isDown=false);
   track.addEventListener('mousemove',e=>{if(!isDown)return;e.preventDefault();track.scrollLeft=sl-(e.pageX-track.offsetLeft-startX);});
 }
 
-function buildReels() {
-  ['adventures','people','moments'].forEach(buildReel);
-}
+function buildReels(){ ['adventures','people','moments'].forEach(buildReel); }
 
 window.switchTab=function(key,btn){
-  document.querySelectorAll('.reel-wrap.active').forEach(r=>{
-    r.classList.remove('active');
-  });
+  document.querySelectorAll('.reel-wrap.active').forEach(r=>r.classList.remove('active'));
   document.querySelectorAll('.exp-tab').forEach(t=>t.classList.remove('active'));
   btn.classList.add('active');
-  setTimeout(()=>{
-    const target=document.getElementById('tab-'+key);
-    if(target) target.classList.add('active');
-  },50);
+  setTimeout(()=>{const t=document.getElementById('tab-'+key);if(t) t.classList.add('active');},50);
 };
 
-// ── LIGHTBOX ──────────────────────────────────────────────────────
-let lbTab='adventures', lbIdx=0;
-function getTabData(tab){ return experiencesData.filter(e=>e.tab===tab); }
-
-function openLightbox(tab,idx){
-  lbTab=tab; lbIdx=idx;
-  renderLB();
-  document.getElementById('lightbox').classList.add('open');
-  document.body.style.overflow='hidden';
-}
+// ── LIGHTBOX ─────────────────────────────────────────────────────
+let lbTab='adventures',lbIdx=0;
+function getTabData(tab){return experiencesData.filter(e=>e.tab===tab);}
+function openLightbox(tab,idx){lbTab=tab;lbIdx=idx;renderLB();document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}
 function renderLB(){
-  const data=getTabData(lbTab);
-  const item=data[lbIdx];
-  if(!item) return;
-  const img=document.getElementById('lbImg');
-  const ph=document.getElementById('lbImgPlaceholder');
+  const data=getTabData(lbTab);const item=data[lbIdx];if(!item) return;
+  const img=document.getElementById('lbImg'),ph=document.getElementById('lbImgPlaceholder');
   if(item.img){img.src=item.img;img.style.display='block';ph.style.display='none';}
   else{img.style.display='none';ph.style.display='flex';}
   document.getElementById('lbLoc').textContent=item.loc||'';
@@ -2622,224 +1835,82 @@ function renderLB(){
 function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
 window.closeLightbox=closeLightbox;
 window.closeLB=function(e){if(e.target===document.getElementById('lightbox'))closeLightbox();};
-window.lbStep=function(dir){
-  const data=getTabData(lbTab);
-  lbIdx=(lbIdx+dir+data.length)%data.length;
-  renderLB();
-};
+window.lbStep=function(dir){const data=getTabData(lbTab);lbIdx=(lbIdx+dir+data.length)%data.length;renderLB();};
 
-// ── CAFES ─────────────────────────────────────────────────────────
-function buildCafes() {
-  const grid=document.getElementById('cafeGrid');
-  if(!grid) return;
-  if(!cafesData.length) {
-    grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">No cafes yet — add from the dashboard.</div>';
-    return;
-  }
+// ── CAFES ────────────────────────────────────────────────────────
+function buildCafes(){
+  const grid=document.getElementById('cafeGrid'); if(!grid) return;
+  if(!cafesData.length){grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">No cafes yet.</div>';return;}
   cafesData.forEach(c=>{
-    const card=document.createElement('div'); card.className='cafe-receipt';
+    const card=document.createElement('div');card.className='cafe-receipt';
     card.innerHTML=`
-      <div class="receipt-header">
-        <div class="receipt-type">${c.type||'CAFE'}</div>
-        <div class="receipt-name">${c.name}</div>
-        <div class="receipt-city">${c.city||''}, ${c.country||''}</div>
-      </div>
-      <div class="receipt-body">
-        <div class="receipt-line"><span class="rl-label">ORDERED</span><span class="rl-val">${c.ordered||'—'}</span></div>
-        <div class="receipt-line"><span class="rl-label">RATING</span><span class="rl-val">${c.rating||'—'}</span></div>
-      </div>
+      <div class="receipt-header"><div class="receipt-type">${c.type||'CAFE'}</div><div class="receipt-name">${c.name}</div><div class="receipt-city">${c.city||''}, ${c.country||''}</div></div>
+      <div class="receipt-body"><div class="receipt-line"><span class="rl-label">ORDERED</span><span class="rl-val">${c.ordered||'—'}</span></div><div class="receipt-line"><span class="rl-label">RATING</span><span class="rl-val">${c.rating||'—'}</span></div></div>
       <div class="receipt-vibe">${c.vibe||''}</div>
       <div class="receipt-perf"></div>
       <div class="receipt-story-wrap"><div class="receipt-story">${c.story||''}</div></div>
-      <div class="receipt-footer">
-        <div class="receipt-rating">${c.rating||''}</div>
-        <button class="receipt-expand" onclick="
-          const w=this.closest('.cafe-receipt').querySelector('.receipt-story-wrap');
-          w.classList.toggle('open');
-          this.textContent=w.classList.contains('open')?'READ LESS ↑':'THE STORY ↓';
-        ">THE STORY ↓</button>
-      </div>`;
+      <div class="receipt-footer"><div class="receipt-rating">${c.rating||''}</div><button class="receipt-expand" onclick="const w=this.closest('.cafe-receipt').querySelector('.receipt-story-wrap');w.classList.toggle('open');this.textContent=w.classList.contains('open')?'READ LESS ↑':'THE STORY ↓';">THE STORY ↓</button></div>`;
     grid.appendChild(card);
   });
 }
 
-// ── STAMPS / COUNTRIES ────────────────────────────────────────────
-function buildStamps() {
-  const grid=document.getElementById('stampsGrid');
-  if(!grid) return;
-  if(!countriesData.length) {
-    grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">Countries data loading — check Firestore rules are published.</div>';
-    return;
-  }
-  const rots=[-2.5,-1.5,-0.5,0.5,1.5,2.5];
+// ── FLAG WALL ────────────────────────────────────────────────────
+function buildStamps(){
+  const grid=document.getElementById('stampsGrid'); if(!grid) return;
+  if(!countriesData.length){grid.innerHTML='<div style="font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);padding:24px 0">Countries loading…</div>';return;}
   countriesData.forEach((c,i)=>{
-    const stamp=document.createElement('div');
-    stamp.className='stamp';
-    const rot=rots[i%rots.length];
-    stamp.style.setProperty('--stamp-rot',rot+'deg');
-    stamp.style.animationDelay=(i*0.04)+'s';
-    stamp.style.transform=`rotate(${rot}deg)`;
-
+    const card=document.createElement('div');
+    card.className='flag-card'+(c.status==='transiting'?' transiting':'');
     const flagId=c.id.toLowerCase().replace('_ei','').replace('cl_ei','cl');
-    stamp.innerHTML=`
-      ${c.emoji?`<div class="stamp-emoji">${c.emoji}</div>`:''}
-      <img class="stamp-flag" src="https://flagcdn.com/${flagId}.svg"
-        onerror="this.style.display='none'" alt="${c.name}" loading="lazy">
-      <div class="stamp-name">${c.name}</div>
-      <div class="stamp-status ${c.status}">${c.status==='transiting'?'TRANSIT*':'VISITED'}</div>`;
-    grid.appendChild(stamp);
+    card.innerHTML=`
+      <img src="https://flagcdn.com/${flagId}.svg" onerror="this.style.display='none'" alt="${c.name}" loading="lazy">
+      <div class="flag-overlay">
+        <div class="flag-name">${c.name}</div>
+        ${c.status==='transiting'?'<div class="flag-transit-badge">TRANSIT</div>':''}
+      </div>
+      ${c.emoji?`<div style="position:absolute;top:3px;right:4px;font-size:10px;pointer-events:none;line-height:1">${c.emoji}</div>`:''}`;
+    grid.appendChild(card);
   });
 }
 
-// ── CLOSING POEM (scroll reveal) ──────────────────────────────────
-function setupClosingPoem() {
+// ── CLOSING POEM ─────────────────────────────────────────────────
+function setupClosingPoem(){
   const couplets=['pc1','pc2','pc3','pc4','poemFinal'];
   const obs=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{
-      if(e.isIntersecting) {
-        const idx=couplets.indexOf(e.target.id);
-        setTimeout(()=>e.target.classList.add('vis'), idx*400);
-        obs.unobserve(e.target);
-      }
-    });
+    entries.forEach(e=>{if(e.isIntersecting){const idx=couplets.indexOf(e.target.id);setTimeout(()=>e.target.classList.add('vis'),idx*400);obs.unobserve(e.target);}});
   },{threshold:0.3});
-  couplets.forEach(id=>{
-    const el=document.getElementById(id);
-    if(el) obs.observe(el);
-  });
+  couplets.forEach(id=>{const el=document.getElementById(id);if(el) obs.observe(el);});
 }
 
-// ── NAV SCROLL ────────────────────────────────────────────────────
-window.addEventListener('scroll',()=>{
-  document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>60);
-});
+// ── NAV SCROLL ───────────────────────────────────────────────────
+window.addEventListener('scroll',()=>{document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>60);});
 
-// ── TERMINAL ──────────────────────────────────────────────────────
-const drawer=document.getElementById('termDrawer'),
-      backdrop=document.getElementById('termBackdrop'),
-      trigger=document.getElementById('termTrigger'),
-      tIn=document.getElementById('tIn'),
-      tBody=document.getElementById('tBody');
+// ── TERMINAL ────────────────────────────────────────────────────
+const drawer=document.getElementById('termDrawer'),backdrop=document.getElementById('termBackdrop'),trigger=document.getElementById('termTrigger'),tIn=document.getElementById('tIn'),tBody=document.getElementById('tBody');
 let tBooted=false;
-
-window.openTerm=function(){
-  drawer.classList.add('open');
-  backdrop.classList.add('open');
-  trigger.classList.add('away');
-  if(!tBooted){tBoot();tBooted=true;}
-  setTimeout(()=>tIn.focus(),440);
-};
-window.closeTerm=function(){
-  drawer.classList.remove('open');
-  backdrop.classList.remove('open');
-  trigger.classList.remove('away');
-};
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){closeTerm();closeLightbox();}
-});
+window.openTerm=function(){drawer.classList.add('open');backdrop.classList.add('open');trigger.classList.add('away');if(!tBooted){tBoot();tBooted=true;}setTimeout(()=>tIn.focus(),440);};
+window.closeTerm=function(){drawer.classList.remove('open');backdrop.classList.remove('open');trigger.classList.remove('away');};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeTerm();closeLightbox();}});
 drawer.addEventListener('click',()=>tIn.focus());
 setInterval(()=>{const el=document.getElementById('tClock');if(el)el.textContent=new Date().toLocaleTimeString();},1000);
-
-const TNAV={home:'home.html',engineer:'Profile.html',contact:'Contact.html'};
+const TNAV={home:'index.html',engineer:'Profile.html',contact:'Contact.html'};
 const tAdd=el=>{tBody.appendChild(el);tBody.scrollTop=tBody.scrollHeight;return el;};
 const tEsc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 function tLn(cls,html,indent=true){const d=document.createElement('div');d.className='tl'+(indent?' out':'');d.innerHTML=`<span class="${cls}">${html}</span>`;return tAdd(d);}
 function tGap(){const d=document.createElement('div');d.className='tl gap';return tAdd(d);}
 function tPl(cmd){const d=document.createElement('div');d.className='tl pl';d.innerHTML=`<span class="tps">anuraag@world:~$</span><span class="tc"> ${tEsc(cmd)}</span>`;return tAdd(d);}
-function tChips(p=[],s=[]){
-  const row=document.createElement('div');row.className='chip-row';
-  p.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});
-  s.forEach(c=>{const b=document.createElement('button');b.className='chip s';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});
-  tAdd(row);
-}
-function tHints(pairs){
-  const row=document.createElement('div');row.className='hint-row';
-  pairs.forEach(([k,v])=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<span>${k}</span> ${v}`;row.appendChild(h);});
-  tAdd(row);
-}
-
-const TCMDS={
-  help:tHelp,ls:tLs,whoami:tWhoami,clear:tClear,
-  home:()=>tGo('home'),engineer:()=>tGo('engineer'),contact:()=>tGo('contact'),
-  globe:()=>{closeTerm();document.querySelector('.globe-section').scrollIntoView({behavior:'smooth'});},
-  flights:()=>{closeTerm();document.querySelector('.flights-section').scrollIntoView({behavior:'smooth'});},
-  stories:()=>{closeTerm();document.querySelector('.experiences').scrollIntoView({behavior:'smooth'});},
-  cafes:()=>{closeTerm();document.querySelector('.cafes-section').scrollIntoView({behavior:'smooth'});},
-  countries:()=>{closeTerm();document.querySelector('.countries-section').scrollIntoView({behavior:'smooth'});},
-  poem:()=>{closeTerm();document.querySelector('.closing-section').scrollIntoView({behavior:'smooth'});},
-};
-const tHist=[]; let tHIdx=-1;
-const TALL=Object.keys(TCMDS);
-
-function tHelp(){
-  tGap();
-  tLn('camb','// NAVIGATE');
-  [['home','→ homepage'],['engineer','→ professional portfolio'],['contact','→ get in touch']].forEach(([k,v])=>tLn('ct',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));
-  tGap();
-  tLn('camb','// THIS PAGE');
-  [['globe','→ 3D globe'],['flights','→ flight log'],['stories','→ experiences'],['cafes','→ cafe receipts'],['countries','→ stamp collection'],['poem','→ Toh Zinda Ho Tum']].forEach(([k,v])=>tLn('cm',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));
-  tGap();
-  tChips(['engineer','home'],['globe','flights','stories','poem']);
-}
-function tLs(){
-  tGap();
-  tLn('ct',`&nbsp;&nbsp;globe/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${countriesData.length} countries</span>`);
-  tLn('ct',`&nbsp;&nbsp;flights/&nbsp;&nbsp;&nbsp;<span class="cd">${flightsData.length} flights</span>`);
-  tLn('ct',`&nbsp;&nbsp;stories/&nbsp;&nbsp;&nbsp;<span class="cd">${experiencesData.length} entries</span>`);
-  tLn('ct',`&nbsp;&nbsp;cafes/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${cafesData.length} cafes</span>`);
-  tGap();
-  tChips(['globe','flights'],['stories','cafes']);
-}
-function tWhoami(){
-  tGap();
-  tLn('cw','The Nomad');
-  tLn('cm',`&nbsp;&nbsp;Origin&nbsp;&nbsp;&nbsp;<span class="cd">:</span> Small town, Andhra Pradesh`);
-  tLn('cm',`&nbsp;&nbsp;Countries<span class="cd">:</span> ${countriesData.length}+`);
-  tLn('cm',`&nbsp;&nbsp;Flights&nbsp;&nbsp;<span class="cd">:</span> ${flightsData.length}+`);
-  tLn('ct',`&nbsp;&nbsp;Status&nbsp;&nbsp;&nbsp;<span class="cd">:</span> <span class="cok">● ALIVE</span>`);
-  tGap();
-  tChips(['engineer'],['home','contact']);
-}
-function tGo(dest){
-  const url=TNAV[dest];
-  tGap();tLn('ct',`Navigating to <span class="cw">${dest}</span>...`);tGap();
-  const d=document.createElement('div');d.className='tl out';
-  d.innerHTML=`<span class="cok">✓</span> <span class="clnk" onclick="window.location.href='${url}'">${url} →</span>`;
-  tAdd(d);
-}
+function tChips(p=[],s=[]){const row=document.createElement('div');row.className='chip-row';p.forEach(c=>{const b=document.createElement('button');b.className='chip';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});s.forEach(c=>{const b=document.createElement('button');b.className='chip s';b.textContent=c;b.onclick=()=>tRun(c);row.appendChild(b);});tAdd(row);}
+function tHints(pairs){const row=document.createElement('div');row.className='hint-row';pairs.forEach(([k,v])=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<span>${k}</span> ${v}`;row.appendChild(h);});tAdd(row);}
+const TCMDS={help:tHelp,ls:tLs,whoami:tWhoami,clear:tClear,home:()=>tGo('home'),engineer:()=>tGo('engineer'),contact:()=>tGo('contact'),globe:()=>{closeTerm();document.querySelector('.globe-section').scrollIntoView({behavior:'smooth'});},flights:()=>{closeTerm();document.querySelector('.flights-section').scrollIntoView({behavior:'smooth'});},stories:()=>{closeTerm();document.querySelector('.experiences').scrollIntoView({behavior:'smooth'});},cafes:()=>{closeTerm();document.querySelector('.cafes-section').scrollIntoView({behavior:'smooth'});},countries:()=>{closeTerm();document.querySelector('.countries-section').scrollIntoView({behavior:'smooth'});},poem:()=>{closeTerm();document.querySelector('.closing-section').scrollIntoView({behavior:'smooth'});}};
+const tHist=[];let tHIdx=-1;const TALL=Object.keys(TCMDS);
+function tHelp(){tGap();tLn('camb','// NAVIGATE');[['home','→ homepage'],['engineer','→ portfolio'],['contact','→ get in touch']].forEach(([k,v])=>tLn('ct',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));tGap();tLn('camb','// THIS PAGE');[['globe','→ 3D globe'],['flights','→ flight log'],['stories','→ experiences'],['cafes','→ cafe receipts'],['countries','→ flag wall'],['poem','→ Toh Zinda Ho Tum']].forEach(([k,v])=>tLn('cm',`&nbsp;&nbsp;${k}&nbsp;&nbsp;<span class="cd">${v}</span>`));tGap();tChips(['engineer','home'],['globe','flights','stories','poem']);}
+function tLs(){tGap();tLn('ct',`&nbsp;&nbsp;globe/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${countriesData.length} countries</span>`);tLn('ct',`&nbsp;&nbsp;flights/&nbsp;&nbsp;&nbsp;<span class="cd">${flightsData.length} flights</span>`);tLn('ct',`&nbsp;&nbsp;stories/&nbsp;&nbsp;&nbsp;<span class="cd">${experiencesData.length} entries</span>`);tLn('ct',`&nbsp;&nbsp;cafes/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">${cafesData.length} cafes</span>`);tGap();tChips(['globe','flights'],['stories','cafes']);}
+function tWhoami(){tGap();tLn('cw','The Nomad');tLn('cm',`&nbsp;&nbsp;Origin&nbsp;&nbsp;&nbsp;<span class="cd">:</span> Small town, Andhra Pradesh`);tLn('cm',`&nbsp;&nbsp;Countries<span class="cd">:</span> ${countriesData.length}+`);tLn('cm',`&nbsp;&nbsp;Flights&nbsp;&nbsp;<span class="cd">:</span> ${flightsData.length}+`);tLn('ct',`&nbsp;&nbsp;Status&nbsp;&nbsp;&nbsp;<span class="cd">:</span> <span class="cok">● ALIVE</span>`);tGap();tChips(['engineer'],['home','contact']);}
+function tGo(dest){const url=TNAV[dest];tGap();tLn('ct',`Navigating to <span class="cw">${dest}</span>...`);tGap();const d=document.createElement('div');d.className='tl out';d.innerHTML=`<span class="cok">✓</span> <span class="clnk" onclick="window.location.href='${url}'">${url} →</span>`;tAdd(d);}
 function tClear(){tBody.innerHTML='';tLn('cd','// cleared',false);tGap();tChips(['home','engineer'],['globe','stories','poem']);}
-
-function tRun(raw){
-  const cmd=raw.trim().split(/\s+/)[0].toLowerCase();
-  if(!cmd) return;
-  tHist.unshift(raw.trim()); tHIdx=-1;
-  tPl(raw.trim());
-  if(TCMDS[cmd]) TCMDS[cmd]();
-  else{tLn('cerr',`command not found: <span class="cw">${tEsc(cmd)}</span>`);tChips(['help'],[]);}
-  tIn.value=''; tBody.scrollTop=tBody.scrollHeight;
-}
-
-tIn.addEventListener('keydown',e=>{
-  if(e.key==='Enter') tRun(tIn.value);
-  else if(e.key==='Tab'){e.preventDefault();const v=tIn.value.toLowerCase();if(!v)return;const m=TALL.find(c=>c.startsWith(v));if(m)tIn.value=m;}
-  else if(e.key==='ArrowUp'){e.preventDefault();if(tHIdx<tHist.length-1){tHIdx++;tIn.value=tHist[tHIdx];}}
-  else if(e.key==='ArrowDown'){e.preventDefault();if(tHIdx>0){tHIdx--;tIn.value=tHist[tHIdx];}else{tHIdx=-1;tIn.value='';}}
-});
-
-async function tBoot(){
-  const delay=ms=>new Promise(r=>setTimeout(r,ms));
-  await delay(200); tLn('cd','Initializing nomad.sh ...',false);
-  await delay(360); tLn('cd','Connecting to Firestore .......... <span class="cok">OK</span>');
-  await delay(280); tLn('cd',`Loading ${countriesData.length} countries ......... <span class="cok">OK</span>`);
-  await delay(280); tLn('cd',`Mounting ${flightsData.length} flights ............. <span class="cok">OK</span>`);
-  await delay(280); tLn('cd','Brewing virtual coffee ............. <span class="cok">OK</span>');
-  await delay(400); tGap();
-  tLn('cw','Toh zinda ho tum.',false);
-  tLn('cm','The world is still out there. Make it smaller.');
-  tGap(); tLn('ct','What do you want to explore?');
-  tChips(['globe','flights','stories','poem'],['whoami','home','engineer']);
-  tHints([['Tab','autocomplete'],['↑↓','history'],['Esc','close']]);
-}
+function tRun(raw){const cmd=raw.trim().split(/\s+/)[0].toLowerCase();if(!cmd) return;tHist.unshift(raw.trim());tHIdx=-1;tPl(raw.trim());if(TCMDS[cmd]) TCMDS[cmd]();else{tLn('cerr',`command not found: <span class="cw">${tEsc(cmd)}</span>`);tChips(['help'],[]);}tIn.value='';tBody.scrollTop=tBody.scrollHeight;}
+tIn.addEventListener('keydown',e=>{if(e.key==='Enter') tRun(tIn.value);else if(e.key==='Tab'){e.preventDefault();const v=tIn.value.toLowerCase();if(!v) return;const m=TALL.find(c=>c.startsWith(v));if(m) tIn.value=m;}else if(e.key==='ArrowUp'){e.preventDefault();if(tHIdx<tHist.length-1){tHIdx++;tIn.value=tHist[tHIdx];}}else if(e.key==='ArrowDown'){e.preventDefault();if(tHIdx>0){tHIdx--;tIn.value=tHist[tHIdx];}else{tHIdx=-1;tIn.value='';}}});
+async function tBoot(){const delay=ms=>new Promise(r=>setTimeout(r,ms));await delay(200);tLn('cd','Initializing nomad.sh ...',false);await delay(360);tLn('cd','Connecting to Firestore .......... <span class="cok">OK</span>');await delay(280);tLn('cd',`Loading ${countriesData.length} countries ......... <span class="cok">OK</span>`);await delay(280);tLn('cd',`Mounting ${flightsData.length} flights ............. <span class="cok">OK</span>`);await delay(280);tLn('cd','Brewing virtual coffee ............. <span class="cok">OK</span>');await delay(400);tGap();tLn('cw','Toh zinda ho tum.',false);tLn('cm','The world is still out there. Make it smaller.');tGap();tLn('ct','What do you want to explore?');tChips(['globe','flights','stories','poem'],['whoami','home','engineer']);tHints([['Tab','autocomplete'],['↑↓','history'],['Esc','close']]);}
 </script>
 </body>
 </html>
