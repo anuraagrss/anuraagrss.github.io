@@ -31,7 +31,7 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
     body { background: var(--paper); color: var(--ink); font-family: var(--serif); overflow-x: hidden; }
-
+ 
     /* ═══════════════════════════════
        PHASE 1 — INTRO
     ═══════════════════════════════ */
@@ -43,7 +43,7 @@
       transition: opacity 1s ease, visibility 1s ease;
     }
     #intro.gone { opacity: 0; visibility: hidden; pointer-events: none; }
-
+ 
     /* Projector grain */
     .intro-grain {
       position: absolute; inset: 0; pointer-events: none; z-index: 0;
@@ -56,7 +56,7 @@
       50% { transform: translate(1%,0); }
       75% { transform: translate(0,1%); }
     }
-
+ 
     /* Postcard texture ghost behind intro lines */
     .intro-postcard-bg {
       position: absolute; inset: 0; z-index: 0;
@@ -66,7 +66,7 @@
       opacity: 0; animation: paperReveal 2s ease 1.2s forwards;
     }
     @keyframes paperReveal { to { opacity: 1; } }
-
+ 
     /* Urdu ghost text */
     .intro-urdu {
       position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
@@ -77,7 +77,7 @@
       opacity: 0; animation: urduReveal 3s ease 0.5s forwards;
     }
     @keyframes urduReveal { to { opacity: 1; } }
-
+ 
     /* Projector light beam */
     .intro-beam {
       position: absolute; top: 0; left: 50%; transform: translateX(-50%);
@@ -87,7 +87,7 @@
       pointer-events: none;
     }
     @keyframes beamGrow { to { height: 100%; } }
-
+ 
     .intro-lines {
       position: relative; z-index: 1;
       display: flex; flex-direction: column; align-items: center;
@@ -112,7 +112,7 @@
       color: rgba(200,145,58,0); transition: color 0.9s ease; margin-top: 4px;
     }
     .il.tag.vis { color: rgba(200,145,58,0.85); }
-
+ 
     /* The final line — proof of aliveness */
     .il.proof {
       font-family: var(--disp); font-style: normal;
@@ -121,14 +121,14 @@
       margin-top: 8px; line-height: 1;
     }
     .il.proof.vis { color: rgba(200,145,58,0.95); }
-
+ 
     .ir {
       width: 0; height: 1px;
       background: linear-gradient(to right, transparent, rgba(200,145,58,0.5), transparent);
       margin: 14px auto; transition: width 1.4s ease;
     }
     .ir.vis { width: 80px; }
-
+ 
     /* Envelope tear transition */
     .intro-tear {
       position: absolute; bottom: 0; left: 0; right: 0;
@@ -141,7 +141,7 @@
       height: 100%; background: var(--paper);
       clip-path: polygon(0 4%, 5% 0%, 10% 5%, 15% 1%, 20% 6%, 25% 2%, 30% 7%, 35% 0%, 40% 5%, 45% 1%, 50% 6%, 55% 2%, 60% 5%, 65% 0%, 70% 4%, 75% 1%, 80% 5%, 85% 2%, 90% 6%, 95% 1%, 100% 4%, 100% 100%, 0 100%);
     }
-
+ 
     .intro-skip {
       position: absolute; bottom: 28px; right: 32px; z-index: 3;
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
@@ -150,13 +150,13 @@
       transition: color 0.2s, border-color 0.2s;
     }
     .intro-skip:hover { color: rgba(246,241,233,0.6); border-color: rgba(246,241,233,0.25); }
-
+ 
     /* ═══════════════════════════════
        PAGE SHELL
     ═══════════════════════════════ */
     #page { opacity: 0; transition: opacity 0.9s ease; }
     #page.vis { opacity: 1; }
-
+ 
     /* ── TOP NAV ── */
     .top-nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 500;
@@ -179,7 +179,7 @@
       display: flex; align-items: center; gap: 6px; transition: color 0.2s;
     }
     .nav-back:hover { color: var(--teal); }
-
+ 
     /* ═══════════════════════════════
        PHASE 2 — HERO
     ═══════════════════════════════ */
@@ -229,946 +229,77 @@
       color: var(--muted); max-width: 520px; line-height: 1.75;
       margin-bottom: 40px;
     }
-
+ 
     /* Stats — typewriter counting */
     .hero-stats { display: flex; gap: 48px; flex-wrap: wrap; align-items: flex-end; }
-    .hero-stat { display: flex; flex-direction: column; gap: 4px; }
-    .hero-stat-num {
-      font-family: var(--disp); font-size: clamp(44px,6vw,72px);
-      color: var(--ink); line-height: 1; letter-spacing: 1px;
-    }
-    .hero-stat-num .accent { color: var(--amber); }
-    .hero-stat-label {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px;
-      color: var(--muted); text-transform: uppercase;
-    }
+    .sketch-unknown{display:flex;align-items:center;justify-content:center;height:100%;font-family:var(--mono);font-size:28px;color:rgba(255,255,255,0.15);letter-spacing:4px}
+ 
+    /* ── AIRPORT PASSPORT STAMPS ── */
+    .passport-page{background:#FDFAF4;border:1px solid var(--paper3);border-radius:4px;padding:28px 28px 20px;box-shadow:2px 3px 12px rgba(28,17,9,0.06);position:relative;overflow:hidden}
+    .passport-page::before{content:'';position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(to bottom,transparent,transparent 27px,rgba(28,17,9,0.03) 27px,rgba(28,17,9,0.03) 28px)}
+    .airport-grid{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;position:relative;z-index:1}
+    .passport-page{background:#FDFAF4;border:1px solid var(--paper3);border-radius:4px;padding:28px 28px 0;box-shadow:2px 3px 12px rgba(28,17,9,0.06);position:relative;overflow:visible}
+    .passport-page::before{content:'';position:absolute;inset:0;pointer-events:none;border-radius:4px;background:repeating-linear-gradient(to bottom,transparent,transparent 27px,rgba(28,17,9,0.03) 27px,rgba(28,17,9,0.03) 28px)}
+ 
+    /* grid clip wrapper — shows ~2 rows */
+    .airport-grid-wrap{position:relative;max-height:248px;overflow:hidden;transition:max-height 0.85s cubic-bezier(0.4,0,0.2,1)}
+    .airport-grid-wrap.open{max-height:4000px}
+    /* fade-out gradient when folded */
+    .airport-grid-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:80px;background:linear-gradient(to bottom,transparent,#FDFAF4);pointer-events:none;transition:opacity 0.5s;z-index:2}
+    .airport-grid-wrap.open::after{opacity:0}
+ 
+    .airport-grid{display:flex;flex-wrap:wrap;gap:20px;align-items:flex-start;position:relative;z-index:1;padding-bottom:20px}
+ 
+    /* fold edge — the clickable paper fold */
+    .passport-fold-edge{position:relative;margin:0 -28px;cursor:pointer;user-select:none;transition:background 0.2s}
+    /* stacked paper layers — crease effect */
+    .passport-fold-edge::before{content:'';display:block;height:6px;background:linear-gradient(to bottom,var(--paper3),var(--paper2));border-top:1px solid rgba(28,17,9,0.1);box-shadow:inset 0 2px 4px rgba(28,17,9,0.06)}
+    .passport-fold-edge::after{content:'';display:block;height:3px;background:var(--paper3);box-shadow:0 1px 0 #D8D0C0,0 2px 0 #CFC7B5}
+    .fold-label-row{background:var(--paper2);border-top:1px solid var(--paper3);border-radius:0 0 4px 4px;padding:11px 28px;display:flex;align-items:center;justify-content:center;gap:10px;transition:background 0.2s}
+    .passport-fold-edge:hover .fold-label-row{background:var(--paper3)}
+    .fold-label-text{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted)}
+    .fold-arrow{display:inline-block;transition:transform 0.45s cubic-bezier(0.4,0,0.2,1);font-size:11px;color:var(--amber)}
+    .passport-fold-edge.open .fold-arrow{transform:rotate(180deg)}
+    .ap-stamp{display:flex;flex-direction:column;align-items:center;animation:stampDrop 0.4s cubic-bezier(0.34,1.3,0.64,1) both}
+    @keyframes stampDrop{from{opacity:0;transform:scale(0.5) rotate(var(--r,0deg))}to{opacity:1;transform:scale(1) rotate(var(--r,0deg))}}
+    .ap-stamp-ring{width:84px;height:84px;border-radius:50%;border:2.5px solid currentColor;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;transition:transform 0.2s;cursor:default}
 
-    /* Thumbtack avatar */
-    .hero-avatar-wrap {
-      position: absolute; top: 100px; right: 56px;
-      display: flex; flex-direction: column; align-items: center;
-      z-index: 2;
-    }
-    .thumbtack {
-      width: 14px; height: 14px; background: var(--amber);
-      border-radius: 50%; margin-bottom: -4px; position: relative; z-index: 1;
-      box-shadow: 0 2px 8px rgba(200,145,58,0.4);
-    }
-    .thumbtack::after {
-      content: ''; position: absolute; bottom: -8px; left: 50%;
-      transform: translateX(-50%);
-      width: 2px; height: 8px; background: rgba(28,17,9,0.3);
-      border-radius: 1px;
-    }
-    .hero-avatar {
-      width: clamp(120px,16vw,180px); height: clamp(120px,16vw,180px);
-      object-fit: cover; border-radius: 2px;
-      border: 3px solid var(--paper);
-      box-shadow: 4px 6px 24px rgba(28,17,9,0.18), -1px -1px 0 rgba(28,17,9,0.08);
-      transform: rotate(1.5deg);
-      filter: sepia(12%);
-    }
-    .avatar-caption {
-      margin-top: 8px; font-family: var(--mono); font-size: 9px;
-      letter-spacing: 1.5px; color: var(--muted);
-      transform: rotate(1.5deg);
-    }
+Expand 417 hidden lines
+      <div class="section-poem-line">Some cities you enter through their airports. The airport is already the story.</div>
+    </div>
+    <div class="passport-page">
+      <div class="airport-grid" id="airportGrid"></div>
+      <div class="airport-grid-wrap" id="airportGridWrap">
+        <div class="airport-grid" id="airportGrid"></div>
+      </div>
+      <div class="passport-fold-edge" id="passportFoldEdge" onclick="window.togglePassport()">
+        <div class="fold-label-row">
+          <span class="fold-label-text" id="foldLabelText">UNFOLD PASSPORT</span>
+          <span class="fold-arrow" id="foldArrow">▾</span>
+        </div>
+      </div>
+    </div>
+  </section>
+ 
 
-    /* ═══════════════════════════════
-       PHASE 3 — GLOBE
-    ═══════════════════════════════ */
-    .globe-section {
-      padding: 0 0 80px;
-    }
-    .globe-outer {
-      background: var(--dark);
-      padding: 48px 56px 40px;
-      position: relative;
-      /* Torn paper top edge */
-    }
-    .globe-outer::before {
-      content: '';
-      position: absolute; top: -18px; left: 0; right: 0; height: 22px;
-      background: var(--dark);
-      clip-path: polygon(0 100%,2% 20%,4% 80%,6% 10%,8% 70%,10% 15%,12% 75%,14% 5%,16% 65%,18% 20%,20% 80%,22% 10%,24% 70%,26% 25%,28% 85%,30% 5%,32% 60%,34% 15%,36% 75%,38% 0%,40% 65%,42% 20%,44% 80%,46% 10%,48% 70%,50% 15%,52% 75%,54% 5%,56% 65%,58% 25%,60% 80%,62% 10%,64% 70%,66% 15%,68% 75%,70% 5%,72% 60%,74% 20%,76% 80%,78% 10%,80% 70%,82% 25%,84% 85%,86% 5%,88% 60%,90% 15%,92% 75%,94% 0%,96% 65%,98% 25%,100% 80%,100% 100%);
-    }
-    .globe-outer::after {
-      content: '';
-      position: absolute; bottom: -18px; left: 0; right: 0; height: 22px;
-      background: var(--dark);
-      clip-path: polygon(0 0,2% 80%,4% 20%,6% 90%,8% 30%,10% 85%,12% 25%,14% 95%,16% 35%,18% 80%,20% 20%,22% 90%,24% 30%,26% 75%,28% 15%,30% 95%,32% 40%,34% 85%,36% 25%,38% 100%,40% 35%,42% 80%,44% 20%,46% 90%,48% 30%,50% 85%,52% 25%,54% 95%,56% 35%,58% 75%,60% 20%,62% 90%,64% 30%,66% 85%,68% 25%,70% 95%,72% 40%,74% 80%,76% 20%,78% 90%,80% 30%,82% 75%,84% 15%,86% 95%,88% 40%,90% 85%,92% 25%,94% 100%,96% 35%,98% 75%,100% 20%,100% 0);
-    }
-
-    .globe-inner { max-width: 1120px; margin: 0 auto; }
-
-    .globe-stamp-row {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 20px; flex-wrap: wrap; gap: 12px;
-    }
-    .globe-stamp {
-      display: inline-flex; align-items: center; gap: 8px;
-      border: 2px solid rgba(46,139,122,0.4);
-      padding: 5px 14px; border-radius: 2px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: rgba(46,139,122,0.8);
-      position: relative;
-    }
-    .globe-stamp::before {
-      content: ''; position: absolute; inset: 2px;
-      border: 1px solid rgba(46,139,122,0.2);
-      pointer-events: none;
-    }
-    .globe-toggle { display: flex; gap: 4px; }
-    .gtog {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      padding: 5px 14px; border-radius: 2px; cursor: pointer;
-      border: 1px solid rgba(255,255,255,0.15);
-      background: transparent; color: rgba(255,255,255,0.35);
-      transition: all 0.2s;
-    }
-    .gtog.active { background: var(--teal); color: #fff; border-color: var(--teal); }
-
-    .globe-wrap {
-      position: relative; width: 100%;
-      height: 65vh; min-height: 400px;
-      border-radius: 12px; overflow: hidden;
-      background: #030608;
-      border: 1px solid rgba(255,255,255,0.05);
-      cursor: grab;
-    }
-    .globe-wrap:active { cursor: grabbing; }
-    #globeCanvas { display: block; width: 100%; height: 100%; }
-    .globe-hint {
-      position: absolute; bottom: 18px; left: 50%; transform: translateX(-50%);
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: rgba(255,255,255,0.28);
-      background: rgba(0,0,0,0.45); padding: 5px 14px; border-radius: 20px;
-      pointer-events: none; transition: opacity 0.5s;
-    }
-    .globe-tooltip {
-      position: absolute; pointer-events: none;
-      background: rgba(3,6,8,0.92); border: 1px solid rgba(46,139,122,0.3);
-      color: rgba(246,241,233,0.9); padding: 7px 13px; border-radius: 4px;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 1px;
-      opacity: 0; transition: opacity 0.15s; white-space: nowrap; z-index: 10;
-    }
-    .globe-counter {
-      position: absolute; top: 16px; right: 16px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 1px;
-      color: rgba(255,255,255,0.35);
-    }
-    .globe-counter span { color: var(--teal); font-family: var(--disp); font-size: 22px; vertical-align: middle; }
-    .globe-legend {
-      position: absolute; bottom: 18px; right: 18px;
-      display: flex; flex-direction: column; gap: 5px;
-    }
-    .leg-item {
-      display: flex; align-items: center; gap: 6px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
-      color: rgba(255,255,255,0.35);
-    }
-    .leg-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
-
-    .globe-caption {
-      margin-top: 14px; font-family: var(--mono); font-size: 11px;
-      letter-spacing: 1px; color: rgba(255,255,255,0.3); text-align: right;
-    }
-    .globe-caption span { color: var(--teal); }
-
-    /* ═══════════════════════════════
-       PHASE 4 — ORIGIN
-    ═══════════════════════════════ */
-    .origin-section {
-      padding: 80px 0; position: relative; overflow: hidden;
-    }
-    .origin-inner {
-      max-width: 1120px; margin: 0 auto; padding: 0 56px;
-    }
-    /* Postcard element */
-    .origin-postcard {
-      background: #FDFAF4;
-      border: 1px solid var(--paper3);
-      border-radius: 3px;
-      padding: 40px 48px 36px 52px;
-      position: relative;
-      box-shadow: 4px 6px 32px rgba(28,17,9,0.1), 0 1px 0 rgba(28,17,9,0.06);
-      max-width: 760px;
-      transform: rotate(-0.4deg);
-    }
-    /* Red left margin line */
-    .origin-postcard::before {
-      content: '';
-      position: absolute; left: 36px; top: 0; bottom: 0;
-      width: 1px; background: rgba(212,121,42,0.3);
-    }
-    /* Ruled lines */
-    .origin-postcard::after {
-      content: '';
-      position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent,
-        transparent 31px,
-        rgba(28,17,9,0.05) 31px,
-        rgba(28,17,9,0.05) 32px
-      );
-      border-radius: 3px; pointer-events: none;
-    }
-    .postcard-header {
-      display: flex; align-items: center; justify-content: space-between;
-      margin-bottom: 28px; position: relative; z-index: 1;
-    }
-    .postcard-to {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: var(--muted);
-    }
-    .postcard-stamp-img {
-      width: 54px; height: 64px;
-      background: var(--paper2);
-      border: 1px solid var(--paper3);
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; gap: 3px;
-      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
-      color: var(--muted); text-align: center;
-      border-radius: 2px;
-    }
-    .postcard-stamp-img .stamp-globe {
-      font-size: 18px; opacity: 0.5;
-    }
-    .postmark {
-      position: absolute; right: 56px; top: 52px;
-      width: 68px; height: 68px; border-radius: 50%;
-      border: 2px solid rgba(200,145,58,0.3);
-      display: flex; flex-direction: column; align-items: center;
-      justify-content: center; text-align: center;
-      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
-      color: rgba(200,145,58,0.45); line-height: 1.4;
-      transform: rotate(12deg); z-index: 1;
-    }
-    .postmark::before {
-      content: ''; position: absolute; inset: 3px;
-      border-radius: 50%; border: 1px solid rgba(200,145,58,0.2);
-    }
-    .origin-text {
-      font-size: clamp(16px,2vw,21px); font-style: italic;
-      line-height: 1.8; color: var(--ink2);
-      position: relative; z-index: 1;
-    }
-    .origin-text .reveal-word {
-      display: inline;
-      opacity: 0; transition: opacity 0.4s ease;
-    }
-    .origin-text .reveal-word.vis { opacity: 1; }
-    .origin-cite {
-      margin-top: 24px; font-family: var(--mono); font-size: 10px;
-      letter-spacing: 2px; color: var(--muted);
-      position: relative; z-index: 1; font-style: normal;
-    }
-
-    /* ═══════════════════════════════
-       FACTS STRIP
-    ═══════════════════════════════ */
-    .facts-strip {
-      background: var(--ink); padding: 56px;
-      display: flex; justify-content: center; gap: 72px;
-      flex-wrap: wrap; margin: 0;
-    }
-    .fact-item { text-align: center; }
-    .fact-num { font-family: var(--disp); font-size: clamp(44px,5.5vw,68px); color: var(--paper); line-height: 1; }
-    .fact-num span { color: var(--teal); }
-    .fact-desc { font-family: var(--mono); font-size: 10px; letter-spacing: 2px; color: rgba(246,241,233,0.3); margin-top: 6px; }
-
-    /* ═══════════════════════════════
-       PHASE 5 — EXPERIENCES (Film wall)
-    ═══════════════════════════════ */
-    .experiences {
-      max-width: 1120px; margin: 0 auto 96px; padding: 80px 56px 0;
-    }
-    .section-header { margin-bottom: 40px; }
-    .section-eyebrow {
-      font-family: var(--mono); font-size: 10px; letter-spacing: 4px;
-      color: var(--teal); margin-bottom: 10px;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .section-eyebrow::before { content:''; width:20px; height:1px; background:var(--teal); }
-    .section-title {
-      font-family: var(--disp); font-size: clamp(40px,6vw,72px);
-      color: var(--ink); line-height: 0.95; margin-bottom: 10px;
-    }
-    .section-poem-line {
-      font-size: 14px; font-style: italic; color: var(--muted); line-height: 1.6;
-    }
-
-    /* Tab switcher — ink fill */
-    .exp-tabs {
-      display: flex; gap: 0; margin-bottom: 36px;
-      position: relative; border-bottom: 1px solid var(--faint);
-    }
-    .exp-tab {
-      position: relative; padding: 13px 28px;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
-      color: var(--muted); cursor: pointer; background: none; border: none;
-      transition: color 0.3s; overflow: hidden; z-index: 1;
-    }
-    .exp-tab::before {
-      content: ''; position: absolute; inset: 0;
-      background: var(--ink);
-      transform: translateY(100%);
-      transition: transform 0.35s cubic-bezier(0.4,0,0.2,1); z-index: -1;
-    }
-    .exp-tab:hover::before { transform: translateY(55%); }
-    .exp-tab:hover { color: var(--paper); }
-    .exp-tab.active { color: var(--paper); }
-    .exp-tab.active::before { transform: translateY(0); }
-    .exp-tab::after {
-      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
-      height: 2px; background: var(--teal);
-      transform: scaleX(0); transition: transform 0.35s ease; z-index: 2;
-    }
-    .exp-tab.active::after { transform: scaleX(1); }
-    .exp-tab .tab-icon { display: inline-block; margin-right: 7px; font-size: 12px; }
-
-    /* Tab poem line */
-    .tab-poem {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      color: var(--teal); margin-bottom: 20px; font-style: italic;
-    }
-
-    /* Reel */
-    .reel-wrap { display: none; flex-direction: column; }
-    .reel-wrap.active { display: flex; animation: reelIn 0.4s ease forwards; }
-    @keyframes reelIn { from{opacity:0;transform:translateY(10px)} to{opacity:1;transform:translateY(0)} }
-
-    /* Film strip with tilted photos */
-    .sprocket-row { display: flex; background: var(--ink); padding: 5px 0; }
-    .sprocket { flex: 0 0 60px; display: flex; align-items: center; justify-content: center; }
-    .sprocket-hole { width: 22px; height: 14px; border-radius: 3px; background: var(--paper2); opacity: 0.15; }
-    .film-track-outer {
-      background: var(--ink); overflow-x: auto; overflow-y: visible;
-      scrollbar-width: none; -webkit-overflow-scrolling: touch; cursor: grab;
-      padding: 16px 24px;
-    }
-    .film-track-outer:active { cursor: grabbing; }
-    .film-track-outer::-webkit-scrollbar { display: none; }
-    .film-track { display: flex; gap: 20px; width: max-content; align-items: flex-end; }
-
-    /* Each photo is a tilted print */
-    .film-frame {
-      flex-shrink: 0; cursor: pointer; position: relative;
-      transition: transform 0.25s, z-index 0s;
-    }
-    .film-frame:nth-child(odd)  { transform: rotate(-2.2deg); }
-    .film-frame:nth-child(even) { transform: rotate(1.8deg); }
-    .film-frame:nth-child(3n)   { transform: rotate(-0.8deg); }
-    .film-frame:hover {
-      transform: rotate(0deg) scale(1.06) translateY(-6px) !important;
-      z-index: 10;
-    }
-
-    .film-print {
-      width: 180px; background: #FEFCF8;
-      padding: 8px 8px 36px;
-      box-shadow: 3px 4px 16px rgba(28,17,9,0.22), 0 1px 0 rgba(28,17,9,0.1);
-    }
-    .film-img-wrap { width: 100%; height: 144px; overflow: hidden; position: relative; }
-    .film-img-wrap img { width:100%; height:100%; object-fit:cover; display:block; filter:sepia(8%); }
-    .film-grain {
-      position: absolute; inset: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay; opacity: 0.5;
-    }
-    .film-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.35) 0%, transparent 50%); }
-    .film-loc { position: absolute; bottom: 6px; left: 8px; font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: rgba(255,255,255,0.75); }
-    .film-placeholder { background: rgba(246,241,233,0.06); display:flex; align-items:center; justify-content:center; }
-    .film-ph-text { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.2); text-align:center; line-height:2; }
-
-    .film-caption {
-      padding: 6px 4px 0; text-align: center;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      color: var(--muted); /* handwritten feel */
-    }
-    .film-frame.active .film-print { box-shadow: 3px 4px 16px rgba(46,139,122,0.3), 0 0 0 2px var(--teal); }
-
-    /* ─ Lightbox — postcard lift-off ─ */
-    .lightbox {
-      position: fixed; inset: 0; z-index: 3000;
-      background: rgba(28,17,9,0); display: flex; align-items: center;
-      justify-content: center; padding: 24px;
-      pointer-events: none; transition: background 0.4s;
-    }
-    .lightbox.open { background: rgba(28,17,9,0.82); pointer-events: auto; }
-
-    .lb-panel {
-      width: 100%; max-width: 900px; max-height: 90vh;
-      background: #FDFAF4;
-      border-radius: 3px;
-      overflow: hidden;
-      transform: scale(0.88) translateY(28px); opacity: 0;
-      transition: transform 0.42s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease;
-      display: grid; grid-template-columns: 1fr 1fr;
-      box-shadow: 12px 16px 64px rgba(28,17,9,0.35), 0 2px 0 rgba(28,17,9,0.12);
-      position: relative;
-    }
-    /* Ruled lines on right side */
-    .lb-panel::after {
-      content: ''; position: absolute; right: 0; top: 0; bottom: 0; width: 50%;
-      background: repeating-linear-gradient(
-        to bottom, transparent, transparent 31px,
-        rgba(28,17,9,0.04) 31px, rgba(28,17,9,0.04) 32px
-      );
-      pointer-events: none;
-    }
-    .lightbox.open .lb-panel { transform: scale(1) translateY(0); opacity: 1; }
-
-    .lb-img-col { position: relative; overflow: hidden; min-height: 420px; }
-    .lb-img-col img { width:100%; height:100%; object-fit:cover; display:block; filter:sepia(8%); }
-    .lb-img-overlay { position:absolute; inset:0; background: linear-gradient(to right, transparent 55%, #FDFAF4 100%); }
-    .lb-img-placeholder { background:var(--paper2); width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--muted); }
-    .lb-loc-badge { position:absolute; bottom:20px; left:20px; font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(255,255,255,0.85); background:rgba(0,0,0,0.35); padding:4px 10px; border-radius:2px; }
-
-    .lb-text-col { padding: 40px 36px 32px; overflow-y: auto; display: flex; flex-direction: column; position: relative; z-index: 1; }
-    /* Red margin line */
-    .lb-text-col::before { content:''; position:absolute; left:24px; top:0; bottom:0; width:1px; background:rgba(212,121,42,0.25); }
-    .lb-close { position:absolute; top:16px; right:18px; font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted); cursor:pointer; background:none; border:none; transition:color 0.2s; z-index:10; }
-    .lb-close:hover { color:var(--ink); }
-    .lb-tab-label { font-family:var(--mono); font-size:9px; letter-spacing:3px; color:var(--teal); margin-bottom:14px; }
-    .lb-title { font-family:var(--disp); font-size:clamp(26px,3.2vw,44px); color:var(--ink); line-height:1; margin-bottom:20px; }
-    .lb-story { font-size:14px; line-height:1.9; color:var(--ink2); flex:1; }
-    .lb-story p { margin-bottom:14px; }
-    .lb-nav { display:flex; gap:10px; margin-top:24px; padding-top:18px; border-top:1px solid var(--faint); }
-    .lb-nav-btn { font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted); background:none; border:1px solid var(--faint); padding:7px 16px; border-radius:2px; cursor:pointer; transition:all 0.2s; }
-    .lb-nav-btn:hover { color:var(--teal); border-color:var(--teal); }
-
-    /* ═══════════════════════════════
-       PHASE 5b — FLIGHTS
-    ═══════════════════════════════ */
-    .flights-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
-
-    /* Boarding pass cards */
-    .boarding-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(320px,1fr)); gap:16px; margin-bottom:48px; }
-    .boarding-pass {
-      background:#FEFCF8; border:1px solid var(--paper3);
-      border-radius:3px; overflow:hidden;
-      display:grid; grid-template-columns:1fr auto;
-      box-shadow:2px 3px 12px rgba(28,17,9,0.08);
-      transition:transform 0.2s, box-shadow 0.2s;
-    }
-    .boarding-pass:hover { transform:translateY(-2px); box-shadow:4px 6px 20px rgba(28,17,9,0.13); }
-    .bp-main { padding:16px 14px 14px; }
-    .bp-airline-bar {
-      height: 3px; width: 100%; margin-bottom: 10px;
-      background: linear-gradient(to right, var(--teal), var(--gold));
-    }
-    .bp-route { display:flex; align-items:center; gap:8px; margin-bottom:6px; }
-    .bp-iata { font-family:var(--disp); font-size:36px; color:var(--ink); line-height:1; letter-spacing:1px; }
-    .bp-arrow { color:var(--amber); font-size:14px; }
-    .bp-cities { font-family:var(--mono); font-size:9px; letter-spacing:1px; color:var(--muted); margin-bottom:8px; }
-    .bp-meta { display:flex; gap:12px; flex-wrap:wrap; }
-    .bp-meta-item { font-family:var(--mono); font-size:9px; letter-spacing:1px; }
-    .bp-meta-label { color:var(--muted); display:block; }
-    .bp-meta-val { color:var(--ink2); }
-    /* Perforation */
-    .bp-stub {
-      width:64px; background:var(--paper2);
-      border-left:2px dashed var(--paper3);
-      display:flex; flex-direction:column; align-items:center;
-      justify-content:center; padding:8px 6px; gap:4px;
-    }
-    .bp-stub-date { font-family:var(--mono); font-size:8px; letter-spacing:1px; color:var(--muted); writing-mode:vertical-rl; transform:rotate(180deg); }
-    .bp-stub-miles { font-family:var(--disp); font-size:16px; color:var(--teal); }
-    .bp-stub-mi { font-family:var(--mono); font-size:7px; color:var(--muted); letter-spacing:1px; }
-
-    /* ── AIRPORTS SECTION ── */
-    .airports-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
-    .airport-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px; margin-top: 8px;
-    }
-    /* First card spans 2 rows tall */
-    .airport-card:first-child { grid-row: span 2; }
-
-    .airport-card {
-      position: relative; overflow: hidden;
-      border-radius: 3px; cursor: pointer;
-      min-height: 260px;
-      background: var(--ink);
-    }
-    .airport-card:first-child { min-height: 100%; }
-
-    /* Hero photo */
-    .airport-photo {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
-      filter: brightness(0.65) saturate(0.9);
-    }
-    .airport-card:hover .airport-photo {
-      transform: scale(1.05);
-      filter: brightness(0.45) saturate(0.8);
-    }
-
-    /* Dark vignette gradient */
-    .airport-vignette {
-      position: absolute; inset: 0;
-      background: linear-gradient(
-        to top,
-        rgba(12,6,2,0.92) 0%,
-        rgba(12,6,2,0.4)  45%,
-        transparent       75%
-      );
-      transition: background 0.4s;
-    }
-    .airport-card:hover .airport-vignette {
-      background: linear-gradient(
-        to top,
-        rgba(12,6,2,0.96) 0%,
-        rgba(12,6,2,0.7)  55%,
-        rgba(12,6,2,0.2)  100%
-      );
-    }
-
-    /* Content layer */
-    .airport-content {
-      position: absolute; inset: 0;
-      display: flex; flex-direction: column; justify-content: flex-end;
-      padding: 22px 22px 20px;
-    }
-    .airport-code {
-      font-family: var(--disp); font-size: 54px;
-      color: rgba(246,241,233,0.95); line-height: 1; letter-spacing: 2px;
-      margin-bottom: 2px;
-    }
-    .airport-card:first-child .airport-code { font-size: 72px; }
-    .airport-name {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.45); margin-bottom: 8px;
-    }
-    .airport-visits {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
-      color: var(--gold); margin-bottom: 10px;
-    }
-    .airport-visits::before { content:''; width:16px; height:1px; background:var(--gold); }
-
-    /* Story — hidden, slides up on hover */
-    .airport-story-text {
-      font-size: 12px; line-height: 1.7;
-      color: rgba(246,241,233,0.7);
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.5s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
-      opacity: 0;
-    }
-    .airport-card:hover .airport-story-text {
-      max-height: 180px;
-      opacity: 1;
-    }
-    .airport-card:first-child .airport-story-text { max-height: 0; }
-    .airport-card:first-child:hover .airport-story-text { max-height: 240px; }
-
-    /* Read more hint */
-    .airport-hint {
-      position: absolute; top: 16px; right: 16px;
-      font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.25); transition: color 0.3s;
-    }
-    .airport-card:hover .airport-hint { color: rgba(246,241,233,0.5); }
-
-    /* Photo credit */
-    .airport-credit {
-      position: absolute; bottom: 10px; right: 14px;
-      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
-      color: rgba(246,241,233,0.2);
-    }
-
-    @media(max-width:768px){
-      .airport-grid { grid-template-columns: 1fr 1fr; }
-      .airport-card:first-child { grid-row: span 1; }
-    }
-
-    /* ── BOARDING PASS DECK ── */
-    .bp-deck-wrap {
-      position: relative; margin-bottom: 56px;
-    }
-    .bp-stack {
-      display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-      gap: 20px;
-    }
-    /* Individual pass */
-    .bp-card {
-      background: #FEFCF8;
-      border: 1px solid var(--paper3);
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 2px 3px 14px rgba(28,17,9,0.09);
-      cursor: pointer;
-      transition: transform 0.2s, box-shadow 0.25s;
-      user-select: none;
-    }
-    .bp-card:hover { transform: translateY(-3px) rotate(0.3deg); box-shadow: 5px 8px 28px rgba(28,17,9,0.15); }
-    .bp-card.open  { box-shadow: 6px 10px 36px rgba(28,17,9,0.18); z-index: 5; }
-
-    /* Airline colour bar */
-    .bp-bar { height: 4px; width: 100%; background: linear-gradient(to right, var(--teal), var(--gold)); }
-
-    /* Main face */
-    .bp-face { padding: 16px 16px 0; }
-    .bp-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
-    .bp-flight-no { font-family: var(--mono); font-size: 11px; letter-spacing: 2px; color: var(--teal); }
-    .bp-date-badge {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 1px;
-      color: var(--muted); background: var(--paper2);
-      padding: 2px 8px; border-radius: 2px;
-    }
-
-    /* Giant route */
-    .bp-route-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-    .bp-iata-big { font-family: var(--disp); font-size: 48px; color: var(--ink); line-height: 1; letter-spacing: 1px; }
-    .bp-route-mid { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-    .bp-route-line { width: 100%; height: 1px; background: repeating-linear-gradient(to right, var(--paper3) 0, var(--paper3) 5px, transparent 5px, transparent 10px); position: relative; }
-    .bp-route-plane { font-size: 14px; color: var(--amber); }
-    .bp-cities-row { display: flex; justify-content: space-between; margin-bottom: 12px; }
-    .bp-city-name { font-family: var(--mono); font-size: 9px; letter-spacing: 1px; color: var(--muted); }
-
-    /* Meta strip */
-    .bp-meta-strip {
-      display: flex; gap: 0; border-top: 1px dashed var(--paper3);
-      margin: 0 -16px;
-    }
-    .bp-meta-cell {
-      flex: 1; padding: 8px 12px; border-right: 1px dashed var(--paper3);
-      text-align: center;
-    }
-    .bp-meta-cell:last-child { border-right: none; }
-    .bp-meta-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); display: block; margin-bottom: 2px; }
-    .bp-meta-val   { font-family: var(--mono); font-size: 11px; color: var(--ink2); }
-    .bp-meta-val.teal { color: var(--teal); }
-
-    /* Expand toggle */
-    .bp-toggle {
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 8px; background: var(--paper2);
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: var(--muted);
-      border-top: 1px solid var(--faint);
-    }
-    .bp-toggle-arrow { transition: transform 0.3s; display: inline-block; }
-    .bp-card.open .bp-toggle-arrow { transform: rotate(180deg); }
-
-    /* Expanded detail */
-    .bp-detail {
-      max-height: 0; overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4,0,0.2,1);
-      background: var(--paper);
-    }
-    .bp-card.open .bp-detail { max-height: 400px; }
-    .bp-detail-inner { padding: 16px 16px 18px; }
-    .bp-detail-title {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: var(--teal); margin-bottom: 12px; padding-bottom: 8px;
-      border-bottom: 1px solid var(--faint);
-    }
-    .bp-detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .bp-detail-item { display: flex; flex-direction: column; gap: 2px; }
-    .bp-detail-label { font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--muted); }
-    .bp-detail-value { font-size: 12px; color: var(--ink2); }
-    .bp-detail-value.mono { font-family: var(--mono); font-size: 11px; }
-
-    /* Route map mini (SVG inline) */
-    .bp-route-mini {
-      margin-top: 12px; padding-top: 12px;
-      border-top: 1px dashed var(--paper3);
-      display: flex; align-items: center; gap: 8px;
-      font-family: var(--mono); font-size: 10px; color: var(--muted);
-    }
-    .bp-route-mini-line {
-      flex: 1; height: 2px; position: relative;
-      background: repeating-linear-gradient(to right,var(--teal) 0,var(--teal) 4px,transparent 4px,transparent 8px);
-    }
-    .bp-route-mini-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
-    .bp-notes {
-      margin-top: 10px; font-size: 12px; font-style: italic;
-      color: var(--muted); line-height: 1.5;
-    }
-
-    /* Perforated tear between face and stub */
-    .bp-perf {
-      border: none; border-top: 2px dashed var(--paper3);
-      margin: 0;
-    }
-
-    /* Flight log table */
-    .flight-log-wrap { overflow-x:auto; border-radius:4px; border:1px solid var(--faint); }
-    table { width:100%; border-collapse:collapse; font-size:13px; }
-    thead th { background:var(--ink); color:rgba(246,241,233,0.5); font-family:var(--mono); font-size:9px; letter-spacing:2px; padding:13px 18px; text-align:left; font-weight:400; }
-    tbody tr { border-bottom:1px solid var(--faint); transition:background 0.15s; }
-    tbody tr:last-child { border-bottom:none; }
-    tbody tr:hover { background:var(--teal2); }
-    tbody td { padding:12px 18px; color:var(--ink2); vertical-align:middle; }
-    td.route { font-family:var(--mono); font-size:12px; color:var(--ink); letter-spacing:0.5px; }
-    td.airline { color:var(--muted); font-size:12px; }
-    td.date { font-family:var(--mono); font-size:11px; color:var(--muted); }
-    td.miles { font-family:var(--mono); font-size:11px; color:var(--teal); }
-    td.aircraft { font-size:11px; color:var(--muted); }
-
-    /* Flight stats */
-    .flight-stats { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr)); gap:2px; margin-bottom:40px; }
-    .fs-block { background:var(--paper2); padding:22px 18px; text-align:center; border:1px solid var(--faint); }
-    .fs-block:first-child { border-radius:4px 0 0 4px; }
-    .fs-block:last-child  { border-radius:0 4px 4px 0; }
-    .fs-num { font-family:var(--disp); font-size:clamp(28px,3.5vw,44px); color:var(--ink); line-height:1; }
-    .fs-num span { color:var(--teal); }
-    .fs-label { font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--muted); margin-top:5px; }
-
-    /* ═══════════════════════════════
-       PHASE 6 — CAFES (receipts)
-    ═══════════════════════════════ */
-    .cafes-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
-    .cafe-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
-
-    .cafe-receipt {
-      background:#FEFEFE;
-      border:1px solid var(--paper3);
-      border-radius:2px;
-      padding:0;
-      box-shadow: 2px 3px 12px rgba(28,17,9,0.07), 0 -2px 6px rgba(28,17,9,0.03);
-      transition:transform 0.25s, box-shadow 0.25s;
-      overflow:hidden;
-      position:relative;
-    }
-    .cafe-receipt:hover { transform:translateY(-3px); box-shadow:4px 8px 24px rgba(28,17,9,0.12); }
-    /* Thermal paper top curl effect */
-    .cafe-receipt::before {
-      content:''; position:absolute; top:0; left:0; right:0; height:4px;
-      background: linear-gradient(to bottom, rgba(28,17,9,0.04), transparent);
-    }
-    /* Perforation line */
-    .receipt-perf {
-      border-top:2px dashed var(--paper3);
-      margin:0 8px;
-    }
-    .receipt-header {
-      padding:18px 18px 12px;
-      text-align:center;
-      border-bottom:1px solid var(--paper3);
-    }
-    .receipt-type { font-family:var(--mono); font-size:8px; letter-spacing:2.5px; color:var(--teal); margin-bottom:6px; }
-    .receipt-name { font-family:var(--disp); font-size:28px; color:var(--ink); line-height:1; }
-    .receipt-city { font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:var(--muted); margin-top:3px; }
-    .receipt-body { padding:14px 18px; }
-    .receipt-line {
-      display:flex; justify-content:space-between; align-items:baseline;
-      font-family:var(--mono); font-size:11px; padding:3px 0;
-      border-bottom:1px dotted rgba(28,17,9,0.07);
-    }
-    .receipt-line:last-child { border-bottom:none; }
-    .rl-label { color:var(--muted); font-size:10px; letter-spacing:1px; }
-    .rl-val   { color:var(--ink2); text-align:right; max-width:55%; font-size:11px; }
-    .receipt-vibe {
-      padding:10px 18px; font-style:italic; font-size:12px;
-      color:var(--muted); line-height:1.6;
-      border-top:1px dashed var(--paper3);
-    }
-    .receipt-story-wrap {
-      padding:0 18px; max-height:0; overflow:hidden;
-      transition:max-height 0.4s ease, padding 0.3s ease;
-    }
-    .receipt-story-wrap.open { max-height:300px; padding:12px 18px; }
-    .receipt-story { font-size:12px; line-height:1.75; color:var(--muted); }
-    .receipt-footer {
-      padding:10px 18px 14px;
-      display:flex; align-items:center; justify-content:space-between;
-      border-top:1px solid var(--paper3);
-    }
-    .receipt-rating { color:var(--gold); font-size:14px; letter-spacing:2px; }
-    .receipt-expand {
-      font-family:var(--mono); font-size:9px; letter-spacing:1.5px;
-      color:var(--teal); background:none; border:none; cursor:pointer;
-      transition:color 0.2s; padding:0;
-    }
-    .receipt-expand:hover { color:var(--amber); }
-
-    /* ═══════════════════════════════
-       PHASE 7 — COUNTRIES (stamps)
-    ═══════════════════════════════ */
-    .countries-section { max-width:1120px; margin:0 auto 0; padding:0 56px 80px; }
-    .stamps-grid {
-      display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
-      gap:16px; margin-top:32px;
-    }
-    .stamp {
-      background:#FEFCF8;
-      border:1px solid var(--paper3);
-      padding:10px 8px 8px;
-      text-align:center; cursor:default;
-      position:relative; overflow:hidden;
-      transition:transform 0.2s, box-shadow 0.2s;
-      box-shadow: 1px 2px 8px rgba(28,17,9,0.07);
-      animation: stampFill 0.4s ease both;
-    }
-    @keyframes stampFill {
-      from { opacity:0; transform:scale(0.85) rotate(var(--stamp-rot,0deg)); }
-      to   { opacity:1; transform:scale(1)    rotate(var(--stamp-rot,0deg)); }
-    }
-    .stamp:hover { transform:scale(1.06) rotate(0deg) !important; box-shadow:3px 4px 16px rgba(28,17,9,0.14); z-index:2; }
-    /* Perforation border */
-    .stamp::before {
-      content:''; position:absolute; inset:4px;
-      border:1px dashed rgba(28,17,9,0.1); pointer-events:none;
-    }
-    .stamp-flag { width:44px; height:29px; object-fit:cover; border-radius:1px; margin:0 auto 7px; display:block; }
-    .stamp-name { font-family:var(--mono); font-size:8px; letter-spacing:1px; color:var(--ink2); line-height:1.3; }
-    .stamp-status {
-      display:inline-block; font-family:var(--mono); font-size:7px; letter-spacing:1px;
-      padding:1px 5px; border-radius:1px; margin-top:4px;
-    }
-    .stamp-status.visited   { background:var(--teal2); color:var(--teal); }
-    .stamp-status.transiting { background:var(--gold2); color:var(--amber); }
-    .stamp-emoji { font-size:13px; position:absolute; top:6px; right:7px; }
-
-    /* ═══════════════════════════════
-       PHASE 7 — CLOSING POEM
-    ═══════════════════════════════ */
-    .closing-section {
-      background:var(--dark);
-      padding:96px 56px;
-      text-align:center;
-      position:relative; overflow:hidden;
-    }
-    .closing-section::before {
-      content:''; position:absolute; inset:0;
-      background: radial-gradient(ellipse 80% 60% at 50% 50%, rgba(46,139,122,0.06) 0%, transparent 70%);
-      pointer-events:none;
-    }
-    .closing-globe-mini {
-      width:200px; height:200px; margin:0 auto 48px;
-      position:relative;
-    }
-    #closingCanvas { width:100%; height:100%; border-radius:50%; overflow:hidden; }
-
-    .closing-poem { position:relative; z-index:1; }
-    .poem-couplet {
-      margin-bottom:32px; opacity:0; transform:translateY(14px);
-      transition:opacity 0.7s ease, transform 0.7s ease;
-    }
-    .poem-couplet.vis { opacity:1; transform:translateY(0); }
-    .poem-urdu {
-      font-size:clamp(13px,1.8vw,18px); color:rgba(200,145,58,0.4);
-      letter-spacing:2px; margin-bottom:4px; font-family:var(--serif); font-style:italic;
-    }
-    .poem-english {
-      font-size:clamp(13px,1.6vw,16px); color:rgba(246,241,233,0.5);
-      font-family:var(--mono); letter-spacing:1px;
-    }
-    .poem-final {
-      margin-top:48px; opacity:0; transform:translateY(20px);
-      transition:opacity 1s ease 0.3s, transform 1s ease 0.3s;
-    }
-    .poem-final.vis { opacity:1; transform:translateY(0); }
-    .poem-final-line {
-      font-family:var(--disp); font-size:clamp(36px,6vw,82px);
-      color:var(--paper); letter-spacing:3px; line-height:1;
-    }
-    .poem-final-line .gold { color:var(--gold); }
-    .poem-final-sub {
-      margin-top:16px; font-family:var(--mono); font-size:11px;
-      letter-spacing:3px; color:rgba(246,241,233,0.3);
-    }
-    .closing-count {
-      margin-top:48px; font-family:var(--mono); font-size:12px;
-      letter-spacing:3px; color:rgba(46,139,122,0.6);
-    }
-    .closing-count span { color:var(--teal); }
-
-    /* ═══════════════════════════════
-       FOOTER
-    ═══════════════════════════════ */
-    .page-footer {
-      background:var(--ink); padding:44px 56px;
-      display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:20px;
-    }
-    .footer-name { font-family:var(--disp); font-size:22px; color:var(--paper); letter-spacing:2px; }
-    .footer-links { display:flex; gap:24px; }
-    .footer-links a { font-family:var(--mono); font-size:11px; letter-spacing:1px; color:rgba(246,241,233,0.3); text-decoration:none; transition:color 0.2s; }
-    .footer-links a:hover { color:var(--teal); }
-
-    /* ═══════════════════════════════
-       SOCIAL BAR + TERMINAL
-    ═══════════════════════════════ */
-    .social-bar { position:fixed; top:50%; left:0; transform:translateY(-50%); z-index:400; display:flex; flex-direction:column; gap:20px; background:rgba(246,241,233,0.92); padding:16px 10px; border-radius:0 20px 20px 0; box-shadow:0 4px 24px rgba(28,17,9,0.1); }
-    .social-bar a { display:flex; align-items:center; justify-content:center; opacity:0.65; transition:opacity 0.2s, transform 0.2s; }
-    .social-bar a:hover { opacity:1; transform:scale(1.12); }
-    .social-bar svg { display:block; width:32px; height:32px; }
-
-    .term-trigger { position:fixed; top:50%; right:0; transform:translateY(-50%); z-index:400; display:flex; flex-direction:column; align-items:center; gap:12px; padding:16px 10px; background:rgba(246,241,233,0.92); border-radius:20px 0 0 20px; box-shadow:0 4px 24px rgba(28,17,9,0.1); cursor:pointer; border:none; transition:background 0.2s; }
-    .term-trigger:hover { background:rgba(246,241,233,1); }
-    .term-trigger svg { display:block; width:32px; height:32px; }
-    .term-trigger-dot { width:7px; height:7px; border-radius:50%; background:var(--teal); box-shadow:0 0 6px var(--teal); animation:tpulse 2.4s ease-in-out infinite; }
-    @keyframes tpulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.7)} }
-    .term-trigger-label { font-family:var(--mono); font-size:8px; letter-spacing:3px; color:var(--muted); writing-mode:vertical-rl; }
-    .term-trigger.away { opacity:0; pointer-events:none; }
-
-    .term-backdrop { position:fixed; inset:0; z-index:700; background:rgba(246,241,233,0.5); backdrop-filter:blur(3px); opacity:0; pointer-events:none; transition:opacity 0.4s; }
-    .term-backdrop.open { opacity:1; pointer-events:auto; }
-    .term-drawer { position:fixed; top:0; right:0; width:min(460px,92vw); height:100vh; z-index:800; transform:translateX(102%); transition:transform 0.42s cubic-bezier(0.4,0,0.2,1); display:flex; flex-direction:column; background:#0d1117; box-shadow:-8px 0 48px rgba(0,0,0,0.2); font-family:var(--mono); }
-    .term-drawer.open { transform:translateX(0); }
-    .term-bar { background:#161b22; padding:11px 18px; display:flex; align-items:center; gap:8px; border-bottom:1px solid rgba(255,255,255,0.05); flex-shrink:0; }
-    .td{width:11px;height:11px;border-radius:50%;cursor:pointer}
-    .td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
-    .t-title{font-size:11px;color:rgba(255,255,255,0.25);letter-spacing:1.5px;margin-left:6px}
-    .t-clock{margin-left:auto;font-size:11px;color:rgba(46,139,122,0.5)}
-    .term-body{flex:1;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:2px}
-    .term-body::-webkit-scrollbar{width:3px}
-    .term-body::-webkit-scrollbar-thumb{background:rgba(91,192,190,0.2);border-radius:2px}
-    .tl{font-size:12px;line-height:1.85}.tl.out{padding-left:14px}.tl.gap{height:8px}.tl.pl{display:flex;gap:8px}
-    .tps{color:#5bc0be;font-size:11px;flex-shrink:0}.tc{color:#e6edf3}
-    .ct{color:#5bc0be}.cd{color:rgba(230,237,243,0.28)}.cm{color:rgba(230,237,243,0.6)}
-    .cw{color:#e6edf3;font-weight:600}.cok{color:#3fb950}.cerr{color:#f85149}.camb{color:#d29922}
-    .clnk{color:#58a6ff;cursor:pointer;text-decoration:underline}
-    .chip-row{display:flex;flex-wrap:wrap;gap:7px;padding:8px 0 8px 14px}
-    .chip{font-size:11px;padding:5px 14px;border-radius:4px;cursor:pointer;font-family:var(--mono);letter-spacing:0.5px;border:1px solid rgba(91,192,190,0.25);background:rgba(91,192,190,0.07);color:#5bc0be;transition:background 0.15s}
-    .chip:hover{background:rgba(91,192,190,0.18);border-color:#5bc0be}
-    .chip.s{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.4)}
-    .chip.s:hover{background:rgba(255,255,255,0.07);color:rgba(255,255,255,0.7)}
-    .hint-row{display:flex;flex-wrap:wrap;gap:16px;padding:4px 0 4px 14px}
-    .hint{font-size:10px;color:rgba(255,255,255,0.18)}.hint span{color:rgba(91,192,190,0.45)}
-    .term-foot{padding:13px 18px;flex-shrink:0;border-top:1px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px;background:#0d1117}
-    .t-ps{color:#5bc0be;font-size:12px;flex-shrink:0}
-    .t-in{flex:1;background:transparent;border:none;outline:none;color:#e6edf3;font-family:var(--mono);font-size:12px;caret-color:#5bc0be}
-    .t-in::placeholder{color:rgba(255,255,255,0.12)}
-    .t-cur{width:7px;height:13px;border-radius:1px;background:#5bc0be;animation:blink 1s step-end infinite}
-    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
-
-    /* ── FLEET GRID (aircraft heroes) ── */
-    .fleet-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 3px; margin-bottom: 48px;
-    }
-    .fleet-card {
-      position: relative; overflow: hidden;
-      border-radius: 3px; min-height: 220px;
-      background: var(--ink); cursor: default;
-    }
-    .fleet-card:first-child { grid-row: span 2; min-height: 100%; }
-    .fleet-photo {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      transition: transform 0.6s cubic-bezier(0.4,0,0.2,1), filter 0.4s ease;
-      filter: brightness(0.6) saturate(0.85) sepia(8%);
-    }
-    .fleet-card:hover .fleet-photo {
-      transform: scale(1.04);
-      filter: brightness(0.42) saturate(0.75);
-    }
-    .fleet-vignette {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(28,17,9,0.94) 0%, rgba(28,17,9,0.35) 50%, transparent 80%);
-      transition: background 0.4s;
-    }
-    .fleet-card:hover .fleet-vignette {
-      background: linear-gradient(to top, rgba(28,17,9,0.97) 0%, rgba(28,17,9,0.6) 55%, rgba(28,17,9,0.1) 100%);
-    }
-    .fleet-content {
+Expand 460 hidden lines
+};
+ 
+let logExpanded=false;
+window.togglePassport=function(){
+  const wrap=document.getElementById('airportGridWrap');
+  const edge=document.getElementById('passportFoldEdge');
+  const label=document.getElementById('foldLabelText');
+  const arrow=document.getElementById('foldArrow');
+  const isOpen=wrap.classList.toggle('open');
+  edge.classList.toggle('open',isOpen);
+  if(label) label.textContent=isOpen?'FOLD PASSPORT':'UNFOLD PASSPORT';
+  if(arrow) arrow.textContent=isOpen?'▴':'▾';
+};
+ 
+window.toggleFlightLog=function(){
+  logExpanded=!logExpanded;
+  const wrap=document.getElementById('flightLogWrap');const arrow=document.getElementById('logArrow');const btn=document.getElementById('logToggleBtn');
       position: absolute; inset: 0;
       display: flex; flex-direction: column; justify-content: flex-end;
       padding: 18px 20px 16px;
@@ -1206,7 +337,7 @@
       .fleet-grid { grid-template-columns: 1fr 1fr; }
       .fleet-card:first-child { grid-row: span 1; }
     }
-
+ 
     /* ── BOARDING PASS STACK PEEK ── */
     .bp-stack-peek {
       position: relative; height: 80px; cursor: pointer;
@@ -1249,7 +380,7 @@
       transition: transform 0.3s;
     }
     .bp-peek-arrow.open { transform: rotate(180deg); }
-
+ 
     /* ── EXPAND BUTTON ── */
     .expand-btn {
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
@@ -1261,11 +392,11 @@
     .expand-btn:hover { color: var(--teal); border-color: var(--teal); }
     .expand-btn-arrow { transition: transform 0.3s; display: inline-block; font-size: 11px; }
     .expand-btn-arrow.open { transform: rotate(180deg); }
-
+ 
     /* Loading skeleton */
     .skel { background:linear-gradient(90deg,var(--paper2) 25%,var(--paper3) 50%,var(--paper2) 75%); background-size:200% 100%; animation:skelShimmer 1.5s infinite; border-radius:3px; }
     @keyframes skelShimmer { to{background-position:-200% 0} }
-
+ 
     /* Responsive */
     @media(max-width:768px){
       .hero,.globe-inner,.flights-section,.experiences,.cafes-section,.countries-section,.closing-section{padding-left:20px;padding-right:20px}
@@ -1283,7 +414,7 @@
   </style>
 </head>
 <body>
-
+ 
 <!-- ══════════════════════════════
      INTRO — The Awakening
 ══════════════════════════════ -->
@@ -1292,7 +423,7 @@
   <div class="intro-postcard-bg"></div>
   <div class="intro-urdu">تو زندہ ہو تم</div>
   <div class="intro-beam"></div>
-
+ 
   <div class="intro-lines">
     <p class="il sm" id="il1">I grew up in a small town in India.</p>
     <p class="il sm" id="il2">Our world was the street, the school, the neighbours.</p>
@@ -1305,21 +436,21 @@
     <p class="il proof" id="il6">TOH ZINDA HO TUM.</p>
     <p class="il tag" id="il7">53 COUNTRIES · 7 CONTINENTS · STILL COUNTING</p>
   </div>
-
+ 
   <div class="intro-tear"><div class="tear-paper"></div></div>
   <div class="intro-skip" id="introSkip">TAP ANYWHERE →</div>
 </div>
-
+ 
 <!-- ══════════════════════════════
      PAGE
 ══════════════════════════════ -->
 <div id="page">
-
+ 
   <nav class="top-nav" id="topNav">
     <a class="nav-logo" href="index.html">AR // NOMAD</a>
     <a class="nav-back" href="index.html">← HOME</a>
   </nav>
-
+ 
   <!-- ── HERO ── -->
   <section class="hero">
     
@@ -1350,7 +481,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- Thumbtack photo -->
     <div class="hero-avatar-wrap">
       <div class="thumbtack"></div>
@@ -1358,7 +489,7 @@
       <div class="avatar-caption">ANURAAG · NOMAD</div>
     </div>
   </section>
-
+ 
   <!-- ── GLOBE ── -->
   <section class="globe-section">
     <div class="globe-outer">
@@ -1387,7 +518,7 @@
       </div>
     </div>
   </section>
-
+ 
   <!-- ── ORIGIN POSTCARD ── -->
   <section class="origin-section">
     <div class="origin-inner">
@@ -1414,7 +545,7 @@
       </div>
     </div>
   </section>
-
+ 
   <!-- ── FACTS STRIP ── -->
   <div class="facts-strip">
     <div class="fact-item"><div class="fact-num">7<span> continents</span></div><div class="fact-desc">Including Antarctica</div></div>
@@ -1423,7 +554,7 @@
     <div class="fact-item"><div class="fact-num" id="fMiles">—</div><div class="fact-desc">Miles in the air</div></div>
     <div class="fact-item"><div class="fact-num" id="fAirlines">—</div><div class="fact-desc">Airlines flown</div></div>
   </div>
-
+ 
   <!-- ── EXPERIENCES ── -->
   <section class="experiences">
     <div class="section-header">
@@ -1431,7 +562,7 @@
       <div class="section-title">EXPERIENCES.</div>
       <div class="section-poem-line" id="expPoemLine">Nazar mein khwaabon ki bijliyan leke chal rahe ho — the proof.</div>
     </div>
-
+ 
     <div class="exp-tabs">
       <button class="exp-tab active" onclick="switchTab('adventures',this)">
         <span class="tab-icon">⚡</span>ADVENTURES
@@ -1443,7 +574,7 @@
         <span class="tab-icon">✦</span>MOMENTS
       </button>
     </div>
-
+ 
     <div class="reel-wrap active" id="tab-adventures">
       <div class="tab-poem" id="poem-adventures">// Nazar mein khwaabon ki bijliyan — the adrenaline chapter</div>
       <div class="sprocket-row" id="spr-t-adv"></div>
@@ -1463,7 +594,7 @@
       <div class="sprocket-row" id="spr-b-mom"></div>
     </div>
   </section>
-
+ 
   <!-- ── FLIGHTS ── -->
   <section class="flights-section">
     <div class="section-header">
@@ -1472,11 +603,11 @@
       <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
     </div>
     <div class="flight-stats" id="flightStats"></div>
-
+ 
     <!-- AIRCRAFT FLEET -->
     <div class="section-eyebrow" style="margin-bottom:20px">// AIRCRAFT FLOWN</div>
     <div class="fleet-grid" id="fleetGrid"></div>
-
+ 
     <!-- BOARDING PASSES — latest 4, rest hidden -->
     <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
     <div class="bp-stack" id="boardingGrid"></div>
@@ -1494,7 +625,7 @@
         </div>
       </div>
     </div>
-
+ 
     <!-- FULL FLIGHT LOG — hidden by default -->
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
       <div class="section-eyebrow" style="margin:0">// FULL FLIGHT LOG</div>
@@ -1511,7 +642,7 @@
       </div>
     </div>
   </section>
-
+ 
   <!-- ── AIRPORTS ── -->
   <section class="airports-section">
     <div class="section-header">
@@ -1521,7 +652,7 @@
     </div>
     <div class="airport-grid" id="airportGrid"></div>
   </section>
-
+ 
   <!-- ── CAFES ── -->
   <section class="cafes-section">
     <div class="section-header">
@@ -1531,14 +662,14 @@
     </div>
     <div class="cafe-grid" id="cafeGrid"></div>
   </section>
-
+ 
   <!-- ── COUNTRIES ── -->
   <section class="countries-section">
     <div class="section-eyebrow">// EVERY STAMP</div>
     <div class="section-title" style="font-size:clamp(36px,5vw,64px)">COUNTRIES.</div>
     <div class="stamps-grid" id="stampsGrid"></div>
   </section>
-
+ 
   <!-- ── CLOSING POEM ── -->
   <section class="closing-section" id="closingSection">
     <div class="closing-poem" id="closingPoem">
@@ -1567,7 +698,7 @@
       </div>
     </div>
   </section>
-
+ 
   <footer class="page-footer">
     <div class="footer-name">ANURAAG RAVULAPARTHI</div>
     <div class="footer-links">
@@ -1577,7 +708,7 @@
     </div>
   </footer>
 </div>
-
+ 
 <!-- Lightbox -->
 <div class="lightbox" id="lightbox" onclick="closeLB(event)">
   <div class="lb-panel">
@@ -1599,7 +730,7 @@
     </div>
   </div>
 </div>
-
+ 
 <!-- Terminal -->
 <button class="term-trigger" id="termTrigger" onclick="openTerm()">
   <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -1621,7 +752,7 @@
     <div class="t-cur"></div>
   </div>
 </div>
-
+ 
 <!-- Social bar -->
 <div class="social-bar">
   <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" aria-label="LinkedIn">
@@ -1638,7 +769,7 @@
 import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs, query, orderBy, doc, getDoc }
                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
+ 
 // ── FIREBASE ──────────────────────────────────────────────────────
 const app = initializeApp({
   apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
@@ -1647,11 +778,11 @@ const app = initializeApp({
   appId:"1:638331724572:web:baa0d70108e920099150d9"
 });
 const db = getFirestore(app);
-
+ 
 // ── STATE ─────────────────────────────────────────────────────────
 let countriesData=[], flightsData=[], cafesData=[], experiencesData=[];
 let globeMode='countries', globeGlobe=null, globeFlightLines=[], globeCamera=null, globeRenderer=null;
-
+ 
 // ── INTRO ─────────────────────────────────────────────────────────
 const introSeq=[
   {el:'il1',d:800},{el:'il2',d:1800},{el:'ir1',d:2600},
@@ -1660,7 +791,7 @@ const introSeq=[
   {el:'il6',d:6800},{el:'il7',d:7800}
 ];
 let introDone=false;
-
+ 
 function dismissIntro() {
   if(introDone) return;
   introDone = true;
@@ -1676,7 +807,7 @@ function dismissIntro() {
     requestAnimationFrame(() => requestAnimationFrame(() => initGlobeWhenReady()));
   }, 1000);
 }
-
+ 
 introSeq.forEach(({el,d}) => {
   setTimeout(() => {
     const n = document.getElementById(el);
@@ -1686,11 +817,11 @@ introSeq.forEach(({el,d}) => {
 setTimeout(dismissIntro, 9000);
 document.getElementById('intro').addEventListener('click', dismissIntro);
 document.getElementById('introSkip').addEventListener('click', e => { e.stopPropagation(); dismissIntro(); });
-
+ 
 // ── LOAD ALL FROM FIRESTORE ───────────────────────────────────────
 let dataLoaded = false;
 let globeInitPending = false;
-
+ 
 async function loadAllData() {
   try {
     // Load each collection independently so one failure doesn't break all
@@ -1700,7 +831,7 @@ async function loadAllData() {
       getDocs(collection(db,'cafes')),
       getDocs(collection(db,'experiences')),
     ]);
-
+ 
     if(results[0].status==='fulfilled') {
       countriesData = results[0].value.docs.map(d => ({id:d.id,...d.data()}))
         .filter(c => c.status !== 'wishlist');
@@ -1716,7 +847,7 @@ async function loadAllData() {
     if(results[3].status==='fulfilled') {
       experiencesData = results[3].value.docs.map(d => ({id:d.id,...d.data()}));
     }
-
+ 
     // Log any failures with detail
     const colNames = ['countries','flights','cafes','experiences'];
     results.forEach((r,i)=>{
@@ -1726,7 +857,7 @@ async function loadAllData() {
         console.log(`✓ ${colNames[i]}: ${r.value.docs.length} docs`);
       }
     });
-
+ 
     dataLoaded = true;
     updateStats();
     revealOriginText();
@@ -1742,7 +873,7 @@ async function loadAllData() {
     console.error('loadAllData failed:', e);
   }
 }
-
+ 
 function initGlobeWhenReady() {
   if(!dataLoaded) { globeInitPending=true; return; } // wait for data
   const wrap = document.getElementById('globeWrap');
@@ -1753,7 +884,7 @@ function initGlobeWhenReady() {
   }
   initGlobe();
 }
-
+ 
 // ── STATS ─────────────────────────────────────────────────────────
 function animateCount(el, target, suffix='') {
   if(!el || !target) return;
@@ -1765,13 +896,13 @@ function animateCount(el, target, suffix='') {
     if(current >= target) clearInterval(timer);
   }, 30);
 }
-
+ 
 function updateStats() {
   const nc = countriesData.length;
   const nf = flightsData.length;
   const totalMiles = flightsData.reduce((s,f) => s+(f.distance_miles||0),0);
   const airlines = [...new Set(flightsData.map(f=>f.airline).filter(Boolean))].length;
-
+ 
   animateCount(document.getElementById('statCountries'), nc);
   animateCount(document.getElementById('statFlights'), nf);
   animateCount(document.getElementById('statMiles'), Math.round(totalMiles/1000));
@@ -1793,29 +924,29 @@ function updateStats() {
   const hmEl = document.getElementById('statMilesTotal');
   if(hmEl) hmEl.innerHTML = `${Math.round(totalMiles/1000)}<span class="accent">K</span>`;
 }
-
+ 
 // ── GLOBE ─────────────────────────────────────────────────────────
 function latLonToVec(lat, lon, r=1.025) {
   const la = lat*Math.PI/180, lo = lon*Math.PI/180;
   return new THREE.Vector3(r*Math.cos(la)*Math.cos(lo), r*Math.sin(la), r*Math.cos(la)*Math.sin(lo));
 }
-
+ 
 function initGlobe() {
   const wrap = document.getElementById('globeWrap');
   const canvas = document.getElementById('globeCanvas');
   const W = wrap.clientWidth, H = wrap.clientHeight;
-
+ 
   const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
   renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
   renderer.setSize(W,H);
   renderer.setClearColor(0x030608,1);
   globeRenderer = renderer;
-
+ 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(45,W/H,0.1,1000);
   camera.position.z = 2.8;
   globeCamera = camera;
-
+ 
   // Stars
   const sv=[];
   for(let i=0;i<3000;i++){
@@ -1825,14 +956,14 @@ function initGlobe() {
   const sGeo=new THREE.BufferGeometry();
   sGeo.setAttribute('position',new THREE.Float32BufferAttribute(sv,3));
   scene.add(new THREE.Points(sGeo,new THREE.PointsMaterial({color:0xffffff,size:0.011,transparent:true,opacity:0.5})));
-
+ 
   // Globe texture
   const tc=document.createElement('canvas'); tc.width=2048; tc.height=1024;
   const cx=tc.getContext('2d');
   const oceanG=cx.createLinearGradient(0,0,0,1024);
   oceanG.addColorStop(0,'#020c1a'); oceanG.addColorStop(0.5,'#052038'); oceanG.addColorStop(1,'#020c1a');
   cx.fillStyle=oceanG; cx.fillRect(0,0,2048,1024);
-
+ 
   const continents=[
     [[490,120],[780,100],[900,110],[980,140],[1050,130],[1120,150],[1180,130],[1260,140],[1350,120],[1420,130],[1480,120],[1520,140],[1540,160],[1560,190],[1500,220],[1450,240],[1400,260],[1350,280],[1280,300],[1200,310],[1140,330],[1100,320],[1050,340],[1000,360],[940,370],[880,350],[820,330],[760,310],[700,300],[640,280],[590,260],[540,240],[500,210],[480,180],[470,160]],
     [[620,310],[680,290],[730,300],[760,320],[780,360],[790,410],[800,460],[810,510],[800,560],[780,610],[750,640],[720,660],[690,650],[660,630],[640,600],[620,560],[600,510],[590,460],[580,410],[590,360],[600,330]],
@@ -1857,7 +988,7 @@ function initGlobe() {
   const iceS=cx.createRadialGradient(1024,1024,0,1024,1024,220);
   iceS.addColorStop(0,'rgba(225,240,250,0.98)'); iceS.addColorStop(1,'rgba(160,200,225,0)');
   cx.fillStyle=iceS; cx.fillRect(0,850,2048,174);
-
+ 
   const globeTex=new THREE.CanvasTexture(tc);
   globeTex.anisotropy=4;
   const gGeo=new THREE.SphereGeometry(1,72,72);
@@ -1865,11 +996,11 @@ function initGlobe() {
   const globe=new THREE.Mesh(gGeo,gMat);
   scene.add(globe);
   globeGlobe=globe;
-
+ 
   // Try NASA texture
   new THREE.TextureLoader().load('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg',
     tex=>{tex.anisotropy=4;gMat.map=tex;gMat.needsUpdate=true;});
-
+ 
   // Atmosphere
   const aGeo=new THREE.SphereGeometry(1.12,64,64);
   const aMat=new THREE.ShaderMaterial({
@@ -1878,23 +1009,23 @@ function initGlobe() {
     fragmentShader:'varying vec3 vN;void main(){float i=pow(0.72-dot(vN,vec3(0,0,1)),4.);gl_FragColor=vec4(0.15,0.5,0.85,1.)*i;}'
   });
   scene.add(new THREE.Mesh(aGeo,aMat));
-
+ 
   // Wireframe grid
   globe.add(new THREE.Mesh(
     new THREE.SphereGeometry(1.002,24,24),
     new THREE.MeshBasicMaterial({color:0x2E8B7A,wireframe:true,transparent:true,opacity:0.05})
   ));
-
+ 
   // Lights
   scene.add(new THREE.AmbientLight(0x334455,1.6));
   const sun=new THREE.DirectionalLight(0x88aacc,1.4); sun.position.set(4,2,5); scene.add(sun);
-
+ 
   // Country dots — amber ember glow
   const dotGeo=new THREE.SphereGeometry(0.02,10,10);
   const dotMat=new THREE.MeshBasicMaterial({color:0xD4792A});
   const pulseMat=new THREE.MeshBasicMaterial({color:0xD4792A,transparent:true,opacity:0.25});
   const pulseGeo=new THREE.SphereGeometry(0.032,10,10);
-
+ 
   const dotCount = Math.max(1, countriesData.length); // InstancedMesh needs at least 1
   const dotMesh=new THREE.InstancedMesh(dotGeo,dotMat,dotCount);
   const dotData=[];
@@ -1907,7 +1038,7 @@ function initGlobe() {
   });
   dotMesh.instanceMatrix.needsUpdate=true;
   globe.add(dotMesh);
-
+ 
   // Pulse rings for first 10
   const rings=[];
   countriesData.slice(0,10).forEach((c,i)=>{
@@ -1916,7 +1047,7 @@ function initGlobe() {
     r.position.copy(p); r._phase=i*0.7;
     globe.add(r); rings.push(r);
   });
-
+ 
   // Drag
   const tip=document.getElementById('globeTip');
   let isDragging=false,prevX=0,prevY=0,autoRotate=true,hintHidden=false;
@@ -1947,9 +1078,9 @@ function initGlobe() {
   wrap2.addEventListener('touchend',()=>{isDragging=false;setTimeout(()=>autoRotate=true,2000);});
   wrap2.addEventListener('touchmove',e=>{if(!isDragging)return;globe.rotation.y+=(e.touches[0].clientX-prevX)*0.005;globe.rotation.x=Math.max(-Math.PI/2,Math.min(Math.PI/2,globe.rotation.x+(e.touches[0].clientY-prevY)*0.003));prevX=e.touches[0].clientX;prevY=e.touches[0].clientY;},{passive:true});
   window.addEventListener('resize',()=>{const nW=wrap2.clientWidth,nH=wrap2.clientHeight;camera.aspect=nW/nH;camera.updateProjectionMatrix();renderer.setSize(nW,nH);});
-
+ 
   buildFlightLines(globe);
-
+ 
   let clock=0;
   (function animate(){
     requestAnimationFrame(animate);
@@ -1969,7 +1100,7 @@ function initGlobe() {
     renderer.render(scene,camera);
   })();
 }
-
+ 
 function buildFlightLines(globe) {
   flightsData.forEach(f=>{
     if(!f.from||!f.to) return;
@@ -1992,7 +1123,7 @@ function buildFlightLines(globe) {
     };
     const fc=AIRPORT_COORDS[f.from], tc2=AIRPORT_COORDS[f.to];
     if(!fc||!tc2) return;
-
+ 
     // Use stored flight_path if available (real ADS-B track)
     let points;
     if(f.flight_path&&Array.isArray(f.flight_path)&&f.flight_path.length>2){
@@ -2006,7 +1137,7 @@ function buildFlightLines(globe) {
       const curve=new THREE.QuadraticBezierCurve3(start,mid,end);
       points=curve.getPoints(50);
     }
-
+ 
     const geo=new THREE.BufferGeometry().setFromPoints(points);
     const mat=new THREE.LineDashedMaterial({color:0xC8913A,dashSize:0.04,gapSize:0.03,transparent:true,opacity:0.65});
     const line=new THREE.Line(geo,mat);
@@ -2018,7 +1149,7 @@ function buildFlightLines(globe) {
     globeFlightLines.push(line);
   });
 }
-
+ 
 window.setGlobeMode=function(mode,btn){
   globeMode=mode;
   document.querySelectorAll('.gtog').forEach(b=>b.classList.remove('active'));
@@ -2032,7 +1163,7 @@ window.setGlobeMode=function(mode,btn){
     leg.innerHTML='<div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div><div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>';
   }
 };
-
+ 
 // ── ORIGIN TEXT REVEAL ─────────────────────────────────────────────
 function revealOriginText() {
   const el = document.getElementById('originText');
@@ -2045,7 +1176,7 @@ function revealOriginText() {
   },{threshold:0.4});
   obs.observe(el);
 }
-
+ 
 // ── FLIGHTS ───────────────────────────────────────────────────────
 function buildFlights() {
   const totalMiles = flightsData.reduce((s,f)=>s+(f.distance_miles||0),0);
@@ -2055,7 +1186,7 @@ function buildFlights() {
     const cnt=flightsData.filter(f=>f.airline===a).length;
     return cnt>(best.count||0)?{name:a,count:cnt}:best;
   },{});
-
+ 
   // Stats blocks
   const statsEl=document.getElementById('flightStats');
   if(statsEl) [
@@ -2070,22 +1201,22 @@ function buildFlights() {
     el.innerHTML=`<div class="fs-num">${b.num}</div><div class="fs-label">${b.label}</div>`;
     statsEl.appendChild(el);
   });
-
+ 
   buildFleet();
-
+ 
   // ── BOARDING PASSES — show only latest 4, rest hidden ──────────
   const grid=document.getElementById('boardingGrid');
   if(!grid) return;
   const INITIAL_BP = 4;
-
+ 
   flightsData.forEach((f,idx)=>{
     const card=document.createElement('div');
     card.className='bp-card';
     if(idx >= INITIAL_BP) { card.classList.add('bp-hidden'); card.style.display='none'; }
-
+ 
     const miles=f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—';
     const km=f.distance_miles?Math.round(f.distance_miles*1.60934).toLocaleString():'—';
-
+ 
     card.innerHTML=`
       <div class="bp-bar"></div>
       <div class="bp-face">
@@ -2182,11 +1313,11 @@ function buildFlights() {
           ${f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:100%;height:80px;object-fit:cover;border-radius:3px;margin-top:10px;filter:sepia(10%)" alt="Aircraft" loading="lazy">`:''}
         </div>
       </div>`;
-
+ 
     card.addEventListener('click',()=>{ card.classList.toggle('open'); });
     grid.appendChild(card);
   });
-
+ 
   // Show "View All" button if more than 4 flights
   if(flightsData.length > INITIAL_BP) {
     const wrap = document.getElementById('bpMoreWrap');
@@ -2196,7 +1327,7 @@ function buildFlights() {
     const lbl = document.getElementById('bpMoreLabel');
     if(lbl)  lbl.textContent=`+ ${hidden} MORE BOARDING PASSES`;
   }
-
+ 
   // Full flight log table
   const tbody=document.getElementById('flightLog');
   if(!tbody) return;
@@ -2213,7 +1344,7 @@ function buildFlights() {
     tbody.appendChild(tr);
   });
 }
-
+ 
 // ── EXPAND / COLLAPSE CONTROLS ────────────────────────────────────
 let bpExpanded = false;
 window.expandBoardingPasses = function() {
@@ -2234,7 +1365,7 @@ window.expandBoardingPasses = function() {
   if(peek) peek.style.opacity = bpExpanded ? '0' : '1';
   if(peek) peek.style.pointerEvents = bpExpanded ? 'none' : 'auto';
 };
-
+ 
 let logExpanded = false;
 window.toggleFlightLog = function() {
   logExpanded = !logExpanded;
@@ -2245,7 +1376,7 @@ window.toggleFlightLog = function() {
   if(arrow) arrow.classList.toggle('open', logExpanded);
   if(btn)   btn.querySelector('span:first-child').textContent = logExpanded ? 'COLLAPSE LOG ' : 'EXPAND LOG ';
 };
-
+ 
 // ── AIRCRAFT FLEET ────────────────────────────────────────────────
 // Permanent Unsplash CDN URLs — no-branding cockpit/exterior shots
 const AIRCRAFT_META = {
@@ -2340,7 +1471,7 @@ const AIRCRAFT_META = {
     story:`First flew 1981. The aircraft that made twin-engine transoceanic flight commercially viable. Two engines, wide body, 2-3-2 seating. Distinctive flat-bottomed fuselage. Still flying — FedEx operates hundreds as freighters. Some airlines keep them for their range-efficiency. Old school in the best sense: over-engineered, under-appreciated, absolutely reliable.`
   },
 };
-
+ 
 // Normalise aircraft type string to a key
 function normaliseAircraft(type) {
   if(!type) return null;
@@ -2357,11 +1488,11 @@ function normaliseAircraft(type) {
   }
   return null;
 }
-
+ 
 function buildFleet() {
   const grid = document.getElementById('fleetGrid');
   if(!grid) return;
-
+ 
   // Count unique aircraft types from flight data
   const counts = {};
   flightsData.forEach(f => {
@@ -2369,12 +1500,12 @@ function buildFleet() {
     const key = normaliseAircraft(f.aircraft_type);
     if(key) counts[key] = (counts[key]||0) + 1;
   });
-
+ 
   // Sort by flight count desc, take top 6
   const ranked = Object.entries(counts)
     .sort((a,b) => b[1]-a[1])
     .slice(0, 6);
-
+ 
   if(!ranked.length) {
     // No aircraft data yet — show placeholder from meta list
     Object.entries(AIRCRAFT_META).slice(0,6).forEach(([key,meta]) => {
@@ -2382,12 +1513,12 @@ function buildFleet() {
     });
     return;
   }
-
+ 
   ranked.forEach(([key, count]) => {
     const meta = AIRCRAFT_META[key];
     if(meta) renderFleetCard(grid, key, meta, count);
   });
-
+ 
   // If fewer than 6 matched, fill with next most common
   const used = new Set(ranked.map(([k])=>k));
   if(ranked.length < 6) {
@@ -2397,7 +1528,7 @@ function buildFleet() {
       .forEach(([k, meta]) => renderFleetCard(grid, k, meta, 0));
   }
 }
-
+ 
 function renderFleetCard(grid, model, meta, count) {
   const card = document.createElement('div');
   card.className = 'fleet-card';
@@ -2413,8 +1544,8 @@ function renderFleetCard(grid, model, meta, count) {
     </div>`;
   grid.appendChild(card);
 }
-
-
+ 
+ 
 // ── AIRPORTS ─────────────────────────────────────────────────────
 // Airport metadata — enriched stories for key hubs
 // Permanent Unsplash CDN URLs — no API key needed, never expire
@@ -2480,34 +1611,34 @@ const AIRPORT_META = {
     story:`Houston's gateway to the world. The international terminal at night when everything is quiet — there's something about the Texas scale of it that gets you.`
   },
 };
-
+ 
 function buildAirports() {
   const visitCounts = {};
   flightsData.forEach(f => {
     if(f.from) visitCounts[f.from] = (visitCounts[f.from]||0) + 1;
     if(f.to)   visitCounts[f.to]   = (visitCounts[f.to]  ||0) + 1;
   });
-
+ 
   // Top airports that have metadata, sorted by visit count
   const topAirports = Object.entries(visitCounts)
     .filter(([code]) => AIRPORT_META[code])
     .sort((a,b) => b[1]-a[1])
     .slice(0,6);
-
+ 
   const grid = document.getElementById('airportGrid');
   if(!grid) return;
-
+ 
   // Fallback if no matches yet
   const toRender = topAirports.length
     ? topAirports
     : Object.entries(AIRPORT_META).slice(0,6).map(([code,meta]) => [code,0]);
-
+ 
   toRender.forEach(([code, visits]) => {
     const meta = AIRPORT_META[code];
     if(!meta) return;
     const card = document.createElement('div');
     card.className = 'airport-card';
-
+ 
     card.innerHTML = `
       <div class="airport-photo" style="background-image:url('${meta.photo}')"></div>
       <div class="airport-vignette"></div>
@@ -2522,7 +1653,7 @@ function buildAirports() {
     grid.appendChild(card);
   });
 }
-
+ 
 // ── FILM REELS ────────────────────────────────────────────────────
 function makeSprockets(id,n){
   const row=document.getElementById(id); if(!row) return;
@@ -2532,7 +1663,7 @@ function makeSprockets(id,n){
     s.appendChild(h); row.appendChild(s);
   }
 }
-
+ 
 function buildReel(tab) {
   const data = experiencesData.filter(e=>e.tab===tab);
   const reel  = document.getElementById('reel-'+tab);
@@ -2541,15 +1672,15 @@ function buildReel(tab) {
   const pfx={adventures:'adv',people:'ppl',moments:'mom'}[tab];
   makeSprockets('spr-t-'+pfx, data.length);
   makeSprockets('spr-b-'+pfx, data.length);
-
+ 
   data.forEach((item,i)=>{
     const frame=document.createElement('div');
     frame.className='film-frame';
     frame.style.setProperty('--stamp-rot','0deg');
-
+ 
     const print=document.createElement('div'); print.className='film-print';
     const iw=document.createElement('div'); iw.className='film-img-wrap';
-
+ 
     if(item.img){
       const img=document.createElement('img'); img.src=item.img; img.alt=item.label||''; img.loading='lazy';
       iw.appendChild(img);
@@ -2564,7 +1695,7 @@ function buildReel(tab) {
     const lc=document.createElement('div'); lc.className='film-loc'; lc.textContent=item.loc||'';
     iw.appendChild(grain); iw.appendChild(ov); iw.appendChild(lc);
     print.appendChild(iw);
-
+ 
     const cap=document.createElement('div'); cap.className='film-caption';
     cap.textContent=item.label||'';
     print.appendChild(cap);
@@ -2572,18 +1703,18 @@ function buildReel(tab) {
     frame.addEventListener('click',()=>openLightbox(tab,i));
     reel.appendChild(frame);
   });
-
+ 
   // Drag scroll
   let isDown=false,startX=0,sl=0;
   track.addEventListener('mousedown',e=>{isDown=true;startX=e.pageX-track.offsetLeft;sl=track.scrollLeft;});
   window.addEventListener('mouseup',()=>isDown=false);
   track.addEventListener('mousemove',e=>{if(!isDown)return;e.preventDefault();track.scrollLeft=sl-(e.pageX-track.offsetLeft-startX);});
 }
-
+ 
 function buildReels() {
   ['adventures','people','moments'].forEach(buildReel);
 }
-
+ 
 window.switchTab=function(key,btn){
   document.querySelectorAll('.reel-wrap.active').forEach(r=>{
     r.classList.remove('active');
@@ -2595,11 +1726,11 @@ window.switchTab=function(key,btn){
     if(target) target.classList.add('active');
   },50);
 };
-
+ 
 // ── LIGHTBOX ──────────────────────────────────────────────────────
 let lbTab='adventures', lbIdx=0;
 function getTabData(tab){ return experiencesData.filter(e=>e.tab===tab); }
-
+ 
 function openLightbox(tab,idx){
   lbTab=tab; lbIdx=idx;
   renderLB();
@@ -2627,7 +1758,7 @@ window.lbStep=function(dir){
   lbIdx=(lbIdx+dir+data.length)%data.length;
   renderLB();
 };
-
+ 
 // ── CAFES ─────────────────────────────────────────────────────────
 function buildCafes() {
   const grid=document.getElementById('cafeGrid');
@@ -2662,7 +1793,7 @@ function buildCafes() {
     grid.appendChild(card);
   });
 }
-
+ 
 // ── STAMPS / COUNTRIES ────────────────────────────────────────────
 function buildStamps() {
   const grid=document.getElementById('stampsGrid');
@@ -2679,7 +1810,7 @@ function buildStamps() {
     stamp.style.setProperty('--stamp-rot',rot+'deg');
     stamp.style.animationDelay=(i*0.04)+'s';
     stamp.style.transform=`rotate(${rot}deg)`;
-
+ 
     const flagId=c.id.toLowerCase().replace('_ei','').replace('cl_ei','cl');
     stamp.innerHTML=`
       ${c.emoji?`<div class="stamp-emoji">${c.emoji}</div>`:''}
@@ -2690,7 +1821,7 @@ function buildStamps() {
     grid.appendChild(stamp);
   });
 }
-
+ 
 // ── CLOSING POEM (scroll reveal) ──────────────────────────────────
 function setupClosingPoem() {
   const couplets=['pc1','pc2','pc3','pc4','poemFinal'];
@@ -2708,12 +1839,12 @@ function setupClosingPoem() {
     if(el) obs.observe(el);
   });
 }
-
+ 
 // ── NAV SCROLL ────────────────────────────────────────────────────
 window.addEventListener('scroll',()=>{
   document.getElementById('topNav').classList.toggle('scrolled',window.scrollY>60);
 });
-
+ 
 // ── TERMINAL ──────────────────────────────────────────────────────
 const drawer=document.getElementById('termDrawer'),
       backdrop=document.getElementById('termBackdrop'),
@@ -2721,7 +1852,7 @@ const drawer=document.getElementById('termDrawer'),
       tIn=document.getElementById('tIn'),
       tBody=document.getElementById('tBody');
 let tBooted=false;
-
+ 
 window.openTerm=function(){
   drawer.classList.add('open');
   backdrop.classList.add('open');
@@ -2739,7 +1870,7 @@ document.addEventListener('keydown',e=>{
 });
 drawer.addEventListener('click',()=>tIn.focus());
 setInterval(()=>{const el=document.getElementById('tClock');if(el)el.textContent=new Date().toLocaleTimeString();},1000);
-
+ 
 const TNAV={home:'home.html',engineer:'Profile.html',contact:'Contact.html'};
 const tAdd=el=>{tBody.appendChild(el);tBody.scrollTop=tBody.scrollHeight;return el;};
 const tEsc=s=>(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -2757,7 +1888,7 @@ function tHints(pairs){
   pairs.forEach(([k,v])=>{const h=document.createElement('div');h.className='hint';h.innerHTML=`<span>${k}</span> ${v}`;row.appendChild(h);});
   tAdd(row);
 }
-
+ 
 const TCMDS={
   help:tHelp,ls:tLs,whoami:tWhoami,clear:tClear,
   home:()=>tGo('home'),engineer:()=>tGo('engineer'),contact:()=>tGo('contact'),
@@ -2770,7 +1901,7 @@ const TCMDS={
 };
 const tHist=[]; let tHIdx=-1;
 const TALL=Object.keys(TCMDS);
-
+ 
 function tHelp(){
   tGap();
   tLn('camb','// NAVIGATE');
@@ -2808,7 +1939,7 @@ function tGo(dest){
   tAdd(d);
 }
 function tClear(){tBody.innerHTML='';tLn('cd','// cleared',false);tGap();tChips(['home','engineer'],['globe','stories','poem']);}
-
+ 
 function tRun(raw){
   const cmd=raw.trim().split(/\s+/)[0].toLowerCase();
   if(!cmd) return;
@@ -2818,14 +1949,14 @@ function tRun(raw){
   else{tLn('cerr',`command not found: <span class="cw">${tEsc(cmd)}</span>`);tChips(['help'],[]);}
   tIn.value=''; tBody.scrollTop=tBody.scrollHeight;
 }
-
+ 
 tIn.addEventListener('keydown',e=>{
   if(e.key==='Enter') tRun(tIn.value);
   else if(e.key==='Tab'){e.preventDefault();const v=tIn.value.toLowerCase();if(!v)return;const m=TALL.find(c=>c.startsWith(v));if(m)tIn.value=m;}
   else if(e.key==='ArrowUp'){e.preventDefault();if(tHIdx<tHist.length-1){tHIdx++;tIn.value=tHist[tHIdx];}}
   else if(e.key==='ArrowDown'){e.preventDefault();if(tHIdx>0){tHIdx--;tIn.value=tHist[tHIdx];}else{tHIdx=-1;tIn.value='';}}
 });
-
+ 
 async function tBoot(){
   const delay=ms=>new Promise(r=>setTimeout(r,ms));
   await delay(200); tLn('cd','Initializing nomad.sh ...',false);
