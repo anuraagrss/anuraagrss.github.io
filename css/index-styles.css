@@ -1,10 +1,5 @@
 
-  <style>
-    /* ═══════════════════════════════════════════
-       THEME SYSTEM — driven by [data-theme] on <html>
-       Three states: default | engineer | nomad
-       Every color in the page comes from these variables.
-    ═══════════════════════════════════════════ */
+
 
     html[data-theme="default"] {
       --bg:           #F3F1EF;
@@ -510,4 +505,4 @@
       .half-desc h1 { font-size: 7vw; }
       .half-desc p  { font-size: 4vw; }
     }
-  </style>
+ 
