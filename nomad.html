@@ -1620,8 +1620,12 @@ function makeSprockets(id,n){const row=document.getElementById(id);if(!row)retur
 function buildReel(tab){
   const data=experiencesData.filter(e=>e.tab===tab);
   const reel=document.getElementById('reel-'+tab);
-  const track=document.getElementById('track-'+tab);
+  // Map full tab name -> short HTML id suffix used in the markup
+  // HTML ids are: track-adv, track-ppl, track-mom (not track-adventures etc.)
+  const TRACK_IDS={adventures:'adv',people:'ppl',moments:'mom'};
+  const track=document.getElementById('track-'+(TRACK_IDS[tab]||tab));
   if(!reel) return;
+  if(!track) return; // null guard — prevents crash if element is missing
   const pfx={adventures:'adv',people:'ppl',moments:'mom'}[tab];
   makeSprockets('spr-t-'+pfx,data.length);makeSprockets('spr-b-'+pfx,data.length);
   if(!data.length){
