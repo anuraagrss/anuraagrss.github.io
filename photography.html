@@ -2,94 +2,81 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://firebasestorage.googleapis.com https://images.unsplash.com data:;">
+  <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://firebasestorage.googleapis.com https://images.unsplash.com data: blob:;">
   <link rel="icon" href="Logo.png" type="image/x-icon">
   <title>Through My Eyes — Anuraag Ravulaparthi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
   <style>
-    /* ── TOKENS ── */
     :root {
-      --paper:  #F6F1E9;
-      --paper2: #EDE7DC;
-      --paper3: #E3DBCD;
-      --ink:    #1C1109;
-      --ink2:   #3D2B1A;
-      --muted:  #7A6A54;
-      --faint:  rgba(28,17,9,0.09);
-      --teal:   #2E8B7A;
-      --gold:   #C8913A;
-      --amber:  #D4792A;
-      --red:    #8B1A1A;   /* darkroom safelight */
-      --dark:   #0A0604;
-      --dark2:  #130D08;
-      --serif:  'Lora', Georgia, serif;
-      --mono:   'JetBrains Mono', monospace;
-      --disp:   'Bebas Neue', sans-serif;
+      --kodak-gold:   #F5A800;
+      --kodak-gold2:  #C8861A;
+      --kodak-orange: #E8600A;
+      --kodak-dark:   #1A0F00;
+      --kodak-film:   #0D0800;
+      --kodak-perf:   #2A1F0A;
+      --kodak-base:   #F5E6C8;
+      --paper:        #F6F1E9;
+      --muted:        #7A6A54;
+      --red:          #8B1A1A;
+      --serif:        'Lora', Georgia, serif;
+      --mono:         'JetBrains Mono', monospace;
+      --disp:         'Bebas Neue', sans-serif;
     }
+
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
+
     body {
-      background: var(--dark);
+      background: var(--kodak-dark);
       color: var(--paper);
       font-family: var(--serif);
       overflow-x: hidden;
-      /* Disable text selection sitewide */
       user-select: none;
       -webkit-user-select: none;
+      cursor: default;
     }
 
-    /* ── GLOBAL PHOTO PROTECTION ── */
     img {
       pointer-events: none;
       draggable: false;
       -webkit-user-drag: none;
     }
-    /* Invisible overlay on every photo container */
-    .photo-shield {
-      position: absolute; inset: 0; z-index: 4;
-      background: transparent;
-      pointer-events: all;
-    }
 
-    /* ── INTRO — Red Safelight ── */
+    /* ══════════════════════════════════════════
+       INTRO — Red Safelight Darkroom (unchanged)
+    ══════════════════════════════════════════ */
     #intro {
       position: fixed; inset: 0; z-index: 3000;
-      background: var(--dark);
+      background: #0A0604;
       display: flex; align-items: center; justify-content: center;
       cursor: pointer;
       transition: opacity 1.2s ease, visibility 1.2s ease;
     }
     #intro.gone { opacity: 0; visibility: hidden; pointer-events: none; }
 
-    /* Safelight glow — red corner light */
     .safelight {
       position: absolute; bottom: -60px; left: -60px;
-      width: 340px; height: 340px;
-      border-radius: 50%;
+      width: 340px; height: 340px; border-radius: 50%;
       background: radial-gradient(circle, rgba(139,26,26,0.35) 0%, rgba(139,26,26,0.12) 40%, transparent 70%);
       animation: safePulse 3s ease-in-out infinite;
+      pointer-events: none;
+    }
+    .safelight2 {
+      position: absolute; top: -40px; right: -40px;
+      width: 220px; height: 220px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(139,26,26,0.2) 0%, transparent 70%);
+      animation: safePulse 4s ease-in-out infinite 1s;
       pointer-events: none;
     }
     @keyframes safePulse {
       0%,100% { opacity: 0.8; transform: scale(1); }
       50%      { opacity: 1;   transform: scale(1.08); }
     }
-    /* Second safelight top right */
-    .safelight2 {
-      position: absolute; top: -40px; right: -40px;
-      width: 220px; height: 220px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(139,26,26,0.2) 0%, transparent 70%);
-      animation: safePulse 4s ease-in-out infinite 1s;
-      pointer-events: none;
-    }
-
-    /* Darkroom grain */
     .dr-grain {
       position: absolute; inset: 0; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height%3D'100%25' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
       animation: grainShift 0.14s steps(1) infinite;
       mix-blend-mode: screen; opacity: 0.6;
     }
@@ -99,19 +86,12 @@
       50% { transform: translate(1%,0); }
       75% { transform: translate(0,-1%); }
     }
-
-    /* Chemical tray lines */
     .tray-lines {
       position: absolute; bottom: 0; left: 0; right: 0; height: 160px;
       pointer-events: none;
-      background: repeating-linear-gradient(
-        0deg, transparent, transparent 18px,
-        rgba(139,26,26,0.04) 18px, rgba(139,26,26,0.04) 19px
-      );
+      background: repeating-linear-gradient(0deg, transparent, transparent 18px, rgba(139,26,26,0.04) 18px, rgba(139,26,26,0.04) 19px);
       mask-image: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
     }
-
-    /* Intro text */
     .intro-content {
       position: relative; z-index: 1;
       text-align: center; max-width: 600px; padding: 0 32px;
@@ -124,11 +104,10 @@
     .intro-title {
       font-family: var(--disp); font-size: clamp(44px,8vw,96px);
       line-height: 0.9; letter-spacing: 3px; color: rgba(246,241,233,0);
-      animation: slowReveal 1.8s ease 0.8s forwards;
-      margin-bottom: 24px;
+      animation: slowReveal 1.8s ease 0.8s forwards; margin-bottom: 24px;
     }
     @keyframes slowReveal {
-      0%   { color: rgba(246,241,233,0);    text-shadow: none; }
+      0%   { color: rgba(246,241,233,0); }
       30%  { color: rgba(246,241,233,0.15); }
       60%  { color: rgba(246,241,233,0.55); }
       100% { color: rgba(246,241,233,0.92); text-shadow: 0 0 40px rgba(139,26,26,0.3); }
@@ -158,7 +137,9 @@
     }
     .intro-skip:hover { color: rgba(246,241,233,0.5); border-color: rgba(246,241,233,0.2); }
 
-    /* ── PAGE SHELL ── */
+    /* ══════════════════════════════════════════
+       PAGE SHELL
+    ══════════════════════════════════════════ */
     #page { opacity: 0; transition: opacity 1s ease; }
     #page.vis { opacity: 1; }
 
@@ -172,398 +153,607 @@
       border-bottom: 1px solid transparent;
     }
     .top-nav.scrolled {
-      background: rgba(10,6,4,0.92);
+      background: rgba(10,6,4,0.95);
       backdrop-filter: blur(12px);
-      border-color: rgba(255,255,255,0.06);
+      border-color: rgba(245,168,0,0.1);
     }
-    .nav-logo { font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; color: var(--gold); text-decoration: none; }
+    .nav-logo { font-family: var(--mono); font-size: 11px; letter-spacing: 2.5px; color: var(--kodak-gold); text-decoration: none; }
     .nav-back  { font-family: var(--mono); font-size: 10px; letter-spacing: 1.5px; color: rgba(246,241,233,0.35); text-decoration: none; transition: color 0.2s; }
-    .nav-back:hover { color: var(--gold); }
+    .nav-back:hover { color: var(--kodak-gold); }
 
-    /* ── HERO ── */
+    /* ══════════════════════════════════════════
+       HERO — Film Header
+    ══════════════════════════════════════════ */
     .hero {
-      min-height: 100vh; position: relative;
-      display: flex; align-items: flex-end;
-      padding: 0 56px 72px; overflow: hidden;
+      padding: 120px 56px 60px;
+      position: relative; overflow: hidden;
     }
-    .hero-bg {
-      position: absolute; inset: 0;
-      background: var(--dark);
+
+    /* Kodak logo watermark bg */
+    .hero-kodak-bg {
+      position: absolute; top: 50%; right: 40px; transform: translateY(-50%);
+      font-family: var(--disp); font-size: 280px; letter-spacing: -6px;
+      color: rgba(245,168,0,0.04); pointer-events: none; line-height: 1;
+      white-space: nowrap;
     }
-    /* Developing effect — hero bg image develops in */
-    .hero-bg-img {
-      position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      filter: saturate(0) brightness(0.1);
-      transition: filter 3s ease 0.5s;
+
+    /* Film border strips top & bottom of hero */
+    .hero-film-strip {
+      position: absolute; left: 0; right: 0; height: 28px;
+      background: var(--kodak-film);
+      display: flex; align-items: center;
+      overflow: hidden;
     }
-    #page.vis .hero-bg-img {
-      filter: saturate(0.7) brightness(0.45);
+    .hero-film-strip.top { top: 80px; }
+    .hero-film-strip.bot { bottom: 0; }
+
+    .perf-row {
+      display: flex; align-items: center; gap: 0;
+      flex-shrink: 0;
+      animation: perfScroll 8s linear infinite;
     }
-    .hero-vignette {
-      position: absolute; inset: 0;
-      background: linear-gradient(to top, rgba(10,6,4,0.96) 0%, rgba(10,6,4,0.4) 50%, rgba(10,6,4,0.15) 100%);
+    .perf-row.rev { animation-direction: reverse; }
+    @keyframes perfScroll {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
     }
-    /* Darkroom grain on hero */
-    .hero-grain {
-      position: absolute; inset: 0; pointer-events: none; z-index: 2;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-      opacity: 0.5; mix-blend-mode: screen;
+    .perf-hole {
+      width: 18px; height: 14px; border-radius: 3px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.04);
+      margin: 0 9px; flex-shrink: 0;
     }
-    .hero-content { position: relative; z-index: 3; }
+
     .hero-eyebrow {
       font-family: var(--mono); font-size: 9px; letter-spacing: 4px;
-      color: var(--red); margin-bottom: 16px;
-      display: flex; align-items: center; gap: 10px;
+      color: rgba(245,168,0,0.6); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 10px; position: relative; z-index: 1;
     }
-    .hero-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--red); }
+    .hero-eyebrow::before { content: ''; width: 20px; height: 1px; background: var(--kodak-gold2); }
     .hero-title {
-      font-family: var(--disp); font-size: clamp(64px,11vw,132px);
+      font-family: var(--disp); font-size: clamp(64px,10vw,130px);
       line-height: 0.88; letter-spacing: 2px; color: var(--paper);
-      margin-bottom: 20px;
+      margin-bottom: 20px; position: relative; z-index: 1;
     }
-    .hero-title .gold { color: var(--gold); }
+    .hero-title .gold { color: var(--kodak-gold); }
     .hero-sub {
-      font-size: clamp(14px,1.7vw,18px); font-style: italic;
-      color: rgba(246,241,233,0.5); max-width: 480px; line-height: 1.75;
-      margin-bottom: 36px;
+      font-size: clamp(14px,1.6vw,17px); font-style: italic;
+      color: rgba(246,241,233,0.45); max-width: 440px; line-height: 1.8;
+      margin-bottom: 32px; position: relative; z-index: 1;
     }
-    .hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+    .hero-stats {
+      display: flex; gap: 40px; flex-wrap: wrap; position: relative; z-index: 1;
+    }
+    .h-stat { display: flex; flex-direction: column; gap: 3px; }
     .h-stat-num { font-family: var(--disp); font-size: 40px; color: var(--paper); line-height: 1; }
-    .h-stat-num span { color: var(--gold); }
-    .h-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: rgba(246,241,233,0.3); margin-top: 3px; }
+    .h-stat-num .acc { color: var(--kodak-gold); }
+    .h-stat-label { font-family: var(--mono); font-size: 9px; letter-spacing: 2px; color: rgba(246,241,233,0.3); }
 
-    /* ── ELEMENT CHAPTERS ── */
-    .chapter {
-      padding: 0 0 120px;
+    /* ══════════════════════════════════════════
+       ELEMENT FILTER TABS
+    ══════════════════════════════════════════ */
+    .filter-bar {
+      display: flex; align-items: center; gap: 6px;
+      padding: 0 56px 32px;
+      overflow-x: auto; scrollbar-width: none;
     }
-
-    /* Chapter header — full width dark band */
-    .chapter-header {
-      padding: 64px 56px 48px;
-      position: relative; overflow: hidden;
+    .filter-bar::-webkit-scrollbar { display: none; }
+    .filter-btn {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px;
+      padding: 7px 18px; border-radius: 2px; cursor: pointer;
+      border: 1px solid rgba(245,168,0,0.2);
+      background: transparent; color: rgba(246,241,233,0.35);
+      transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
     }
-    .chapter-element-bg {
-      position: absolute; inset: 0;
-      opacity: 0.06; pointer-events: none;
-      font-family: var(--disp); font-size: 220px; font-weight: 400;
-      color: var(--paper); letter-spacing: -4px; line-height: 1;
-      display: flex; align-items: center; justify-content: flex-end;
-      padding-right: 40px; overflow: hidden;
-    }
-    .chapter-eyebrow {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 4px;
-      margin-bottom: 10px; display: flex; align-items: center; gap: 10px;
-    }
-    .chapter-eyebrow::before { content: ''; width: 16px; height: 1px; }
-    .chapter-title {
-      font-family: var(--disp); font-size: clamp(52px,8vw,96px);
-      line-height: 0.9; letter-spacing: 2px; color: var(--paper); margin-bottom: 10px;
-    }
-    .chapter-poem {
-      font-size: 14px; font-style: italic;
-      color: rgba(246,241,233,0.4); max-width: 520px; line-height: 1.65;
+    .filter-btn:hover { color: var(--kodak-gold); border-color: rgba(245,168,0,0.5); }
+    .filter-btn.active {
+      background: var(--kodak-gold); color: var(--kodak-dark);
+      border-color: var(--kodak-gold); font-weight: 600;
     }
 
-    /* ── PHOTO SPREADS — field journal inside darkroom ── */
-    .spread {
-      display: grid;
-      margin-bottom: 4px;
+    /* ══════════════════════════════════════════
+       MAIN VIEWER — Selected photo display
+    ══════════════════════════════════════════ */
+    .viewer-section {
+      padding: 0 56px 0;
       position: relative;
     }
-    /* Alternating: photo 65% | journal 35% and journal 35% | photo 65% */
-    .spread.photo-left  { grid-template-columns: 65fr 35fr; }
-    .spread.photo-right { grid-template-columns: 35fr 65fr; }
-    .spread.photo-full  { grid-template-columns: 1fr; }
 
-    /* Photo panel */
-    .spread-photo {
-      position: relative; overflow: hidden;
-      min-height: 520px; background: var(--dark2);
+    /* The big photo display */
+    .main-display {
+      position: relative;
+      background: #000;
+      border-radius: 2px;
+      overflow: hidden;
+      aspect-ratio: 16/9;
+      max-height: 72vh;
+      border: 2px solid rgba(245,168,0,0.15);
+      box-shadow:
+        0 0 0 1px rgba(0,0,0,0.8),
+        0 24px 80px rgba(0,0,0,0.6),
+        inset 0 0 0 1px rgba(245,168,0,0.05);
     }
-    .spread.photo-full .spread-photo { min-height: 80vh; }
 
-    /* The image — develops on scroll */
-    .spread-img {
+    /* Corner brackets — Kodak style */
+    .main-display::before,
+    .main-display::after {
+      content: '';
+      position: absolute; z-index: 20; pointer-events: none;
+      width: 28px; height: 28px;
+    }
+    .main-display::before {
+      top: 12px; left: 12px;
+      border-top: 2px solid var(--kodak-gold);
+      border-left: 2px solid var(--kodak-gold);
+      opacity: 0.5;
+    }
+    .main-display::after {
+      bottom: 12px; right: 12px;
+      border-bottom: 2px solid var(--kodak-gold);
+      border-right: 2px solid var(--kodak-gold);
+      opacity: 0.5;
+    }
+
+    /* Corner bracket — bottom-left / top-right via pseudo on child */
+    .main-display-corners::before,
+    .main-display-corners::after {
+      content: '';
+      position: absolute; z-index: 20; pointer-events: none;
+      width: 28px; height: 28px;
+    }
+    .main-display-corners::before {
+      bottom: 12px; left: 12px;
+      border-bottom: 2px solid var(--kodak-gold);
+      border-left: 2px solid var(--kodak-gold);
+      opacity: 0.5;
+    }
+    .main-display-corners::after {
+      top: 12px; right: 12px;
+      border-top: 2px solid var(--kodak-gold);
+      border-right: 2px solid var(--kodak-gold);
+      opacity: 0.5;
+    }
+
+    .main-photo-img {
       position: absolute; inset: 0;
-      background-size: cover; background-position: center;
-      filter: saturate(0) brightness(0.08) contrast(1.1);
-      transition: filter 0s; /* controlled by JS */
-      transform: scale(1.03);
-      transition: transform 0.8s ease;
-    }
-    .spread-photo:hover .spread-img { transform: scale(1.0); }
-    .spread-img.developed {
-      filter: saturate(0.85) brightness(0.75) contrast(1.05);
-      transition: filter 1.8s cubic-bezier(0.4,0,0.2,1),
-                  transform 0.8s ease;
-    }
-
-    /* Developing ripple — chemical tray wave */
-    .develop-ripple {
-      position: absolute; inset: 0; z-index: 2;
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: opacity 0.5s ease, transform 0.6s cubic-bezier(0.4,0,0.2,1);
       pointer-events: none;
-      background: linear-gradient(
-        to bottom,
-        transparent 0%,
-        rgba(10,6,4,0.3) 50%,
-        transparent 100%
-      );
-      transform: translateY(-100%);
-      transition: transform 0s;
+      -webkit-user-drag: none;
     }
-    .spread-img.developing .develop-ripple {
-      transform: translateY(100%);
-      transition: transform 1.6s cubic-bezier(0.4,0,0.2,1);
+    .main-photo-img.changing {
+      opacity: 0; transform: scale(1.03);
     }
 
-    /* Grain on each photo */
-    .spread-photo-grain {
-      position: absolute; inset: 0; z-index: 3; pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-      opacity: 0.45; mix-blend-mode: screen;
+    /* Grain overlay on main display */
+    .main-grain {
+      position: absolute; inset: 0; z-index: 8; pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+      opacity: 0.5; mix-blend-mode: screen;
     }
 
-    /* Frame number — top right of photo */
-    .photo-frame-no {
-      position: absolute; top: 14px; right: 14px; z-index: 6;
+    /* Bottom info bar over the photo */
+    .main-info-bar {
+      position: absolute; bottom: 0; left: 0; right: 0; z-index: 15;
+      padding: 40px 28px 22px;
+      background: linear-gradient(to top, rgba(10,6,4,0.92) 0%, transparent 100%);
+      display: flex; align-items: flex-end; justify-content: space-between;
+      pointer-events: none;
+    }
+    .main-info-left { display: flex; flex-direction: column; gap: 5px; }
+    .main-frame-no {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+      color: rgba(245,168,0,0.6);
+    }
+    .main-title {
+      font-family: var(--disp); font-size: clamp(24px,3.5vw,48px);
+      color: var(--paper); line-height: 1; letter-spacing: 1px;
+    }
+    .main-location {
       font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.25); pointer-events: none;
+      color: rgba(246,241,233,0.45);
     }
-    /* Watermark — invisible on dark, visible if lightened */
-    .spread-watermark {
-      position: absolute; bottom: 14px; right: 14px; z-index: 4;
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
-      color: rgba(246,241,233,0.18); pointer-events: none;
+    .main-info-right {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 4px;
     }
-
-    /* Photo shield */
-    .spread-photo .photo-shield { z-index: 10; }
-
-    /* Fullscreen button — always visible, centered bottom of photo */
-    .btn-fullscreen {
-      position: absolute; bottom: 20px; left: 50%;
-      transform: translateX(-50%);
-      z-index: 20;
-      display: flex; align-items: center; gap: 8px;
-      padding: 9px 20px;
-      background: rgba(10,6,4,0.75);
-      border: 1px solid rgba(246,241,233,0.25);
-      border-radius: 3px; cursor: pointer;
-      font-family: var(--mono); font-size: 10px;
-      letter-spacing: 2.5px; color: rgba(246,241,233,0.7);
-      transition: background 0.2s, border-color 0.2s, color 0.2s;
-      pointer-events: all !important;
-      backdrop-filter: blur(4px);
-      opacity: 0; transition: opacity 0.3s ease;
-    }
-    .spread-photo:hover .btn-fullscreen { opacity: 1; }
-    .btn-fullscreen:hover {
-      background: rgba(200,145,58,0.25);
-      border-color: var(--gold); color: var(--gold);
-    }
-    .btn-fullscreen svg { width: 13px; height: 13px; flex-shrink: 0; }
-
-    /* Develop status badge */
-    .develop-badge {
-      position: absolute; bottom: 12px; right: 14px; z-index: 12;
+    .main-element-tag {
       font-family: var(--mono); font-size: 8px; letter-spacing: 2px;
-      color: rgba(139,26,26,0.8);
-      display: flex; align-items: center; gap: 5px;
-      opacity: 1; transition: opacity 0.5s;
+      padding: 3px 10px; border-radius: 20px;
+      background: rgba(245,168,0,0.15); color: var(--kodak-gold);
+      border: 1px solid rgba(245,168,0,0.25);
     }
-    .develop-badge.done { opacity: 0; }
-    .develop-badge::before {
-      content: ''; width: 5px; height: 5px; border-radius: 50%;
-      background: var(--red); animation: safePulse 1s ease-in-out infinite;
+    .main-date {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px;
+      color: rgba(246,241,233,0.3);
     }
 
-    /* ── JOURNAL PANEL — warm paper ── */
-    .spread-journal {
+    /* Fullscreen button — top right of main display */
+    .btn-fullscreen {
+      position: absolute; top: 16px; right: 16px; z-index: 25;
+      pointer-events: all;
+      display: flex; align-items: center; gap: 8px;
+      padding: 9px 18px;
+      background: rgba(10,6,4,0.8);
+      border: 1px solid rgba(245,168,0,0.4);
+      border-radius: 2px; cursor: pointer;
+      font-family: var(--mono); font-size: 9px;
+      letter-spacing: 2px; color: rgba(245,168,0,0.8);
+      transition: all 0.2s;
+      backdrop-filter: blur(8px);
+    }
+    .btn-fullscreen:hover {
+      background: rgba(245,168,0,0.2);
+      border-color: var(--kodak-gold);
+      color: var(--kodak-gold);
+    }
+    .btn-fullscreen svg { width: 12px; height: 12px; flex-shrink: 0; }
+
+    /* Story panel — slides out below photo */
+    .story-panel {
       background: var(--paper);
-      padding: 48px 40px;
-      display: flex; flex-direction: column; justify-content: center;
+      border-left: 2px solid rgba(245,168,0,0.2);
+      border-right: 2px solid rgba(245,168,0,0.2);
+      border-bottom: 2px solid rgba(245,168,0,0.15);
+      padding: 28px 32px 24px;
+      display: grid; grid-template-columns: 1fr auto;
+      gap: 24px; align-items: start;
       position: relative;
     }
     /* Red margin line */
-    .spread-journal::before {
+    .story-panel::before {
       content: ''; position: absolute;
-      left: 28px; top: 0; bottom: 0; width: 1px;
-      background: rgba(212,121,42,0.25);
+      left: 20px; top: 0; bottom: 0; width: 1px;
+      background: rgba(212,121,42,0.2);
     }
     /* Ruled lines */
-    .spread-journal::after {
+    .story-panel::after {
       content: ''; position: absolute; inset: 0;
-      background: repeating-linear-gradient(
-        to bottom,
-        transparent, transparent 31px,
-        rgba(28,17,9,0.04) 31px, rgba(28,17,9,0.04) 32px
-      );
+      background: repeating-linear-gradient(to bottom, transparent, transparent 31px, rgba(28,17,9,0.04) 31px, rgba(28,17,9,0.04) 32px);
       pointer-events: none;
     }
-    .journal-inner { position: relative; z-index: 1; }
-
-    .journal-frame-no {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
-      color: rgba(139,26,26,0.5); margin-bottom: 20px;
+    .story-text {
+      position: relative; z-index: 1;
+      font-size: 14px; line-height: 1.85; color: #3D2B1A;
+      font-style: italic;
+      min-height: 64px;
+      transition: opacity 0.4s ease;
     }
-    .journal-element-tag {
-      display: inline-block; font-family: var(--mono); font-size: 8px;
-      letter-spacing: 2px; padding: 3px 10px; border-radius: 20px;
-      margin-bottom: 16px;
-    }
-    .journal-title {
-      font-family: var(--disp); font-size: clamp(28px,3vw,44px);
-      color: var(--ink); line-height: 1; margin-bottom: 18px;
-      letter-spacing: 1px;
-    }
-    .journal-what-said {
-      font-family: var(--mono); font-size: 9px; letter-spacing: 2.5px;
-      color: var(--teal); margin-bottom: 10px;
-    }
-    .journal-story {
-      font-size: 14px; line-height: 1.85; color: var(--ink2);
-      font-style: italic; margin-bottom: 20px;
-    }
-    .journal-meta {
-      border-top: 1px solid var(--faint); padding-top: 14px;
+    .story-text.changing { opacity: 0; }
+    .story-exif {
+      position: relative; z-index: 1;
       display: flex; flex-direction: column; gap: 5px;
+      border-left: 1px solid rgba(28,17,9,0.1);
+      padding-left: 20px; min-width: 160px;
     }
-    .journal-meta-row {
-      display: flex; gap: 8px; align-items: baseline;
-      font-family: var(--mono); font-size: 9px;
-    }
-    .journal-meta-label { letter-spacing: 2px; color: var(--muted); min-width: 72px; }
-    .journal-meta-val   { color: var(--ink2); font-size: 10px; }
+    .exif-row { display: flex; flex-direction: column; gap: 1px; }
+    .exif-label { font-family: var(--mono); font-size: 8px; letter-spacing: 2px; color: #7A6A54; }
+    .exif-val   { font-family: var(--mono); font-size: 10px; color: #3D2B1A; }
 
-    /* ── FULLSCREEN VIEWER ── */
-    #viewer {
-      position: fixed; inset: 0; z-index: 9000;
-      background: #000;
-      display: none; align-items: center; justify-content: center;
-      cursor: none; /* hide cursor for immersion */
+    /* Prev/Next nav over main display */
+    .main-nav-btn {
+      position: absolute; top: 50%; z-index: 25;
+      transform: translateY(-50%);
+      pointer-events: all;
+      width: 42px; height: 42px;
+      display: flex; align-items: center; justify-content: center;
+      background: rgba(10,6,4,0.75);
+      border: 1px solid rgba(245,168,0,0.3);
+      border-radius: 2px; cursor: pointer;
+      font-family: var(--mono); font-size: 16px; color: rgba(245,168,0,0.7);
+      transition: all 0.2s; backdrop-filter: blur(6px);
     }
-    #viewer.open { display: flex; }
-    #viewer-img {
-      max-width: 100vw; max-height: 100vh;
-      width: 100%; height: 100%;
-      object-fit: contain;
-      pointer-events: none; draggable: false;
-      -webkit-user-drag: none;
-      /* Prevent screenshot via CSS (mild deterrent) */
-      filter: contrast(1.0); /* reset — no degradation */
-    }
-    /* Invisible watermark in viewer */
-    #viewer-watermark {
-      position: absolute; bottom: 20px; right: 24px;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
-      color: rgba(255,255,255,0.15); pointer-events: none;
-      text-shadow: 0 1px 4px rgba(0,0,0,0.5);
-    }
-    /* Close hint — fades after 2s */
-    #viewer-hint {
-      position: absolute; top: 20px; right: 24px;
-      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
-      color: rgba(255,255,255,0.25);
-      transition: opacity 0.5s;
-    }
-    /* Viewer caption — bottom center */
-    #viewer-caption {
-      position: absolute; bottom: 20px; left: 0; right: 0;
-      text-align: center;
-      font-family: var(--serif); font-style: italic;
-      font-size: 14px; color: rgba(255,255,255,0.2);
-      pointer-events: none;
+    .main-nav-btn:hover { background: rgba(245,168,0,0.2); color: var(--kodak-gold); }
+    .main-nav-btn.prev { left: 16px; }
+    .main-nav-btn.next { right: 16px; }
+    .main-nav-btn:disabled { opacity: 0.2; cursor: default; }
+
+    /* ══════════════════════════════════════════
+       KODAK GOLD FILM REEL — THE STRIP
+    ══════════════════════════════════════════ */
+    .reel-section {
+      padding: 32px 0 0;
+      position: relative;
+      user-select: none;
     }
 
-    /* ── ELEMENT COLOR TOKENS ── */
-    .el-water  { --el-color:#2D6EA8; --el-bg:rgba(45,110,168,0.12); }
-    .el-sky    { --el-color:#8B6E9E; --el-bg:rgba(139,110,158,0.12); }
-    .el-earth  { --el-color:#7A5C2E; --el-bg:rgba(122,92,46,0.12); }
-    .el-ice    { --el-color:#5A9EB5; --el-bg:rgba(90,158,181,0.12); }
-    .el-fire   { --el-color:#C4520A; --el-bg:rgba(196,82,10,0.12); }
-
-    /* Chapter header tints */
-    .ch-water  { background:linear-gradient(to bottom, rgba(45,110,168,0.08),var(--dark)); }
-    .ch-sky    { background:linear-gradient(to bottom, rgba(139,110,158,0.08),var(--dark)); }
-    .ch-earth  { background:linear-gradient(to bottom, rgba(122,92,46,0.08),var(--dark)); }
-    .ch-ice    { background:linear-gradient(to bottom, rgba(90,158,181,0.08),var(--dark)); }
-    .ch-fire   { background:linear-gradient(to bottom, rgba(196,82,10,0.08),var(--dark)); }
-
-    /* eyebrow + tag color per element */
-    .el-water .chapter-eyebrow, .el-water .chapter-eyebrow::before { color:rgba(45,110,168,0.7); background:rgba(45,110,168,0.7); }
-    .el-sky   .chapter-eyebrow, .el-sky   .chapter-eyebrow::before { color:rgba(139,110,158,0.7);background:rgba(139,110,158,0.7);}
-    .el-earth .chapter-eyebrow, .el-earth .chapter-eyebrow::before { color:rgba(162,122,66,0.8); background:rgba(162,122,66,0.8); }
-    .el-ice   .chapter-eyebrow, .el-ice   .chapter-eyebrow::before { color:rgba(90,158,181,0.7); background:rgba(90,158,181,0.7); }
-    .el-fire  .chapter-eyebrow, .el-fire  .chapter-eyebrow::before { color:rgba(196,82,10,0.8);  background:rgba(196,82,10,0.8);  }
-
-    .journal-element-tag {
-      color: var(--el-color); background: var(--el-bg);
+    /* Reel label strip */
+    .reel-label-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 56px 14px;
     }
-
-    /* ── LOADING SKELETON ── */
-    .skeleton-spread {
-      display: grid; grid-template-columns: 65fr 35fr;
-      margin-bottom: 4px; min-height: 520px;
+    .reel-label {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 3px;
+      color: rgba(245,168,0,0.5);
+      display: flex; align-items: center; gap: 8px;
     }
-    .skel-photo { background: var(--dark2); animation: skelDark 1.8s ease-in-out infinite; }
-    .skel-journal { background: var(--paper2); animation: skelLight 1.8s ease-in-out infinite; }
-    @keyframes skelDark  { 0%,100%{opacity:0.6}50%{opacity:1} }
-    @keyframes skelLight { 0%,100%{opacity:0.8}50%{opacity:1} }
-
-    /* ── EMPTY STATE ── */
-    .empty-chapter {
-      padding: 80px 56px; text-align: center;
-      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+    .reel-label::before {
+      content: ''; width: 16px; height: 1px; background: rgba(245,168,0,0.3);
+    }
+    .reel-counter {
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
       color: rgba(246,241,233,0.2);
     }
 
-    /* ── CLOSING ── */
+    /* The full film strip wrapper */
+    .film-strip-wrap {
+      position: relative;
+      overflow: hidden;
+      cursor: grab;
+    }
+    .film-strip-wrap:active { cursor: grabbing; }
+
+    /* The actual Kodak-gold film strip */
+    .film-strip {
+      background: var(--kodak-film);
+      position: relative;
+      display: flex; flex-direction: column;
+      border-top: 3px solid var(--kodak-gold2);
+      border-bottom: 3px solid var(--kodak-gold2);
+    }
+
+    /* Sprocket rows — top and bottom */
+    .sprocket-row {
+      height: 28px; background: var(--kodak-perf);
+      display: flex; align-items: center;
+      overflow: hidden; flex-shrink: 0;
+    }
+
+    /* Animated sprocket holes — driven by JS scroll offset */
+    .sprocket-inner {
+      display: flex; align-items: center; gap: 0;
+      will-change: transform;
+      flex-shrink: 0;
+    }
+
+    .sprocket-hole {
+      width: 20px; height: 15px; border-radius: 3px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.04);
+      margin: 0 10px; flex-shrink: 0;
+      box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    /* The frames row — horizontal scroll */
+    .frames-row {
+      display: flex; align-items: center;
+      padding: 16px 56px 16px;
+      gap: 6px;
+      overflow-x: auto; overflow-y: visible;
+      scrollbar-width: none;
+      will-change: transform;
+    }
+    .frames-row::-webkit-scrollbar { display: none; }
+
+    /* Individual film frame */
+    .film-frame {
+      flex-shrink: 0;
+      cursor: pointer;
+      position: relative;
+      transition: transform 0.25s cubic-bezier(0.34,1.3,0.64,1), z-index 0s;
+    }
+
+    /* Photo print inside the frame */
+    .film-print {
+      width: 160px;
+      background: #0A0600;
+      border: 2px solid rgba(245,168,0,0.12);
+      padding: 5px 5px 28px;
+      box-shadow:
+        3px 4px 16px rgba(0,0,0,0.5),
+        inset 0 0 0 1px rgba(255,255,255,0.03);
+      position: relative;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .film-frame:hover .film-print {
+      border-color: rgba(245,168,0,0.4);
+    }
+    .film-frame.active .film-print {
+      border-color: var(--kodak-gold);
+      box-shadow:
+        3px 4px 24px rgba(245,168,0,0.3),
+        0 0 0 1px var(--kodak-gold),
+        inset 0 0 0 1px rgba(245,168,0,0.1);
+    }
+
+    .film-img-wrap {
+      width: 100%; height: 110px; overflow: hidden; position: relative;
+      background: #060402;
+    }
+    .film-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover; display: block;
+      filter: sepia(6%) contrast(1.05);
+      transition: transform 0.4s ease, filter 0.3s ease;
+    }
+    .film-frame:hover .film-img-wrap img {
+      transform: scale(1.05);
+      filter: sepia(0%) contrast(1.08) brightness(1.05);
+    }
+    .film-frame.active .film-img-wrap img {
+      filter: sepia(0%) contrast(1.1) brightness(1.08);
+    }
+
+    /* Frame number caption */
+    .film-caption {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      height: 28px; display: flex; align-items: center; justify-content: space-between;
+      padding: 0 7px;
+    }
+    .fc-num {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px;
+      color: rgba(245,168,0,0.55);
+    }
+    .fc-name {
+      font-family: var(--mono); font-size: 7px; letter-spacing: 1px;
+      color: rgba(246,241,233,0.2); white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; max-width: 90px; text-align: right;
+    }
+
+    /* Active glow indicator */
+    .film-frame.active::after {
+      content: '';
+      position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%);
+      width: 4px; height: 4px; border-radius: 50%;
+      background: var(--kodak-gold);
+      box-shadow: 0 0 8px var(--kodak-gold);
+    }
+
+    /* Frame hover lift */
+    .film-frame:hover { transform: translateY(-8px) scale(1.04); z-index: 10; }
+    .film-frame.active { transform: translateY(-12px) scale(1.06); z-index: 12; }
+
+    /* Slight alternating rotation for feel */
+    .film-frame:nth-child(3n+1) { transform-origin: center bottom; }
+    .film-frame:nth-child(3n+2) { transform-origin: center bottom; }
+    .film-frame:nth-child(3n)   { transform-origin: center bottom; }
+
+    /* Empty placeholder frame */
+    .film-frame.placeholder .film-img-wrap {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .film-frame.placeholder .film-img-wrap::after {
+      content: '◎';
+      font-size: 24px; color: rgba(245,168,0,0.15);
+    }
+
+    /* Kodak stripe along bottom of strip */
+    .kodak-stripe {
+      height: 6px;
+      background: repeating-linear-gradient(
+        90deg,
+        var(--kodak-gold)  0px,
+        var(--kodak-gold)  40px,
+        var(--kodak-gold2) 40px,
+        var(--kodak-gold2) 80px,
+        #C04800             80px,
+        #C04800             120px,
+        var(--kodak-gold)  120px
+      );
+      opacity: 0.7;
+    }
+
+    /* Kodak branding badge on the strip */
+    .kodak-badge {
+      position: absolute; right: 56px; top: 50%;
+      transform: translateY(-50%);
+      z-index: 20; pointer-events: none;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 1px;
+    }
+    .kb-brand {
+      font-family: var(--disp); font-size: 13px; letter-spacing: 3px;
+      color: rgba(245,168,0,0.12);
+    }
+    .kb-iso {
+      font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px;
+      color: rgba(245,168,0,0.08);
+    }
+
+    /* Scroll hint arrows */
+    .reel-scroll-hint {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 14px 0 0;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.15);
+    }
+    .rsh-arrow { animation: arrowBounce 2s ease-in-out infinite; }
+    .rsh-arrow:nth-child(3) { animation-delay: 0.15s; }
+    .rsh-arrow:nth-child(4) { animation-delay: 0.30s; }
+    @keyframes arrowBounce {
+      0%,100% { opacity: 0.2; transform: translateX(0); }
+      50%      { opacity: 0.6; transform: translateX(4px); }
+    }
+
+    /* ══════════════════════════════════════════
+       EMPTY STATE
+    ══════════════════════════════════════════ */
+    .empty-state {
+      padding: 100px 56px; text-align: center;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+      color: rgba(246,241,233,0.15);
+    }
+    .empty-icon { font-size: 48px; opacity: 0.1; margin-bottom: 20px; }
+
+    /* ══════════════════════════════════════════
+       FULLSCREEN VIEWER
+    ══════════════════════════════════════════ */
+    #fullscreen-viewer {
+      position: fixed; inset: 0; z-index: 9000;
+      background: #000;
+      display: none; align-items: center; justify-content: center;
+    }
+    #fullscreen-viewer.open { display: flex; }
+    #fv-img {
+      max-width: 100vw; max-height: 100vh;
+      width: 100%; height: 100%;
+      object-fit: contain;
+      pointer-events: none;
+      -webkit-user-drag: none;
+    }
+    #fv-watermark {
+      position: absolute; bottom: 20px; right: 24px;
+      font-family: var(--mono); font-size: 11px; letter-spacing: 2px;
+      color: rgba(255,255,255,0.1); pointer-events: none;
+    }
+    #fv-close {
+      position: absolute; top: 20px; right: 24px;
+      font-family: var(--mono); font-size: 10px; letter-spacing: 2px;
+      color: rgba(255,255,255,0.3); cursor: pointer;
+      background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1);
+      padding: 7px 16px; border-radius: 2px; transition: all 0.2s;
+    }
+    #fv-close:hover { color: var(--kodak-gold); border-color: rgba(245,168,0,0.4); }
+    #fv-caption {
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      text-align: center; font-family: var(--serif); font-style: italic;
+      font-size: 14px; color: rgba(255,255,255,0.2); pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       CLOSING & FOOTER
+    ══════════════════════════════════════════ */
     .closing {
       padding: 96px 56px; text-align: center;
+      margin-top: 80px;
       position: relative; overflow: hidden;
     }
     .closing::before {
       content: ''; position: absolute; inset: 0;
-      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(139,26,26,0.06), transparent);
-      pointer-events: none;
+      background: radial-gradient(ellipse 60% 50% at 50% 50%, rgba(245,168,0,0.04), transparent);
     }
     .closing-title {
       font-family: var(--disp); font-size: clamp(40px,6vw,72px);
-      color: var(--paper); letter-spacing: 3px; margin-bottom: 20px;
+      color: var(--paper); letter-spacing: 3px; margin-bottom: 20px; position: relative;
     }
-    .closing-title span { color: var(--gold); }
+    .closing-title span { color: var(--kodak-gold); }
     .closing-sub {
-      font-size: 16px; font-style: italic; color: rgba(246,241,233,0.35);
-      max-width: 480px; margin: 0 auto; line-height: 1.75;
+      font-size: 15px; font-style: italic; color: rgba(246,241,233,0.3);
+      max-width: 480px; margin: 0 auto; line-height: 1.75; position: relative;
     }
-
-    /* ── FOOTER ── */
     .page-footer {
-      background: var(--dark2); padding: 40px 56px;
+      background: #080502; padding: 40px 56px;
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 16px;
-      border-top: 1px solid rgba(255,255,255,0.05);
+      border-top: 1px solid rgba(245,168,0,0.08);
     }
-    .footer-name { font-family: var(--disp); font-size: 20px; color: rgba(246,241,233,0.5); letter-spacing: 2px; }
+    .footer-name { font-family: var(--disp); font-size: 20px; color: rgba(246,241,233,0.3); letter-spacing: 2px; }
     .footer-links { display: flex; gap: 24px; }
     .footer-links a { font-family: var(--mono); font-size: 10px; letter-spacing: 1px; color: rgba(246,241,233,0.2); text-decoration: none; transition: color 0.2s; }
-    .footer-links a:hover { color: var(--gold); }
+    .footer-links a:hover { color: var(--kodak-gold); }
 
-    /* Responsive */
     @media(max-width:768px){
-      .top-nav, .hero, .chapter-header, .closing, .page-footer { padding-left:20px; padding-right:20px; }
-      .hero { padding-bottom: 48px; }
-      .spread.photo-left, .spread.photo-right { grid-template-columns: 1fr; }
-      .spread-photo { min-height: 300px; order: 1; }
-      .spread-journal { order: 2; padding: 28px 24px; }
-      .spread.photo-full .spread-photo { min-height: 55vh; }
+      .top-nav, .hero, .filter-bar, .viewer-section, .reel-label-bar, .closing, .page-footer { padding-left: 20px; padding-right: 20px; }
+      .frames-row { padding-left: 20px; padding-right: 20px; }
+      .kodak-badge { display: none; }
+      .story-panel { grid-template-columns: 1fr; }
+      .story-exif { border-left: none; padding-left: 0; border-top: 1px solid rgba(28,17,9,0.1); padding-top: 12px; flex-direction: row; flex-wrap: wrap; gap: 12px; }
+      .main-nav-btn { width: 34px; height: 34px; font-size: 13px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── INTRO — Red Safelight Darkroom ── -->
+<!-- ══ INTRO — Red Safelight (unchanged) ══ -->
 <div id="intro">
   <div class="safelight"></div>
   <div class="safelight2"></div>
@@ -571,51 +761,134 @@
   <div class="tray-lines"></div>
   <div class="intro-content">
     <div class="intro-mono">// DARKROOM · DEVELOPING</div>
-    <div class="intro-title">THROUGH<br>MY<br><span style="color:var(--gold)">EYES.</span></div>
+    <div class="intro-title">THROUGH<br>MY<br><span style="color:var(--kodak-gold)">EYES.</span></div>
     <div class="intro-rule"></div>
-    <div class="intro-sub">
-      "Every landscape has a story.<br>
-      I just held the camera still long enough to hear it."
-    </div>
+    <div class="intro-sub">"Every landscape has a story.<br>I just held the camera still long enough to hear it."</div>
     <div class="intro-cta">TAP ANYWHERE TO ENTER THE DARKROOM</div>
   </div>
-  <div class="intro-skip" id="introSkip" onclick="window.dismissIntro()">SKIP →</div>
+  <div class="intro-skip" id="introSkip">SKIP →</div>
 </div>
 
-<!-- ── PAGE ── -->
+<!-- ══ PAGE ══ -->
 <div id="page">
   <nav class="top-nav" id="topNav">
     <a class="nav-logo" href="nomad.html">AR // LENS</a>
     <a class="nav-back" href="nomad.html">← NOMAD</a>
   </nav>
 
-  <!-- Hero — develops on load -->
+  <!-- ── HERO ── -->
   <section class="hero">
-    <div class="hero-bg">
-      <div class="hero-bg-img" id="heroBg"></div>
-      <div class="hero-vignette"></div>
-      <div class="hero-grain"></div>
+    <div class="hero-film-strip top" id="filmStripTop">
+      <div class="perf-row" id="perfTop"></div>
+      <div class="perf-row" id="perfTop2"></div>
     </div>
-    <div class="hero-content">
-      <div class="hero-eyebrow">// WORLD THROUGH MY EYES</div>
-      <h1 class="hero-title">WHAT<br>NATURE<br><span class="gold">SAID.</span></h1>
-      <p class="hero-sub">I don't take photographs. I listen to landscapes — and write down what they tell me.</p>
-      <div class="hero-stats">
-        <div><div class="h-stat-num" id="statPhotos">—</div><div class="h-stat-label">PHOTOGRAPHS</div></div>
-        <div><div class="h-stat-num" id="statCountries">—</div><div class="h-stat-label">COUNTRIES</div></div>
-        <div><div class="h-stat-num">5</div><div class="h-stat-label">ELEMENTS</div></div>
-      </div>
+    <div class="hero-kodak-bg">KODAK GOLD</div>
+    <div class="hero-eyebrow">// WORLD THROUGH MY EYES</div>
+    <h1 class="hero-title">WHAT<br>NATURE<br><span class="gold">SAID.</span></h1>
+    <p class="hero-sub">I don't take photographs. I listen to landscapes — and write down what they tell me.</p>
+    <div class="hero-stats">
+      <div class="h-stat"><div class="h-stat-num" id="statPhotos">—</div><div class="h-stat-label">PHOTOGRAPHS</div></div>
+      <div class="h-stat"><div class="h-stat-num" id="statCountries">—</div><div class="h-stat-label">COUNTRIES</div></div>
+      <div class="h-stat"><div class="h-stat-num">5</div><div class="h-stat-label">ELEMENTS</div></div>
+    </div>
+    <div class="hero-film-strip bot">
+      <div class="perf-row rev" id="perfBot"></div>
+      <div class="perf-row rev" id="perfBot2"></div>
     </div>
   </section>
 
-  <!-- Chapters container -->
-  <div id="chaptersContainer">
-    <!-- Loading skeletons -->
-    <div class="skeleton-spread"><div class="skel-photo"></div><div class="skel-journal"></div></div>
-    <div class="skeleton-spread" style="grid-template-columns:35fr 65fr"><div class="skel-journal"></div><div class="skel-photo"></div></div>
+  <!-- ── ELEMENT FILTER TABS ── -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn active" data-el="all">ALL FRAMES</button>
+    <button class="filter-btn" data-el="ice">❄ ICE</button>
+    <button class="filter-btn" data-el="sky">◉ SKY</button>
+    <button class="filter-btn" data-el="water">〜 WATER</button>
+    <button class="filter-btn" data-el="fire">◈ FIRE</button>
+    <button class="filter-btn" data-el="earth">◆ EARTH</button>
   </div>
 
-  <!-- Closing -->
+  <!-- ── MAIN VIEWER ── -->
+  <div class="viewer-section">
+    <div class="main-display" id="mainDisplay">
+      <div class="main-display-corners"></div>
+      <img class="main-photo-img" id="mainImg" src="" alt="">
+      <div class="main-grain"></div>
+
+      <!-- Fullscreen button -->
+      <button class="btn-fullscreen" id="btnFullscreen">
+        <svg viewBox="0 0 16 16" fill="none">
+          <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        FULLSCREEN
+      </button>
+
+      <!-- Prev / Next -->
+      <button class="main-nav-btn prev" id="mainPrev">‹</button>
+      <button class="main-nav-btn next" id="mainNext">›</button>
+
+      <!-- Info bar -->
+      <div class="main-info-bar">
+        <div class="main-info-left">
+          <div class="main-frame-no" id="mainFrameNo">FRAME 001</div>
+          <div class="main-title" id="mainTitle">—</div>
+          <div class="main-location" id="mainLocation">—</div>
+        </div>
+        <div class="main-info-right">
+          <div class="main-element-tag" id="mainElement">—</div>
+          <div class="main-date" id="mainDate">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Story panel -->
+    <div class="story-panel" id="storyPanel">
+      <div class="story-text" id="storyText">Select a frame from the reel below.</div>
+      <div class="story-exif" id="storyExif"></div>
+    </div>
+  </div>
+
+  <!-- ── KODAK GOLD FILM REEL ── -->
+  <div class="reel-section">
+    <div class="reel-label-bar">
+      <div class="reel-label">KODAK GOLD 200 · 35MM</div>
+      <div class="reel-counter" id="reelCounter">0 FRAMES</div>
+    </div>
+
+    <div class="film-strip-wrap" id="filmStripWrap">
+      <div class="film-strip" id="filmStrip">
+        <!-- Top sprocket -->
+        <div class="sprocket-row">
+          <div class="sprocket-inner" id="sprocketTop"></div>
+        </div>
+
+        <!-- Kodak branding badge -->
+        <div class="kodak-badge">
+          <div class="kb-brand">KODAK GOLD</div>
+          <div class="kb-iso">ISO 200 · 35MM</div>
+        </div>
+
+        <!-- The frames -->
+        <div class="frames-row" id="framesRow"></div>
+
+        <!-- Bottom sprocket -->
+        <div class="sprocket-row">
+          <div class="sprocket-inner" id="sprocketBot"></div>
+        </div>
+      </div>
+
+      <!-- Kodak colour stripe -->
+      <div class="kodak-stripe"></div>
+    </div>
+
+    <div class="reel-scroll-hint">
+      <span>SCROLL THE REEL</span>
+      <span class="rsh-arrow">›</span>
+      <span class="rsh-arrow">›</span>
+      <span class="rsh-arrow">›</span>
+    </div>
+  </div>
+
+  <!-- ── CLOSING ── -->
   <div class="closing">
     <div class="closing-title">THE <span>LIGHT</span> REMAINS.</div>
     <div class="closing-sub">"Pighle neelam sa behta hua ye sama" — the sky melting like liquid sapphire. That is not poetry. That is meteorology, if you pay attention.</div>
@@ -632,311 +905,360 @@
 </div>
 
 <!-- ── FULLSCREEN VIEWER ── -->
-<div id="viewer" onclick="window.closeViewer()">
-  <img id="viewer-img" src="" alt="" draggable="false">
-  <div id="viewer-watermark">© ANURAAG RAVULAPARTHI · anuraag.me</div>
-  <div id="viewer-hint">PRESS ESC OR CLICK TO EXIT</div>
-  <div id="viewer-caption"></div>
+<div id="fullscreen-viewer">
+  <img id="fv-img" src="" alt="" draggable="false">
+  <div id="fv-watermark">© ANURAAG RAVULAPARTHI · anuraag.me</div>
+  <div id="fv-close" onclick="closeFullscreen()">ESC / CLOSE ✕</div>
+  <div id="fv-caption"></div>
 </div>
 
 <script type="module">
-import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, getDocs, query, orderBy, where }
-                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 
-// ── FIREBASE ──────────────────────────────────────────────────────
+// ── FIREBASE ──────────────────────────────────────────
 const app = initializeApp({
-  apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
-  authDomain:"nomad-404.firebaseapp.com",
-  projectId:"nomad-404",
-  appId:"1:638331724572:web:baa0d70108e920099150d9"
+  apiKey: "AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+  authDomain: "nomad-404.firebaseapp.com",
+  projectId: "nomad-404",
+  appId: "1:638331724572:web:baa0d70108e920099150d9"
 });
 const db = getFirestore(app);
 
-// ── PHOTO PROTECTION ──────────────────────────────────────────────
-// Disable right-click
-document.addEventListener('contextmenu', e => {
-  if(e.target.tagName === 'IMG' || e.target.closest('.spread-photo') || e.target.closest('#viewer')) {
-    e.preventDefault();
-    return false;
-  }
-});
-// Disable drag on all images
-document.addEventListener('dragstart', e => {
-  if(e.target.tagName === 'IMG') { e.preventDefault(); return false; }
-});
-// Disable long-press save on mobile
-document.addEventListener('touchstart', e => {
-  if(e.target.tagName === 'IMG') e.preventDefault();
-}, { passive: false });
-// Disable print (soft deterrent)
+// ── PHOTO PROTECTION ──────────────────────────────────
+document.addEventListener('contextmenu', e => { if(e.target.tagName==='IMG') { e.preventDefault(); return false; } });
+document.addEventListener('dragstart', e => { if(e.target.tagName==='IMG') { e.preventDefault(); return false; } });
+document.addEventListener('touchstart', e => { if(e.target.tagName==='IMG') e.preventDefault(); }, { passive: false });
 window.addEventListener('beforeprint', e => e.preventDefault());
-// Keyboard shortcuts for screenshot (soft deterrent — logs attempt)
-document.addEventListener('keydown', e => {
-  if((e.key === 'PrintScreen') || (e.metaKey && e.shiftKey && (e.key==='3'||e.key==='4'||e.key==='s'))) {
-    // Can't prevent but can detect
-    console.warn('Screenshot attempt detected');
-  }
-  if(e.key === 'Escape') closeViewer();
-});
+document.addEventListener('keydown', e => { if(e.key==='Escape') { closeFullscreen(); } });
 
-// ── ELEMENT CONFIG ────────────────────────────────────────────────
-const ELEMENTS = {
-  water: { label:'WATER', poem:'Rivers don\'t ask permission. They just find their way.', class:'el-water', chClass:'ch-water' },
-  sky:   { label:'SKY',   poem:'Pighle neelam sa behta hua ye sama — the sky, melting.', class:'el-sky',   chClass:'ch-sky'   },
-  earth: { label:'EARTH', poem:'The ground remembers every footstep. Long after you\'ve gone.', class:'el-earth', chClass:'ch-earth' },
-  ice:   { label:'ICE',   poem:'Ice is just water that decided to stay.', class:'el-ice',   chClass:'ch-ice'   },
-  fire:  { label:'FIRE',  poem:'Golden hour doesn\'t last. That\'s why it matters.', class:'el-fire',  chClass:'ch-fire'  },
-};
-const ELEMENT_ORDER = ['ice','sky','water','fire','earth'];
+// ── ELEMENT CONFIG ─────────────────────────────────────
+const EL_LABELS = { water:'WATER', sky:'SKY', earth:'EARTH', ice:'ICE', fire:'FIRE' };
 
-// ── STATE ─────────────────────────────────────────────────────────
-let photosData = [], introDone = false;
+// ── STATE ──────────────────────────────────────────────
+let allPhotos = [], filteredPhotos = [], currentIdx = 0, activeEl = 'all';
+let introDone = false;
 
-// ── INTRO ─────────────────────────────────────────────────────────
-// Define before the timer so the callback can reference it
-window.dismissIntro = function() {
+// ── INTRO ──────────────────────────────────────────────
+function dismissIntro() {
   if(introDone) return;
   introDone = true;
   clearTimeout(introTimer);
   document.getElementById('intro').classList.add('gone');
   document.getElementById('page').classList.add('vis');
-};
+}
+const introTimer = setTimeout(dismissIntro, 5500);
+document.getElementById('intro').addEventListener('click', e => { if(e.target.id!=='introSkip') dismissIntro(); });
+document.getElementById('introSkip').addEventListener('click', dismissIntro);
 
-const introTimer = setTimeout(window.dismissIntro, 5500);
+// ── BUILD PERFORATION ROWS ─────────────────────────────
+function buildPerfs() {
+  const N = 120;
+  ['perfTop','perfTop2','perfBot','perfBot2'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    // Duplicate for seamless loop
+    for(let pass=0; pass<2; pass++) {
+      for(let i=0; i<N; i++) {
+        const h = document.createElement('div');
+        h.className = 'perf-hole';
+        el.appendChild(h);
+      }
+    }
+  });
+}
+buildPerfs();
 
-document.getElementById('intro').addEventListener('click', function(e) {
-  if(e.target.id !== 'introSkip') window.dismissIntro();
-});
+// Build sprocket holes
+function buildSprockets() {
+  const N = 200;
+  ['sprocketTop','sprocketBot'].forEach(id => {
+    const el = document.getElementById(id);
+    if(!el) return;
+    for(let i=0; i<N; i++) {
+      const h = document.createElement('div');
+      h.className = 'sprocket-hole';
+      el.appendChild(h);
+    }
+  });
+}
+buildSprockets();
 
-// ── LOAD PHOTOS ───────────────────────────────────────────────────
+// ── LOAD PHOTOS ────────────────────────────────────────
 async function loadPhotos() {
   try {
     const snap = await getDocs(collection(db, 'photos'));
-    photosData = snap.docs.map(d => ({id:d.id, ...d.data()}));
-    // Sort: featured first, then by date desc
-    photosData.sort((a,b) => {
+    allPhotos = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    allPhotos.sort((a,b) => {
       if(a.featured && !b.featured) return -1;
       if(!a.featured && b.featured) return 1;
       return (b.date||'').localeCompare(a.date||'');
     });
-    buildGallery();
   } catch(e) {
     console.error('Photos load failed:', e);
-    buildGallery(); // show empty states
   }
+  applyFilter('all');
+  updateStats();
 }
 loadPhotos();
 
-// ── BUILD GALLERY ─────────────────────────────────────────────────
-function buildGallery() {
-  const container = document.getElementById('chaptersContainer');
-  container.innerHTML = ''; // clear skeletons
+function updateStats() {
+  const countries = [...new Set(allPhotos.map(p=>p.country_id).filter(Boolean))].length;
+  const sp = document.getElementById('statPhotos');
+  const sc = document.getElementById('statCountries');
+  if(sp) sp.innerHTML = `${allPhotos.length}<span class="acc">+</span>`;
+  if(sc) sc.innerHTML = `${countries || '—'}`;
+}
 
-  // Update hero stats
-  const countries = [...new Set(photosData.map(p=>p.country_id).filter(Boolean))].length;
-  document.getElementById('statPhotos').innerHTML = `${photosData.length}<span style="color:var(--gold)">+</span>`;
-  document.getElementById('statCountries').innerHTML = `${countries}<span style="color:var(--gold)">+</span>`;
+// ── FILTER ─────────────────────────────────────────────
+function applyFilter(el) {
+  activeEl = el;
+  filteredPhotos = el === 'all' ? [...allPhotos] : allPhotos.filter(p => (p.element||'earth') === el);
+  currentIdx = 0;
 
-  // Set hero background — most dramatic photo
-  const heroPhoto = photosData.find(p=>p.featured) || photosData[0];
-  if(heroPhoto?.image_url) {
-    document.getElementById('heroBg').style.backgroundImage = `url('${heroPhoto.image_url}')`;
-  }
-
-  if(!photosData.length) {
-    container.innerHTML = `
-      <div class="empty-chapter">
-        <div style="font-size:32px;opacity:0.2;margin-bottom:16px">◎</div>
-        NO PHOTOGRAPHS YET<br>
-        <span style="opacity:0.5">Add photos from the dashboard → Photography module</span>
-      </div>`;
-    return;
-  }
-
-  // Group by element
-  const byElement = {};
-  ELEMENT_ORDER.forEach(el => byElement[el] = []);
-  photosData.forEach(p => {
-    const el = p.element || 'earth';
-    if(!byElement[el]) byElement[el] = [];
-    byElement[el].push(p);
+  // Update filter buttons
+  document.querySelectorAll('.filter-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.el === el);
   });
 
-  // Render each chapter that has photos
-  ELEMENT_ORDER.forEach(elKey => {
-    const photos = byElement[elKey];
-    if(!photos.length) return;
-
-    const elConf = ELEMENTS[elKey];
-    const chapter = document.createElement('div');
-    chapter.className = `chapter el-${elKey}`;
-
-    // Chapter header
-    chapter.innerHTML = `
-      <div class="chapter-header ${elConf.chClass}">
-        <div class="chapter-element-bg">${elConf.label}</div>
-        <div class="chapter-eyebrow">// ${elConf.label}</div>
-        <div class="chapter-title">${elConf.label}.</div>
-        <div class="chapter-poem">${elConf.poem}</div>
-      </div>`;
-
-    // Spreads — alternating left/right, first is full-width if featured
-    photos.forEach((photo, i) => {
-      const spread = buildSpread(photo, i, elKey);
-      chapter.appendChild(spread);
-    });
-
-    container.appendChild(chapter);
-  });
-
-  // Init scroll observer for develop effect
-  initDevelopObserver();
+  buildReel();
+  if(filteredPhotos.length > 0) selectPhoto(0);
+  else showEmpty();
 }
 
-// ── BUILD A SPREAD ────────────────────────────────────────────────
-let spreadCount = 0;
+document.querySelectorAll('.filter-btn').forEach(b => {
+  b.addEventListener('click', () => applyFilter(b.dataset.el));
+});
 
-function buildSpread(photo, i, elKey) {
-  const isFirst = i === 0;
-  const isLeft  = i % 2 === 0;
-  const isFull  = photo.featured && i === 0;
-  const elConf  = ELEMENTS[elKey];
-  const frameNo = String(++spreadCount).padStart(3,'0');
+// ── BUILD REEL ─────────────────────────────────────────
+function buildReel() {
+  const row = document.getElementById('framesRow');
+  const counter = document.getElementById('reelCounter');
+  if(!row) return;
+  row.innerHTML = '';
 
-  const spread = document.createElement('div');
-  spread.className = `spread ${isFull ? 'photo-full' : isLeft ? 'photo-left' : 'photo-right'}`;
-  if(!isFull && !isLeft) {
-    // journal comes first on right-layout
-    spread.innerHTML = buildJournal(photo, elKey, elConf, frameNo, 'right') + buildPhoto(photo, photo.title, frameNo);
-  } else {
-    spread.innerHTML = buildPhoto(photo, photo.title, frameNo) + (isFull ? '' : buildJournal(photo, elKey, elConf, frameNo, 'left'));
-  }
+  if(counter) counter.textContent = `${filteredPhotos.length} FRAME${filteredPhotos.length!==1?'S':''}`;
 
-  // Attach fullscreen handler after DOM insert
-  setTimeout(() => {
-    const btn = spread.querySelector('.btn-fullscreen');
-    if(btn) btn.addEventListener('click', e => {
-      e.stopPropagation();
-      openViewer(photo.image_url, photo.title);
-    });
-  }, 0);
+  if(!filteredPhotos.length) { showEmpty(); return; }
 
-  return spread;
-}
+  filteredPhotos.forEach((photo, i) => {
+    const frame = document.createElement('div');
+    frame.className = 'film-frame' + (i===0?' active':'');
+    frame.dataset.idx = i;
 
-function buildPhoto(photo, title, frameNo) {
-  return `
-    <div class="spread-photo" data-src="${photo.image_url||''}">
-      <div class="spread-img" style="background-image:url('${photo.image_url||''}')"></div>
-      <div class="develop-ripple"></div>
-      <div class="spread-photo-grain"></div>
-      <div class="spread-watermark">© ANURAAG RAVULAPARTHI</div>
-      <div class="photo-shield" oncontextmenu="return false;"></div>
-      <div class="develop-badge" id="badge-${frameNo}">DEVELOPING</div>
-      <div class="photo-frame-no">${frameNo}</div>
-      <button class="btn-fullscreen" title="View fullscreen">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        VIEW FULLSCREEN
-      </button>
-    </div>`;
-}
+    const frameNo = String(i+1).padStart(3,'0');
+    const imgSrc = photo.image_url || '';
 
-function buildJournal(photo, elKey, elConf, frameNo, side) {
-  const exif = photo.exif || {};
-  return `
-    <div class="spread-journal el-${elKey}">
-      <div class="journal-inner">
-        <div class="journal-frame-no">FRAME ${frameNo} &nbsp;·&nbsp; WHAT NATURE SAID</div>
-        <div class="journal-element-tag">// ${elConf.label}</div>
-        <div class="journal-title">${photo.title || 'Untitled'}</div>
-        <div class="journal-what-said">// WHAT NATURE SAID</div>
-        <div class="journal-story">${photo.story || 'Story coming soon.'}</div>
-        <div class="journal-meta">
-          <div class="journal-meta-row">
-            <span class="journal-meta-label">LOCATION</span>
-            <span class="journal-meta-val">${photo.location || '—'}</span>
-          </div>
-          <div class="journal-meta-row">
-            <span class="journal-meta-label">DATE</span>
-            <span class="journal-meta-val">${photo.date || '—'}</span>
-          </div>
-          ${exif.camera ? `<div class="journal-meta-row"><span class="journal-meta-label">CAMERA</span><span class="journal-meta-val">${exif.camera}</span></div>` : ''}
-          ${exif.lens   ? `<div class="journal-meta-row"><span class="journal-meta-label">LENS</span><span class="journal-meta-val">${exif.lens}</span></div>` : ''}
-          ${exif.settings ? `<div class="journal-meta-row"><span class="journal-meta-label">SETTINGS</span><span class="journal-meta-val">${exif.settings}</span></div>` : ''}
+    frame.innerHTML = `
+      <div class="film-print">
+        <div class="film-img-wrap">
+          ${imgSrc
+            ? `<img src="${imgSrc}" alt="${photo.title||''}" loading="lazy">`
+            : ``
+          }
         </div>
-      </div>
+        <div class="film-caption">
+          <span class="fc-num">${frameNo}</span>
+          <span class="fc-name">${photo.title||''}</span>
+        </div>
+      </div>`;
+
+    frame.addEventListener('click', () => selectPhoto(i));
+    row.appendChild(frame);
+  });
+
+  // Drag-to-scroll on reel
+  initReelDrag();
+  // Sync sprocket animation to scroll
+  syncSprockets();
+}
+
+// ── SELECT PHOTO ───────────────────────────────────────
+function selectPhoto(idx) {
+  if(idx < 0 || idx >= filteredPhotos.length) return;
+  currentIdx = idx;
+
+  const photo = filteredPhotos[idx];
+  const frameNo = String(idx+1).padStart(3,'0');
+
+  // Update active frame in reel
+  document.querySelectorAll('.film-frame').forEach((f,i) => {
+    f.classList.toggle('active', i === idx);
+  });
+
+  // Scroll active frame into view in reel
+  const activeFrame = document.querySelector('.film-frame.active');
+  if(activeFrame) {
+    const row = document.getElementById('framesRow');
+    const frameLeft = activeFrame.offsetLeft;
+    const frameWidth = activeFrame.offsetWidth;
+    const rowWidth = row.clientWidth;
+    row.scrollTo({ left: frameLeft - rowWidth/2 + frameWidth/2, behavior: 'smooth' });
+  }
+
+  // Animate main photo transition
+  const mainImg = document.getElementById('mainImg');
+  const storyText = document.getElementById('storyText');
+
+  mainImg.classList.add('changing');
+  storyText.classList.add('changing');
+
+  setTimeout(() => {
+    mainImg.src = photo.image_url || '';
+    mainImg.alt = photo.title || '';
+    mainImg.classList.remove('changing');
+    storyText.classList.remove('changing');
+
+    document.getElementById('mainFrameNo').textContent = `FRAME ${frameNo}`;
+    document.getElementById('mainTitle').textContent = photo.title || 'Untitled';
+    document.getElementById('mainLocation').textContent = photo.location || '—';
+    document.getElementById('mainElement').textContent = `// ${EL_LABELS[photo.element||'earth']||'NATURE'}`;
+    document.getElementById('mainDate').textContent = photo.date || '—';
+    storyText.textContent = photo.story || 'Story coming soon.';
+
+    // EXIF
+    const exifEl = document.getElementById('storyExif');
+    const exif = photo.exif || {};
+    exifEl.innerHTML = '';
+    const exifFields = [
+      ['CAMERA', exif.camera],
+      ['LENS',   exif.lens],
+      ['SETTINGS', exif.settings],
+      ['COUNTRY', photo.country_id],
+    ].filter(([,v]) => v);
+    exifFields.forEach(([label, val]) => {
+      exifEl.innerHTML += `<div class="exif-row"><span class="exif-label">${label}</span><span class="exif-val">${val}</span></div>`;
+    });
+  }, 250);
+
+  // Prev / Next buttons
+  const prev = document.getElementById('mainPrev');
+  const next = document.getElementById('mainNext');
+  if(prev) prev.disabled = idx === 0;
+  if(next) next.disabled = idx === filteredPhotos.length - 1;
+
+  // Fullscreen button
+  document.getElementById('btnFullscreen').onclick = () => openFullscreen(photo.image_url, photo.title);
+}
+
+// ── EMPTY STATE ────────────────────────────────────────
+function showEmpty() {
+  const mainImg = document.getElementById('mainImg');
+  if(mainImg) { mainImg.src=''; }
+  document.getElementById('mainTitle').textContent = 'No photos';
+  document.getElementById('mainLocation').textContent = '—';
+  document.getElementById('mainElement').textContent = '—';
+  document.getElementById('mainDate').textContent = '—';
+  document.getElementById('storyText').textContent = 'No photographs in this category yet.';
+  document.getElementById('storyExif').innerHTML = '';
+  document.getElementById('framesRow').innerHTML = `
+    <div style="padding:40px 24px;font-family:var(--mono);font-size:10px;letter-spacing:2px;color:rgba(245,168,0,0.2)">
+      NO FRAMES IN THIS CATEGORY
     </div>`;
 }
 
-// ── SCROLL-TRIGGERED DEVELOP EFFECT ──────────────────────────────
-function initDevelopObserver() {
-  const observer = new IntersectionObserver(entries => {
-    entries.forEach(entry => {
-      if(!entry.isIntersecting) return;
-      const photo  = entry.target;
-      const img    = photo.querySelector('.spread-img');
-      const badge  = photo.querySelector('.develop-badge');
-      if(!img || img.classList.contains('developed')) return;
+// ── PREV / NEXT ────────────────────────────────────────
+document.getElementById('mainPrev').addEventListener('click', () => selectPhoto(currentIdx - 1));
+document.getElementById('mainNext').addEventListener('click', () => selectPhoto(currentIdx + 1));
 
-      // Step 1: ripple sweep (chemical tray wave)
-      img.classList.add('developing');
-      const ripple = photo.querySelector('.develop-ripple');
-      if(ripple) {
-        ripple.style.transition = 'transform 1.6s cubic-bezier(0.4,0,0.2,1)';
-        ripple.style.transform  = 'translateY(100%)';
-      }
+// Keyboard navigation
+document.addEventListener('keydown', e => {
+  if(e.key === 'ArrowLeft')  selectPhoto(currentIdx - 1);
+  if(e.key === 'ArrowRight') selectPhoto(currentIdx + 1);
+});
 
-      // Step 2: colour blooms in
-      setTimeout(() => {
-        img.classList.add('developed');
-        if(badge) badge.classList.add('done');
-        observer.unobserve(photo);
-      }, 400);
-    });
-  }, { threshold: 0.25 });
+// ── DRAG-TO-SCROLL REEL ────────────────────────────────
+function initReelDrag() {
+  const row = document.getElementById('framesRow');
+  if(!row) return;
 
-  document.querySelectorAll('.spread-photo').forEach(p => observer.observe(p));
+  let isDown = false, startX = 0, scrollLeft = 0, didDrag = false;
+
+  row.addEventListener('mousedown', e => {
+    isDown = true; didDrag = false;
+    startX = e.pageX - row.offsetLeft;
+    scrollLeft = row.scrollLeft;
+    row.style.cursor = 'grabbing';
+  });
+  window.addEventListener('mouseup', () => {
+    isDown = false;
+    row.style.cursor = 'grab';
+  });
+  row.addEventListener('mousemove', e => {
+    if(!isDown) return;
+    e.preventDefault();
+    const x = e.pageX - row.offsetLeft;
+    const walk = (x - startX) * 1.2;
+    if(Math.abs(walk) > 4) didDrag = true;
+    row.scrollLeft = scrollLeft - walk;
+    animateSprockets(row.scrollLeft);
+  });
+
+  // Touch support
+  let touchStartX = 0, touchScrollLeft = 0;
+  row.addEventListener('touchstart', e => {
+    touchStartX = e.touches[0].pageX;
+    touchScrollLeft = row.scrollLeft;
+  }, { passive: true });
+  row.addEventListener('touchmove', e => {
+    const x = e.touches[0].pageX;
+    row.scrollLeft = touchScrollLeft - (x - touchStartX) * 1.2;
+    animateSprockets(row.scrollLeft);
+  }, { passive: true });
+
+  // Scroll event for trackpad / native scroll
+  row.addEventListener('scroll', () => animateSprockets(row.scrollLeft));
 }
 
-// ── FULLSCREEN VIEWER ─────────────────────────────────────────────
-window.openViewer = function(url, title) {
-  if(!url) return;
-  const viewer  = document.getElementById('viewer');
-  const img     = document.getElementById('viewer-img');
-  const caption = document.getElementById('viewer-caption');
-  const hint    = document.getElementById('viewer-hint');
+// ── SPROCKET ANIMATION TIED TO SCROLL ─────────────────
+let lastScrollPos = 0;
+function animateSprockets(scrollPos) {
+  const delta = scrollPos - lastScrollPos;
+  lastScrollPos = scrollPos;
 
+  // Move sprocket strips in opposite directions (top vs bottom)
+  // Each hole is 40px wide, creating a clicking-reel effect
+  const topEl  = document.getElementById('sprocketTop');
+  const botEl  = document.getElementById('sprocketBot');
+
+  if(topEl) topEl.style.transform = `translateX(${-scrollPos * 0.6}px)`;
+  if(botEl) botEl.style.transform = `translateX(${-scrollPos * 0.6}px)`;
+}
+
+function syncSprockets() {
+  const row = document.getElementById('framesRow');
+  if(row) row.addEventListener('scroll', () => animateSprockets(row.scrollLeft));
+}
+
+// ── FULLSCREEN VIEWER ──────────────────────────────────
+function openFullscreen(url, title) {
+  if(!url) return;
+  const viewer = document.getElementById('fullscreen-viewer');
+  const img    = document.getElementById('fv-img');
+  const cap    = document.getElementById('fv-caption');
   img.src = url;
-  if(caption) caption.textContent = title || '';
+  if(cap) cap.textContent = title || '';
   viewer.classList.add('open');
   document.body.style.overflow = 'hidden';
-  document.body.style.cursor = 'none';
 
-  // Request browser fullscreen
   if(viewer.requestFullscreen)            viewer.requestFullscreen();
   else if(viewer.webkitRequestFullscreen) viewer.webkitRequestFullscreen();
-  else if(viewer.mozRequestFullScreen)    viewer.mozRequestFullScreen();
-
-  // Fade hint after 2.5s
-  setTimeout(() => { if(hint) hint.style.opacity = '0'; }, 2500);
-  setTimeout(() => { if(hint) hint.style.opacity = '0.25'; }, 5000);
-};
-
-window.closeViewer = function() {
-  const viewer = document.getElementById('viewer');
+}
+window.closeFullscreen = function() {
+  const viewer = document.getElementById('fullscreen-viewer');
   viewer.classList.remove('open');
   document.body.style.overflow = '';
-  document.body.style.cursor = '';
-  document.getElementById('viewer-img').src = '';
+  document.getElementById('fv-img').src = '';
   if(document.exitFullscreen)            document.exitFullscreen().catch(()=>{});
   else if(document.webkitExitFullscreen) document.webkitExitFullscreen();
-  else if(document.mozCancelFullScreen)  document.mozCancelFullScreen();
 };
+document.getElementById('fullscreen-viewer').addEventListener('click', e => {
+  if(e.target === document.getElementById('fullscreen-viewer') || e.target === document.getElementById('fv-img')) {
+    window.closeFullscreen();
+  }
+});
 
-// ── NAV SCROLL ────────────────────────────────────────────────────
+// ── NAV SCROLL ─────────────────────────────────────────
 window.addEventListener('scroll', () => {
   document.getElementById('topNav').classList.toggle('scrolled', window.scrollY > 60);
 });
