@@ -1630,6 +1630,8 @@ function updateStats() {
   if(ccEl) ccEl.textContent = nc;
   const hmEl = document.getElementById('statMilesTotal');
   if(hmEl) hmEl.innerHTML = `${Math.round(totalMiles/1000)}<span class="accent">K</span>`;
+  // Update oracle portrait stats
+  updateOracleStats();
 }
 
 // ── LETTERS ──
@@ -2592,12 +2594,7 @@ function escHtml(s) {
   return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-// Call stats update whenever data finishes loading
-const _origUpdateStats = updateStats;
-function updateStats() {
-  _origUpdateStats();
-  updateOracleStats();
-}
+// Oracle stats are updated inside updateStats() directly — see call above
 
 // ── TERMINAL ──
 const drawer=document.getElementById('termDrawer'),backdrop=document.getElementById('termBackdrop'),trigger=document.getElementById('termTrigger'),tIn=document.getElementById('tIn'),tBody=document.getElementById('tBody');
