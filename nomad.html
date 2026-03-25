@@ -1584,22 +1584,39 @@ const AIRPORT_META={
 };
 
 function buildAirports() {
-  const visitCounts={};
-  flightsData.forEach(f=>{if(f.from)visitCounts[f.from]=(visitCounts[f.from]||0)+1;if(f.to)visitCounts[f.to]=(visitCounts[f.to]||0)+1;});
-
-  const toRender = Object.entries(visitCounts).filter(([code])=>AIRPORT_META[code]).sort((a,b)=>b[1]-a[1]).slice(0,12);
-  const fallback = Object.entries(AIRPORT_META).slice(0,12).map(([code])=>[code,0]);
-  const airports = toRender.length ? toRender : fallback;
-
   const visGrid=document.getElementById('airportGridVisible');
   const hidGrid=document.getElementById('airportGridHidden');
   if(!visGrid||!hidGrid) return;
 
+  // Count every from/to airport across all flights
+  const visitCounts={};
+  const cityMap={};  // code -> city name from flight data
+  flightsData.forEach(f=>{
+    if(f.from){
+      visitCounts[f.from]=(visitCounts[f.from]||0)+1;
+      if(f.from_city && !cityMap[f.from]) cityMap[f.from]=f.from_city;
+    }
+    if(f.to){
+      visitCounts[f.to]=(visitCounts[f.to]||0)+1;
+      if(f.to_city && !cityMap[f.to]) cityMap[f.to]=f.to_city;
+    }
+  });
+
+  if(!Object.keys(visitCounts).length) return;
+
+  // Sort by visit count, show all airports
+  const airports = Object.entries(visitCounts)
+    .sort((a,b)=>b[1]-a[1]);
+
   airports.forEach(([code,visits],i)=>{
-    const meta=AIRPORT_META[code];if(!meta)return;
+    // Supplement with AIRPORT_META if available, otherwise use flight data
+    const meta=AIRPORT_META[code];
     const card=document.createElement('div');card.className='airport-stamp-card';
-    card.innerHTML=`<div class="asc-inkmark">✈</div><div class="asc-code">${code}</div><div class="asc-name">${meta.name}<br>${meta.city}, ${meta.country}</div>${visits>0?`<div class="asc-visits">${visits} visit${visits!==1?'s':''}</div>`:''}`;
-    card.title=meta.story;
+    const cityLine = meta
+      ? `${meta.name}<br>${meta.city}, ${meta.country}`
+      : (cityMap[code] || code);
+    card.innerHTML=`<div class="asc-inkmark">✈</div><div class="asc-code">${code}</div><div class="asc-name">${cityLine}</div><div class="asc-visits">${visits} visit${visits!==1?'s':''}</div>`;
+    if(meta) card.title=meta.story;
     if(i<8) visGrid.appendChild(card);
     else hidGrid.appendChild(card);
   });
