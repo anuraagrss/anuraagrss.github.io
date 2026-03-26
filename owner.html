@@ -955,7 +955,7 @@ const app      = initializeApp(FB);
 const auth     = getAuth(app);
 const db       = getFirestore(app);
 const storage  = getStorage(app);
-const functions = getFunctions(app, \'us-central1\');
+const functions = getFunctions(app, 'us-central1');
 const provider = new GoogleAuthProvider();
 
 let currentUser=null, currentRole=null, tripsCache=[];
@@ -1122,7 +1122,7 @@ window.saveAdbKey=async function(){
   toast('✓ FR24 token saved','ok');
 };
 
-async function async enrichFlight(flightId, flightNum, date, force=false){
+async function enrichFlight(flightId, flightNum, date, force=false){
   // Calls the enrichFlight Cloud Function — FR24 token stays server-side
   try {
     const fn = httpsCallable(functions, 'enrichFlight');
@@ -1254,7 +1254,7 @@ function renderPreview(){
 }
 window.importFlights=async function(){
   if(!parsedFlights.length)return;
-  const doEnrich=document.getElementById('enrichToggle').checked&&adbApiKey;
+  const doEnrich=document.getElementById('enrichToggle').checked;
   const btn=document.getElementById('importBtn'); btn.disabled=true;btn.textContent='IMPORTING…';
   document.getElementById('importProgress').style.display='block';
   const log=document.getElementById('importLog');
@@ -1264,50 +1264,37 @@ window.importFlights=async function(){
     document.getElementById('importProgressLabel').textContent=`${i+1} / ${parsedFlights.length}`;
     document.getElementById('importProgressBar').style.width=`${Math.round((i/parsedFlights.length)*100)}%`;
     document.getElementById('ps-'+i).textContent='saving…';document.getElementById('ps-'+i).style.color='var(--gold)';
-    if(doEnrich&&f.flight_number&&f.date){
-      document.getElementById('ps-'+i).textContent='enriching…';
-      const en=await enrichFlight(f.id, f.flight_number, f.date);
-      if(en){
-        if(!f.aircraft_type&&en.aircraft_type) f.aircraft_type=en.aircraft_type;
-        if(en.tail_number)   f.tail_number=en.tail_number;
-        if(en.duration_mins) f.duration_mins=en.duration_mins;
-        if(en.flight_path)   f.flight_path=en.flight_path;
-        if(en.fr24_id)       f.fr24_id=en.fr24_id;
-        if(en.dep_gate)      f.dep_gate=en.dep_gate;
-        if(en.dep_terminal)  f.dep_terminal=en.dep_terminal;
-        if(en.dep_scheduled) f.dep_scheduled=en.dep_scheduled;
-        if(en.dep_actual)    f.dep_actual=en.dep_actual;
-        if(en.arr_gate)      f.arr_gate=en.arr_gate;
-        if(en.arr_terminal)  f.arr_terminal=en.arr_terminal;
-        if(en.arr_scheduled) f.arr_scheduled=en.arr_scheduled;
-        if(en.arr_actual)    f.arr_actual=en.arr_actual;
-        if(en.runway_dep)    f.runway_dep=en.runway_dep;
-        if(en.runway_arr)    f.runway_arr=en.runway_arr;
-        if(f.tail_number){const ph=await getAircraftPhoto(f.tail_number);if(ph)f.aircraft_photo=ph;}
+    try{
+      const ref=await addDoc(collection(db,'flights'),{
+        ...f, addedAt:serverTimestamp(), addedBy:currentUser.uid
+      });
+      if(doEnrich&&f.flight_number&&f.date){
+        document.getElementById('ps-'+i).textContent='enriching…';
+        const en=await enrichFlight(ref.id, f.flight_number, f.date);
+        if(en&&en.success){
+          document.getElementById('ps-'+i).textContent='✓ enriched';
+          document.getElementById('ps-'+i).style.color='var(--teal)';
+        } else {
+          document.getElementById('ps-'+i).textContent='✓ saved';
+          document.getElementById('ps-'+i).style.color='var(--teal)';
+        }
+      } else {
+        document.getElementById('ps-'+i).textContent='✓ saved';
+        document.getElementById('ps-'+i).style.color='var(--teal)';
       }
-      await new Promise(r=>setTimeout(r,350));
-      };
+      done++;
+    }catch(e){
+      errors++;
+      document.getElementById('ps-'+i).textContent='✗ error';
+      document.getElementById('ps-'+i).style.color='var(--red)';
+      console.error('import error row',i,e);
     }
-    const exif={};
-    ['camera','lens','settings'].forEach(k=>{const v=document.getElementById(`ph-${k}`).value.trim();if(v)exif[k]=v;});
-    await addDoc(collection(db,'photos'),{
-      title,story:story||null,
-      image_url:imageUrl,
-      location:document.getElementById('ph-location').value.trim()||null,
-      country_id:document.getElementById('ph-country').value.toUpperCase().trim()||null,
-      date:document.getElementById('ph-date').value||null,
-      element:document.getElementById('ph-element').value,
-      featured:document.getElementById('ph-featured').value==='true',
-      trip_id:document.getElementById('ph-trip').value||null,
-      exif:Object.keys(exif).length?exif:null,
-      addedAt:serverTimestamp(),addedBy:currentUser.uid
-    });
-    toast('✓ Photo saved','ok');clearForm('photo');
-    document.getElementById('uploadProgress').style.display='none';
-    document.getElementById('uploadBar').style.width='0%';
-    loadPhotoGrid();loadAllCounts();
-  }catch(e){toast('✗ '+e.message,'err');}
-  finally{btn.disabled=false;btn.textContent='UPLOAD & SAVE';}
+    await new Promise(r=>setTimeout(r,120));
+  }
+  document.getElementById('importProgressBar').style.width='100%';
+  document.getElementById('importProgressLabel').textContent=`Done — ${done} saved, ${errors} errors`;
+  btn.disabled=false; btn.textContent='IMPORT ALL TO FIRESTORE';
+  loadAllCounts(); toast(`✓ ${done} flight${done!==1?'s':''} imported`,'ok');
 };
 async function loadPhotoGrid(){
   const grid=document.getElementById('photoGrid');
