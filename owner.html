@@ -1031,10 +1031,7 @@ window.showPanel=function(name){
     countries:'COUNTRIES',content:'PAGE CONTENT',travel:'TRAVEL PLANS',journal:'JOURNAL',
     users:'USERS',config:'CONFIG & API KEYS'};
   document.getElementById('topbarTitle').textContent=titles[name]||name.toUpperCase();
-  const loaders={cafes:loadCafesTable,experiences:loadExpTable,
-    adventures:loadAdvTable,people:loadPeopleTable,photos:loadPhotoGrid,trips:loadTripsTable,
-    countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,
-    content:loadContent,config:loadConfig};
+  const loaders={photos:loadPhotoGrid,trips:loadTripsTable,countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,content:loadContent,config:loadConfig};
   if(loaders[name])loaders[name]();
 };
 
