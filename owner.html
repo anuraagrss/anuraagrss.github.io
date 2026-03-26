@@ -1031,7 +1031,7 @@ window.showPanel=function(name){
     countries:'COUNTRIES',content:'PAGE CONTENT',travel:'TRAVEL PLANS',journal:'JOURNAL',
     users:'USERS',config:'CONFIG & API KEYS'};
   document.getElementById('topbarTitle').textContent=titles[name]||name.toUpperCase();
-  const loaders={flights:loadFlightsTable,cafes:loadCafesTable,experiences:loadExpTable,
+  const loaders={cafes:loadCafesTable,experiences:loadExpTable,
     adventures:loadAdvTable,people:loadPeopleTable,photos:loadPhotoGrid,trips:loadTripsTable,
     countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,
     content:loadContent,config:loadConfig};
@@ -1807,7 +1807,7 @@ window.checkCors = async function() {
 // ── ENRICH ALL FLIGHTS via Cloud Function ────────────────────────────
 let enrichAllUnsubscribe = null;
 
-async function runEnrichAll(force = false) {
+window.runEnrichAll = async function(force = false) {
   const btn      = document.getElementById(force ? 'forceEnrichAllBtn' : 'enrichAllBtn');
   const progress = document.getElementById('enrichAllProgress');
   const statusEl = document.getElementById('enrichAllStatus');
@@ -1873,7 +1873,7 @@ async function runEnrichAll(force = false) {
         document.getElementById('enrichAllBtn').disabled = false;
         document.getElementById('forceEnrichAllBtn').disabled = false;
         // Refresh flights list
-        if (typeof loadFlights === 'function') loadFlights();
+        // flights reload handled by user
         toast(`Enriched ${j.enriched} flight${j.enriched!==1?'s':''}`, 'success');
       }
     });
@@ -1884,7 +1884,7 @@ async function runEnrichAll(force = false) {
     console.error('enrichAllFlights error:', err);
     toast('Enrichment failed — check console', 'error');
   }
-}
+};
 
 </script>
 </body>
