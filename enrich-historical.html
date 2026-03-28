@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Flight Enrichment Tool — nomad-404</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#0d1117;--bg2:#161c28;--bg3:#1e2738;--border:rgba(91,192,190,0.15);
+      --teal:#5bc0be;--gold:#f59e0b;--red:#f85149;--green:#3fb950;
+      --text:#e6edf3;--muted:rgba(230,237,243,0.45);
+      --mono:'JetBrains Mono',monospace;--disp:'Bebas Neue',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;min-height:100vh;padding:32px}
+    .header{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .header h1{font-family:var(--disp);font-size:36px;color:var(--teal);letter-spacing:2px}
+    .header span{color:var(--muted);font-size:11px;letter-spacing:2px}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px}
+    .card-title{font-size:10px;letter-spacing:3px;color:var(--teal);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    label{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;margin-top:14px}
+    label:first-of-type{margin-top:0}
+    input,select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:4px;outline:none;transition:border-color 0.2s}
+    input:focus,select:focus{border-color:var(--teal)}
+    input::placeholder{color:var(--muted)}
+    .btn{width:100%;padding:11px;border-radius:4px;border:none;font-family:var(--mono);font-size:11px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-top:14px}
+    .btn-primary{background:var(--teal);color:var(--bg);font-weight:700}
+    .btn-primary:hover{background:#7dd3d1}
+    .btn-primary:disabled{background:rgba(91,192,190,0.3);color:rgba(91,192,190,0.5);cursor:not-allowed}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);margin-top:8px}
+    .btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+    .progress-wrap{margin-top:16px;display:none}
+    .progress-wrap.visible{display:block}
+    .progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+    .progress-label{font-size:11px;color:var(--text)}
+    .progress-counter{font-size:11px;color:var(--teal)}
+    .progress-bar-track{background:var(--bg3);border-radius:3px;height:6px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:linear-gradient(to right,var(--teal),var(--gold));border-radius:3px;width:0%;transition:width 0.3s ease}
+    .progress-stats{display:flex;gap:20px;margin-top:10px;font-size:10px;color:var(--muted)}
+    .log-wrap{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;height:500px;overflow-y:auto;font-size:11px;line-height:1.9}
+    .log-wrap::-webkit-scrollbar{width:3px}
+    .log-wrap::-webkit-scrollbar-thumb{background:rgba(91,192,190,0.2);border-radius:2px}
+    .log-line{display:flex;gap:10px;padding:1px 0}
+    .log-time{color:rgba(91,192,190,0.4);flex-shrink:0;width:60px}
+    .log-msg{color:var(--text);flex:1;word-break:break-all}
+    .log-ok   .log-msg{color:var(--green)}
+    .log-err  .log-msg{color:var(--red)}
+    .log-skip .log-msg{color:var(--muted)}
+    .log-info .log-msg{color:var(--teal)}
+    .log-warn .log-msg{color:var(--gold)}
+    .summary-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:14px;display:none}
+    .summary-box.visible{display:block}
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .summary-item{text-align:center}
+    .summary-num{font-family:var(--disp);font-size:32px;line-height:1}
+    .summary-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:3px}
+    .s-green{color:var(--green)}.s-gold{color:var(--gold)}.s-red{color:var(--red)}.s-muted{color:var(--muted)}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>FLIGHT ENRICHMENT</h1>
+  <span>ONE-TIME HISTORICAL TOOL · nomad-404</span>
+</div>
+
+<div class="grid">
+  <div>
+    <div class="card">
+      <div class="card-title">// CONFIGURATION</div>
+      <label>AERODATABOX API KEY (api.market)</label>
+      <input type="password" id="adbKey" placeholder="your x-magicapi-key">
+      <label>MODE</label>
+      <select id="mode">
+        <option value="unenriched">Skip already enriched flights</option>
+        <option value="all">Re-enrich everything</option>
+        <option value="test">Test mode — first 3 flights only</option>
+      </select>
+      <label>SOURCES</label>
+      <select id="sources">
+        <option value="both">AeroDataBox + OpenSky (metadata + track)</option>
+        <option value="adb">AeroDataBox only (metadata, no track)</option>
+        <option value="opensky">OpenSky only (track/path only)</option>
+      </select>
+      <label>DELAY BETWEEN REQUESTS (ms)</label>
+      <input type="number" id="delay" value="1000" min="500" max="5000">
+      <button class="btn btn-primary" id="startBtn" onclick="startEnrichment()">▶ START ENRICHMENT</button>
+      <button class="btn btn-ghost"   id="stopBtn"  onclick="stopEnrichment()" disabled>■ STOP</button>
+
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-header">
+          <span class="progress-label"  id="progressLabel">Initialising…</span>
+          <span class="progress-counter" id="progressCounter">0 / 0</span>
+        </div>
+        <div class="progress-bar-track"><div class="progress-bar-fill" id="progressBar"></div></div>
+        <div class="progress-stats">
+          <span><span style="color:var(--green)">✓</span> <span id="cntEnriched">0</span> enriched</span>
+          <span><span style="color:var(--gold)">–</span>  <span id="cntSkipped">0</span> skipped</span>
+          <span><span style="color:var(--red)">✗</span>   <span id="cntFailed">0</span> failed</span>
+        </div>
+      </div>
+
+      <div class="summary-box" id="summaryBox">
+        <div class="card-title" style="margin-bottom:0;padding-bottom:0;border:none">// COMPLETE</div>
+        <div class="summary-grid">
+          <div class="summary-item"><div class="summary-num s-green" id="sumEnriched">0</div><div class="summary-lbl">ENRICHED</div></div>
+          <div class="summary-item"><div class="summary-num s-gold"  id="sumSkipped">0</div><div class="summary-lbl">SKIPPED</div></div>
+          <div class="summary-item"><div class="summary-num s-red"   id="sumFailed">0</div><div class="summary-lbl">FAILED</div></div>
+          <div class="summary-item"><div class="summary-num s-muted" id="sumTotal">0</div><div class="summary-lbl">TOTAL</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">// ENRICHMENT LOG</div>
+    <div class="log-wrap" id="logWrap">
+      <div class="log-line log-info">
+        <span class="log-time">—</span>
+        <span class="log-msg">Ready. Enter your AeroDataBox API key and click START.</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFirestore, collection, getDocs, doc, updateDoc }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getAuth, onAuthStateChanged }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+
+const app = initializeApp({
+  apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+  authDomain:"nomad-404.firebaseapp.com",
+  projectId:"nomad-404",
+  appId:"1:638331724572:web:baa0d70108e920099150d9"
+});
+const db   = getFirestore(app);
+const auth = getAuth(app);
+
+const sleep     = ms => new Promise(r => setTimeout(r, ms));
+const kmToMiles = km => Math.round(Number(km) * 0.621371);
+let running = false;
+let stats   = { enriched:0, skipped:0, failed:0, total:0 };
+
+function log(msg, type='default') {
+  const wrap = document.getElementById('logWrap');
+  const now  = new Date().toTimeString().slice(0,8);
+  const line = document.createElement('div');
+  line.className = `log-line log-${type}`;
+  line.innerHTML = `<span class="log-time">${now}</span><span class="log-msg">${msg}</span>`;
+  wrap.appendChild(line);
+  wrap.scrollTop = wrap.scrollHeight;
+}
+
+function updateProgress(processed, total, label) {
+  const pct = total > 0 ? Math.round((processed/total)*100) : 0;
+  document.getElementById('progressBar').style.width     = pct+'%';
+  document.getElementById('progressCounter').textContent = `${processed} / ${total}`;
+  document.getElementById('progressLabel').textContent   = label || `Enriching… ${pct}%`;
+  document.getElementById('cntEnriched').textContent = stats.enriched;
+  document.getElementById('cntSkipped').textContent  = stats.skipped;
+  document.getElementById('cntFailed').textContent   = stats.failed;
+}
+
+// ── AeroDataBox ───────────────────────────────────────────────────
+async function fetchAeroDataBox(flightNumber, date, apiKey) {
+  const fn      = flightNumber.replace(/\s+/g,'').toUpperCase();
+  const dateStr = date.split('T')[0];
+  const url     = `https://aerodatabox.p.api.market/flights/number/${encodeURIComponent(fn)}/${dateStr}`;
+  const res     = await fetch(url, { headers:{ 'x-magicapi-key': apiKey, 'Accept':'application/json' } });
+  if (res.status === 404) return null;
+  if (res.status === 429) { await sleep(3000); return fetchAeroDataBox(flightNumber, date, apiKey); }
+  if (!res.ok) throw new Error(`ADB ${res.status}: ${(await res.text()).slice(0,100)}`);
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+function parseAeroDataBox(item) {
+  if (!item) return {};
+  const u = {};
+  // Aircraft
+  if (item.aircraft?.reg)         u.tail_number   = item.aircraft.reg;
+  if (item.aircraft?.model?.code) u.aircraft_type = item.aircraft.model.code;
+  if (item.aircraft?.model?.text) u.aircraft_name = item.aircraft.model.text;
+  if (item.aircraft?.hex)         u._icao24       = item.aircraft.hex.toLowerCase();
+  // Airline
+  if (item.airline?.iata||item.airline?.name) u.airline = item.airline.iata||item.airline.name;
+  // Departure
+  if (item.departure?.airport?.iata)      u.from          = item.departure.airport.iata;
+  if (item.departure?.airport?.name)      u.from_city     = item.departure.airport.name;
+  if (item.departure?.scheduledTime?.utc) u.dep_scheduled = item.departure.scheduledTime.utc;
+  if (item.departure?.actualTime?.utc)    u.dep_actual    = item.departure.actualTime.utc;
+  if (item.departure?.terminal)           u.dep_terminal  = String(item.departure.terminal);
+  if (item.departure?.gate)               u.dep_gate      = String(item.departure.gate);
+  if (item.departure?.runway)             u.runway_dep    = item.departure.runway;
+  // Arrival
+  if (item.arrival?.airport?.iata)        u.to            = item.arrival.airport.iata;
+  if (item.arrival?.airport?.name)        u.to_city       = item.arrival.airport.name;
+  if (item.arrival?.scheduledTime?.utc)   u.arr_scheduled = item.arrival.scheduledTime.utc;
+  if (item.arrival?.actualTime?.utc)      u.arr_actual    = item.arrival.actualTime.utc;
+  if (item.arrival?.terminal)             u.arr_terminal  = String(item.arrival.terminal);
+  if (item.arrival?.gate)                 u.arr_gate      = String(item.arrival.gate);
+  if (item.arrival?.runway)               u.runway_arr    = item.arrival.runway;
+  // Distance & duration
+  if (item.greatCircleDistance?.km) {
+    u.distance_km    = Math.round(item.greatCircleDistance.km);
+    u.distance_miles = kmToMiles(item.greatCircleDistance.km);
+  }
+  if (item.duration?.scheduledTime) {
+    const parts = String(item.duration.scheduledTime).split(':');
+    if (parts.length >= 2) u.duration_mins = parseInt(parts[0])*60+parseInt(parts[1]);
+  }
+  if (item.number) u.flight_number = item.number;
+  return u;
+}
+
+// ── OpenSky ───────────────────────────────────────────────────────
+async function fetchOpenSkyTrack(icao24, depTime) {
+  if (!icao24||!depTime) return null;
+  const ts = Math.floor(new Date(depTime).getTime()/1000);
+  if (isNaN(ts)) return null;
+  try {
+    const res = await fetch(`https://opensky-network.org/api/tracks/all?icao24=${icao24.toLowerCase()}&time=${ts}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (!data?.path?.length) return null;
+    return data.path
+      .filter(p => p[1]!=null && p[2]!=null)
+      .map(p => ({ lat:Number(p[1]), lon:Number(p[2]), alt:Number(p[3]??p[4]??0) }));
+  } catch { return null; }
+}
+
+// ── Main loop ─────────────────────────────────────────────────────
+window.startEnrichment = async function() {
+  const apiKey  = document.getElementById('adbKey').value.trim();
+  const mode    = document.getElementById('mode').value;
+  const sources = document.getElementById('sources').value;
+  const delay   = parseInt(document.getElementById('delay').value)||1000;
+
+  if (!apiKey && sources !== 'opensky') { log('✗ Enter your AeroDataBox API key first.','err'); return; }
+  if (!auth.currentUser) { log('✗ Not signed in. Open owner.html first, then return here.','err'); return; }
+
+  running = true;
+  stats   = { enriched:0, skipped:0, failed:0, total:0 };
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('stopBtn').disabled  = false;
+  document.getElementById('progressWrap').classList.add('visible');
+  document.getElementById('summaryBox').classList.remove('visible');
+  document.getElementById('logWrap').innerHTML = '';
+
+  log('Loading flights from Firestore…','info');
+
+  try {
+    const snap    = await getDocs(collection(db,'flights'));
+    let   flights = snap.docs.map(d => ({id:d.id,...d.data()}));
+
+    if (mode==='unenriched')     flights = flights.filter(f => !f.adb_enriched);
+    else if (mode==='test')      flights = flights.filter(f => !f.adb_enriched).slice(0,3);
+
+    stats.total = flights.length;
+    log(`${flights.length} flights to process (${snap.docs.length} total in Firestore)`, 'info');
+    if (mode==='test') log('TEST MODE — only first 3 unenriched flights','warn');
+    updateProgress(0, flights.length, 'Starting…');
+
+    for (let i=0; i<flights.length; i++) {
+      if (!running) { log('⏹ Stopped.','warn'); break; }
+
+      const f     = flights[i];
+      const label = `[${i+1}/${flights.length}] ${f.flight_number||'?'} ${f.date||'?'} ${f.from||'?'}→${f.to||'?'}`;
+
+      if (!f.flight_number||!f.date) {
+        log(`– ${label} — skipped (missing flight_number or date)`,'skip');
+        stats.skipped++; updateProgress(i+1,flights.length); continue;
+      }
+
+      try {
+        const update = {};
+        let icao24   = f._icao24||null;
+        let depTime  = f.dep_actual||f.dep_scheduled||null;
+
+        // AeroDataBox
+        if (sources!=='opensky') {
+          const raw = await fetchAeroDataBox(f.flight_number, f.date, apiKey);
+          if (raw) {
+            const parsed = parseAeroDataBox(raw);
+            icao24  = parsed._icao24  || icao24;
+            depTime = parsed.dep_actual||parsed.dep_scheduled||depTime;
+            Object.assign(update, parsed);
+            delete update._icao24;
+            const fields = Object.keys(parsed).filter(k=>k[0]!=='_');
+            log(`✓ ADB ${label} — ${fields.length} fields: ${fields.slice(0,5).join(', ')}${fields.length>5?'…':''}`, 'ok');
+          } else {
+            log(`– ADB ${label} — no data from AeroDataBox`, 'skip');
+          }
+        }
+
+        // OpenSky track
+        if (sources!=='adb' && icao24 && depTime) {
+          await sleep(400);
+          const track = await fetchOpenSkyTrack(icao24, depTime);
+          if (track&&track.length>5) {
+            update.flight_path = track;
+            log(`  ↳ OpenSky: ${track.length} track points`,'ok');
+          } else {
+            log(`  ↳ OpenSky: no track found for ${icao24}`,'skip');
+          }
+        }
+
+        if (Object.keys(update).length > 0) {
+          update.adb_enriched    = true;
+          update.adb_enriched_at = new Date().toISOString();
+          await updateDoc(doc(db,'flights',f.id), update);
+          stats.enriched++;
+        } else {
+          stats.skipped++;
+        }
+      } catch(err) {
+        log(`✗ ${label} — ${err.message}`,'err');
+        stats.failed++;
+      }
+
+      updateProgress(i+1, flights.length);
+      await sleep(delay);
+    }
+  } catch(err) {
+    log(`✗ Fatal: ${err.message}`,'err');
+  }
+
+  running = false;
+  document.getElementById('startBtn').disabled = false;
+  document.getElementById('stopBtn').disabled  = true;
+  updateProgress(stats.total, stats.total, '✓ Done');
+  document.getElementById('summaryBox').classList.add('visible');
+  document.getElementById('sumEnriched').textContent = stats.enriched;
+  document.getElementById('sumSkipped').textContent  = stats.skipped;
+  document.getElementById('sumFailed').textContent   = stats.failed;
+  document.getElementById('sumTotal').textContent    = stats.total;
+  log(`Complete — ${stats.enriched} enriched · ${stats.skipped} skipped · ${stats.failed} failed`,'info');
+};
+
+window.stopEnrichment = function() {
+  running = false;
+  document.getElementById('stopBtn').disabled = true;
+  log('Stopping after current flight…','warn');
+};
+
+onAuthStateChanged(auth, user => {
+  if (user) {
+    log(`Signed in as ${user.email} ✓`,'info');
+  } else {
+    log('⚠ Not signed in — open owner.html first to authenticate, then come back here.','warn');
+    document.getElementById('startBtn').disabled = true;
+  }
+});
+</script>
+</body>
+</html>
