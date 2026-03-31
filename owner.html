@@ -448,75 +448,6 @@
             </div>
           </div>
         </div>
-
-        <!-- ── ENRICH ALL FLIGHTS (Cloud Function) ── -->
-        <div class="section-card" id="enrichAllCard">
-          <div class="section-card-title">// ENRICH ALL WITH FR24</div>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-            Calls the <code style="background:var(--bg2);padding:1px 6px;border-radius:3px;font-size:11px">enrichAllFlights</code>
-            Cloud Function — your FR24 token stays server-side. Skips already-enriched flights unless you force re-enrich.
-          </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
-            <button class="btn btn-primary" id="enrichAllBtn" onclick="runEnrichAll(false)">
-              ✦ ENRICH UNENRICHED FLIGHTS
-            </button>
-            <button class="btn btn-ghost" id="forceEnrichAllBtn" onclick="runEnrichAll(true)">
-              ↺ FORCE RE-ENRICH ALL
-            </button>
-          </div>
-          <!-- Progress bar — hidden until job starts -->
-          <div id="enrichAllProgress" style="display:none">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-family:var(--mono);font-size:11px;color:var(--text)" id="enrichAllStatus">Starting…</span>
-              <span style="font-family:var(--mono);font-size:11px;color:var(--teal)" id="enrichAllCounter">0 / 0</span>
-            </div>
-            <div style="background:var(--bg2);border-radius:4px;height:8px;overflow:hidden">
-              <div id="enrichAllBar" style="height:100%;width:0%;background:linear-gradient(to right,var(--teal),var(--gold));border-radius:4px;transition:width 0.4s ease"></div>
-            </div>
-            <div style="display:flex;gap:20px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">
-              <span>✓ <span id="enrichAllEnriched">0</span> enriched</span>
-              <span>– <span id="enrichAllSkipped">0</span> skipped</span>
-              <span>✗ <span id="enrichAllFailed">0</span> failed</span>
-            </div>
-            <div id="enrichAllErrors" style="margin-top:10px;display:none">
-              <div style="font-family:var(--mono);font-size:10px;color:var(--amber);margin-bottom:4px">ERRORS:</div>
-              <div id="enrichAllErrorList" style="font-family:var(--mono);font-size:10px;color:var(--muted);line-height:1.8;max-height:120px;overflow-y:auto"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ── ENRICH HISTORICAL (AeroDataBox + OpenSky) ── -->
-        <div class="section-card" id="enrichHistoricalCard">
-          <div class="section-card-title">// ENRICH HISTORICAL — AERODATABOX + OPENSKY</div>
-          <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
-            Uses AeroDataBox for metadata and OpenSky for flight tracks. Covers all historical flights.
-            Skips already-enriched flights unless force is selected.
-          </p>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px">
-            <button class="btn btn-primary" id="enrichHistBtn" onclick="window.runEnrichHistorical(false)">
-              ✦ ENRICH HISTORICAL FLIGHTS
-            </button>
-            <button class="btn btn-ghost" id="forceEnrichHistBtn" onclick="window.runEnrichHistorical(true)">
-              ↺ FORCE RE-ENRICH ALL
-            </button>
-          </div>
-          <div id="enrichHistProgress" style="display:none">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-              <span style="font-family:var(--mono);font-size:11px;color:var(--text)" id="enrichHistStatus">Starting…</span>
-              <span style="font-family:var(--mono);font-size:11px;color:var(--teal)" id="enrichHistCounter">0 / 0</span>
-            </div>
-            <div style="background:var(--bg2);border-radius:4px;height:8px;overflow:hidden">
-              <div id="enrichHistBar" style="height:100%;width:0%;background:linear-gradient(to right,var(--teal),var(--gold));border-radius:4px;transition:width 0.4s ease"></div>
-            </div>
-            <div style="display:flex;gap:20px;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)">
-              <span>✓ <span id="enrichHistEnriched">0</span> enriched</span>
-              <span>– <span id="enrichHistSkipped">0</span> skipped</span>
-              <span>✗ <span id="enrichHistFailed">0</span> failed</span>
-            </div>
-          </div>
-        </div>
-
-
         <div class="section-card">
           <div class="section-card-title">// ADD SINGLE FLIGHT</div>
           <div class="form-grid cols-3">
@@ -968,12 +899,10 @@ import { initializeApp }   from 'https://www.gstatic.com/firebasejs/10.12.0/fire
 import { getAuth, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, GoogleAuthProvider }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
-         collection, getDocs, query, orderBy, serverTimestamp, onSnapshot }
+         collection, getDocs, query, orderBy, serverTimestamp }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
-import { getFunctions, httpsCallable }
-                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 const FB = {
   apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
@@ -987,7 +916,6 @@ const app      = initializeApp(FB);
 const auth     = getAuth(app);
 const db       = getFirestore(app);
 const storage  = getStorage(app);
-const functions = getFunctions(app, 'us-central1');
 const provider = new GoogleAuthProvider();
 
 let currentUser=null, currentRole=null, tripsCache=[];
@@ -1063,7 +991,10 @@ window.showPanel=function(name){
     countries:'COUNTRIES',content:'PAGE CONTENT',travel:'TRAVEL PLANS',journal:'JOURNAL',
     users:'USERS',config:'CONFIG & API KEYS'};
   document.getElementById('topbarTitle').textContent=titles[name]||name.toUpperCase();
-  const loaders={photos:loadPhotoGrid,trips:loadTripsTable,countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,content:loadContent,config:loadConfig};
+  const loaders={flights:loadFlightsTable,cafes:loadCafesTable,experiences:loadExpTable,
+    adventures:loadAdvTable,people:loadPeopleTable,photos:loadPhotoGrid,trips:loadTripsTable,
+    countries:loadCountries,travel:loadTravelTable,journal:loadJournal,users:loadUsers,
+    content:loadContent,config:loadConfig};
   if(loaders[name])loaders[name]();
 };
 
@@ -1151,16 +1082,50 @@ window.saveAdbKey=async function(){
   toast('✓ FR24 token saved','ok');
 };
 
-async function enrichFlight(flightId, flightNum, date, force=false){
-  // Calls the enrichFlight Cloud Function — FR24 token stays server-side
-  try {
-    const fn = httpsCallable(functions, 'enrichFlight');
-    const result = await fn({ flightId, force });
-    return result.data;
-  } catch(err) {
-    console.error('enrichFlight cloud fn:', err.message);
-    return null;
-  }
+async function enrichFlight(flightNum,date){
+  if(!adbApiKey||!flightNum||!date)return null;
+  try{
+    const fn=flightNum.replace(/\s+/g,'').toUpperCase();
+    const dateStr=date.split('T')[0];
+    const url=`${FR24_BASE}/v1/historic/flight-summaries/full?flight_number=${encodeURIComponent(fn)}&date_from=${encodeURIComponent(dateStr+'T00:00:00Z')}&date_to=${encodeURIComponent(dateStr+'T23:59:59Z')}`;
+    const res=await fetch(url,{headers:{'Authorization':`Bearer ${adbApiKey}`,'Accept':'application/json'}});
+    if(!res.ok)return null;
+    const data=await res.json();
+    const flights=data.data||data.results||data;
+    const flight=Array.isArray(flights)?flights[0]:flights;
+    if(!flight)return null;
+    const dep=flight.departure||flight.orig||{};
+    const arr=flight.arrival||flight.dest||{};
+    let flightPath=null;
+    const fid=flight.fr24_id||flight.fid||flight.id;
+    if(fid){
+      try{
+        const tr=await fetch(`${FR24_BASE}/v1/historic/flight-tracks/${fid}`,{headers:{'Authorization':`Bearer ${adbApiKey}`,'Accept':'application/json'}});
+        if(tr.ok){
+          const td=await tr.json();
+          const track=td.data||td;
+          if(Array.isArray(track)&&track.length>0){
+            flightPath=track.map(p=>({lat:p.lat||p.latitude,lon:p.lon||p.longitude||p.lng,alt:p.alt||p.altitude,spd:p.spd||p.speed})).filter(p=>p.lat&&p.lon);
+          }
+        }
+      }catch(_){}
+    }
+    return{
+      fr24_id:fid||null,
+      aircraft_type:(flight.aircraft?.model||flight.aircraft?.type)||null,
+      tail_number:(flight.aircraft?.registration||flight.aircraft?.reg)||null,
+      duration_mins:flight.duration||null,
+      distance_km:flight.distance||null,
+      runway_dep:flight.dep_runway||null,
+      runway_arr:flight.arr_runway||null,
+      dep_terminal:dep.terminal||null, dep_gate:dep.gate||null,
+      dep_scheduled:dep.scheduled_time||dep.sched||null,
+      dep_actual:dep.actual_time||dep.actual||null,
+      arr_terminal:arr.terminal||null, arr_gate:arr.gate||null,
+      arr_scheduled:arr.scheduled_time||null, arr_actual:arr.actual_time||null,
+      flight_path:flightPath,
+    };
+  }catch(_){return null;}
 }
 
 async function getAircraftPhoto(tailNumber){
@@ -1283,7 +1248,7 @@ function renderPreview(){
 }
 window.importFlights=async function(){
   if(!parsedFlights.length)return;
-  const doEnrich=document.getElementById('enrichToggle').checked;
+  const doEnrich=document.getElementById('enrichToggle').checked&&adbApiKey;
   const btn=document.getElementById('importBtn'); btn.disabled=true;btn.textContent='IMPORTING…';
   document.getElementById('importProgress').style.display='block';
   const log=document.getElementById('importLog');
@@ -1293,37 +1258,341 @@ window.importFlights=async function(){
     document.getElementById('importProgressLabel').textContent=`${i+1} / ${parsedFlights.length}`;
     document.getElementById('importProgressBar').style.width=`${Math.round((i/parsedFlights.length)*100)}%`;
     document.getElementById('ps-'+i).textContent='saving…';document.getElementById('ps-'+i).style.color='var(--gold)';
-    try{
-      const ref=await addDoc(collection(db,'flights'),{
-        ...f, addedAt:serverTimestamp(), addedBy:currentUser.uid
-      });
-      if(doEnrich&&f.flight_number&&f.date){
-        document.getElementById('ps-'+i).textContent='enriching…';
-        const en=await enrichFlight(ref.id, f.flight_number, f.date);
-        if(en&&en.success){
-          document.getElementById('ps-'+i).textContent='✓ enriched';
-          document.getElementById('ps-'+i).style.color='var(--teal)';
-        } else {
-          document.getElementById('ps-'+i).textContent='✓ saved';
-          document.getElementById('ps-'+i).style.color='var(--teal)';
-        }
-      } else {
-        document.getElementById('ps-'+i).textContent='✓ saved';
-        document.getElementById('ps-'+i).style.color='var(--teal)';
+    if(doEnrich&&f.flight_number&&f.date){
+      document.getElementById('ps-'+i).textContent='enriching…';
+      const en=await enrichFlight(f.flight_number,f.date);
+      if(en){
+        if(!f.aircraft_type&&en.aircraft_type)f.aircraft_type=en.aircraft_type;
+        if(en.tail_number)f.tail_number=en.tail_number;
+        if(en.duration_mins)f.duration_mins=en.duration_mins;
+        if(en.flight_path)f.flight_path=en.flight_path;
+        if(en.fr24_id)f.fr24_id=en.fr24_id;
+        if(en.dep_gate)f.dep_gate=en.dep_gate;if(en.dep_terminal)f.dep_terminal=en.dep_terminal;
+        if(en.arr_gate)f.arr_gate=en.arr_gate;if(en.arr_terminal)f.arr_terminal=en.arr_terminal;
+        if(en.runway_dep)f.runway_dep=en.runway_dep;if(en.runway_arr)f.runway_arr=en.runway_arr;
+        if(f.tail_number){const ph=await getAircraftPhoto(f.tail_number);if(ph)f.aircraft_photo=ph;}
       }
-      done++;
-    }catch(e){
-      errors++;
-      document.getElementById('ps-'+i).textContent='✗ error';
-      document.getElementById('ps-'+i).style.color='var(--red)';
-      console.error('import error row',i,e);
+      await new Promise(r=>setTimeout(r,300));
     }
-    await new Promise(r=>setTimeout(r,120));
+    if(!f.distance_miles&&f.from&&f.to)f.distance_miles=getDistance(f.from,f.to);
+    try{
+      // Clean nulls
+      const save={};Object.entries(f).forEach(([k,v])=>{if(v!==null&&v!==undefined&&v!=='null')save[k]=v;});
+      save.addedAt=serverTimestamp();save.addedBy=currentUser.uid;save.source='import';
+      await addDoc(collection(db,'flights'),save);
+      done++;
+      document.getElementById('ps-'+i).textContent='✓';document.getElementById('ps-'+i).style.color='var(--green)';
+      const m=document.createElement('div');m.textContent=`✓ ${f.flight_number||''} ${f.from}→${f.to} ${f.date||''}`;m.style.color='var(--green)';log.appendChild(m);log.scrollTop=log.scrollHeight;
+    }catch(e){errors++;document.getElementById('ps-'+i).textContent='✗';document.getElementById('ps-'+i).style.color='var(--red)';}
   }
-  document.getElementById('importProgressBar').style.width='100%';
-  document.getElementById('importProgressLabel').textContent=`Done — ${done} saved, ${errors} errors`;
-  btn.disabled=false; btn.textContent='IMPORT ALL TO FIRESTORE';
-  loadAllCounts(); toast(`✓ ${done} flight${done!==1?'s':''} imported`,'ok');
+  document.getElementById('importProgressBar').style.width='100%';document.getElementById('importProgressBar').classList.add('done');
+  document.getElementById('importProgressLabel').textContent=`${done} saved · ${errors} errors`;
+  btn.textContent=`✓ ${done} IMPORTED`;
+  toast(`✓ ${done} flights imported`,'ok');
+  parsedFlights=[];loadAllCounts();loadFlightsTable();
+};
+
+// ── SINGLE FLIGHT ─────────────────────────────────────────────────
+window.addFlight=async function(){
+  const from=(document.getElementById('f-from').value||'').toUpperCase().trim();
+  const to=(document.getElementById('f-to').value||'').toUpperCase().trim();
+  if(!from||!to){toast('FROM and TO required','err');return;}
+  const data={
+    flight_number:document.getElementById('f-fn').value.trim()||null,
+    from,to,airline:document.getElementById('f-airline').value.trim()||null,
+    from_city:document.getElementById('f-fromCity').value.trim()||null,
+    to_city:document.getElementById('f-toCity').value.trim()||null,
+    date:document.getElementById('f-date').value||null,
+    cabin:document.getElementById('f-cabin').value||null,
+    seat:document.getElementById('f-seat').value.trim()||null,
+    aircraft_type:document.getElementById('f-aircraft').value.trim()||null,
+    tail_number:(document.getElementById('f-tail').value||'').toUpperCase().trim()||null,
+    distance_miles:getDistance(from,to),
+    notes:document.getElementById('f-notes').value.trim()||null,
+    trip_id:document.getElementById('f-trip').value||null,
+    addedAt:serverTimestamp(),addedBy:currentUser.uid
+  };
+  try{await addDoc(collection(db,'flights'),data);toast('✓ Flight saved','ok');clearForm('flight');loadFlightsTable();loadAllCounts();}
+  catch(e){toast('✗ '+e.message,'err');}
+};
+window.enrichSingle=async function(){
+  const fn=document.getElementById('f-fn').value.trim();
+  const date=document.getElementById('f-date').value;
+  if(!fn||!date){toast('Enter flight number and date first','err');return;}
+  if(!adbApiKey){toast('No FR24 token configured','err');return;}
+  toast('Enriching…');
+  const en=await enrichFlight(fn,date);
+  if(en){
+    if(en.aircraft_type)document.getElementById('f-aircraft').value=en.aircraft_type;
+    if(en.tail_number)document.getElementById('f-tail').value=en.tail_number;
+    toast('✓ Enriched from FR24','ok');
+  }else toast('No data found','err');
+};
+
+// ── FLIGHTS TABLE ─────────────────────────────────────────────────
+let allFlightDocs=[];
+async function loadFlightsTable(){
+  const el=document.getElementById('flightsTable');
+  el.innerHTML='<div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div>';
+  try{
+    const snap=await getDocs(collection(db,'flights'));
+    allFlightDocs=snap.docs.map(d=>({id:d.id,...d.data()}));
+    allFlightDocs.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+    // Stats
+    const stats=document.getElementById('flightStats');
+    if(stats&&!stats.children.length){
+      const totalMiles=allFlightDocs.reduce((s,f)=>s+(f.distance_miles||0),0);
+      [
+        {num:allFlightDocs.length,label:'FLIGHTS'},
+        {num:Math.round(totalMiles).toLocaleString()+' MI',label:'TOTAL MILES'},
+        {num:[...new Set(allFlightDocs.map(f=>f.airline).filter(Boolean))].length,label:'AIRLINES'},
+      ].forEach(b=>{const c=document.createElement('div');c.className='stat-card';c.innerHTML=`<div class="stat-card-num teal">${b.num}</div><div class="stat-card-label">${b.label}</div>`;stats.appendChild(c);});
+    }
+    renderFlightLog(allFlightDocs);
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
+}
+function renderFlightLog(docs){
+  const el=document.getElementById('flightsTable');
+  if(!docs.length){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No flights yet — import from Excel above</div></div>';return;}
+  el.innerHTML=`<div class="data-table-wrap"><table>
+    <thead><tr><th>FLIGHT</th><th>ROUTE</th><th>DATE</th><th>AIRCRAFT</th><th>TAIL</th><th>DIST MI</th><th>GATE</th><th>PHOTO</th><th></th></tr></thead>
+    <tbody>${docs.map(f=>{
+      const photo=f.aircraft_photo?.url?`<img src="${f.aircraft_photo.url}" style="width:56px;height:36px;object-fit:cover;border-radius:3px;cursor:pointer" onclick="window.open('${f.aircraft_photo.url}','_blank')">`:'—';
+      const gate=f.dep_gate?`<span style="background:rgba(91,192,190,0.12);border:1px solid rgba(91,192,190,0.25);border-radius:2px;padding:1px 5px;font-size:9px;color:var(--teal)">G${f.dep_gate}</span>`:(f.dep_terminal?`T${f.dep_terminal}`:'—');
+      return `<tr>
+        <td class="mono">${f.flight_number||'—'}<br><span style="font-size:10px;color:var(--muted)">${f.airline||''}</span></td>
+        <td class="mono">${f.from||'?'}→${f.to||'?'}<br><span style="font-size:10px;color:var(--muted)">${f.from_city||''}→${f.to_city||''}</span></td>
+        <td class="muted">${f.date||'—'}</td>
+        <td class="muted" style="font-size:11px;max-width:120px">${f.aircraft_type||'—'}</td>
+        <td class="teal" style="font-size:11px">${f.tail_number||'—'}</td>
+        <td class="teal">${f.distance_miles?Math.round(f.distance_miles).toLocaleString():'—'}</td>
+        <td style="font-size:11px">${gate}</td>
+        <td>${photo}</td>
+        <td><div class="tbl-actions">
+          <button class="tbl-btn" onclick="enrichAndUpdate('${f.id}','${f.flight_number||''}','${f.date||''}')">ENRICH</button>
+          <button class="tbl-btn del" onclick="deleteEntry('flights','${f.id}',loadFlightsTable)">DEL</button>
+        </div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+}
+window.filterFlights=function(q){
+  const filtered=allFlightDocs.filter(f=>!q||[f.flight_number,f.from,f.to,f.airline,f.aircraft_type,f.tail_number].some(v=>v&&v.toLowerCase().includes(q.toLowerCase())));
+  renderFlightLog(filtered);
+};
+window.sortFlights=function(v){
+  const s=[...allFlightDocs];
+  if(v==='date-asc')s.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  else if(v==='date-desc')s.sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  else if(v==='airline')s.sort((a,b)=>(a.airline||'').localeCompare(b.airline||''));
+  else if(v==='miles')s.sort((a,b)=>(b.distance_miles||0)-(a.distance_miles||0));
+  renderFlightLog(s);
+};
+window.enrichAndUpdate=async function(docId,fn,date){
+  if(!adbApiKey){toast('No FR24 token','err');return;}
+  if(!fn||!date){toast('Flight number and date needed','err');return;}
+  toast('Enriching…');
+  const en=await enrichFlight(fn,date); if(!en){toast('No data found','err');return;}
+  const updates={};
+  ['aircraft_type','tail_number','duration_mins','dep_terminal','dep_gate','dep_scheduled','dep_actual',
+   'arr_terminal','arr_gate','arr_scheduled','arr_actual','flight_path','fr24_id','runway_dep','runway_arr','distance_km']
+  .forEach(k=>{if(en[k])updates[k]=en[k];});
+  if(en.tail_number){const ph=await getAircraftPhoto(en.tail_number);if(ph)updates.aircraft_photo=ph;}
+  if(Object.keys(updates).length){
+    await updateDoc(doc(db,'flights',docId),updates);
+    toast('✓ Flight enriched','ok'); loadFlightsTable();
+  }else toast('Nothing new found','err');
+};
+
+// ══════════════════════════════════════════════════════════════════
+// CAFES
+// ══════════════════════════════════════════════════════════════════
+window.addCafe=async function(){
+  const name=document.getElementById('c-name').value.trim();
+  if(!name){toast('Name required','err');return;}
+  await addDoc(collection(db,'cafes'),{
+    name,type:document.getElementById('c-type').value.trim()||null,
+    city:document.getElementById('c-city').value.trim()||null,
+    country:document.getElementById('c-country').value.toUpperCase().trim()||null,
+    ordered:document.getElementById('c-ordered').value.trim()||null,
+    rating:document.getElementById('c-rating').value,
+    vibe:document.getElementById('c-vibe').value.trim()||null,
+    story:document.getElementById('c-story').value.trim()||null,
+    trip_id:document.getElementById('c-trip').value||null,
+    addedAt:serverTimestamp(),addedBy:currentUser.uid
+  });
+  toast('✓ Cafe saved','ok');clearForm('cafe');loadCafesTable();loadAllCounts();
+};
+async function loadCafesTable(){
+  const el=document.getElementById('cafesTable');
+  try{
+    const snap=await getDocs(collection(db,'cafes'));
+    if(snap.empty){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No cafes yet</div></div>';return;}
+    el.innerHTML=`<div class="data-table-wrap"><table><thead><tr><th>NAME</th><th>CITY</th><th>TYPE</th><th>RATING</th><th>TRIP</th><th></th></tr></thead><tbody>
+      ${snap.docs.map(d=>{const c=d.data();const trip=tripsCache.find(t=>t.id===c.trip_id);return`<tr>
+        <td>${c.name}</td><td class="muted">${c.city||'—'}</td><td class="muted">${c.type||'—'}</td>
+        <td>${c.rating||'—'}</td><td class="muted" style="font-size:10px">${trip?.title||'—'}</td>
+        <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('cafes','${d.id}',loadCafesTable)">DEL</button></div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// EXPERIENCES
+// ══════════════════════════════════════════════════════════════════
+window.addExperience=async function(){
+  const title=document.getElementById('e-title').value.trim();
+  if(!title){toast('Title required','err');return;}
+  await addDoc(collection(db,'experiences'),{
+    tab:document.getElementById('e-tab').value,
+    loc:document.getElementById('e-loc').value.trim()||null,
+    label:(document.getElementById('e-label').value.trim()||'').toUpperCase(),
+    title,story:document.getElementById('e-story').value.trim()||null,
+    img:document.getElementById('e-img').value.trim()||null,
+    trip_id:document.getElementById('e-trip').value||null,
+    addedAt:serverTimestamp(),addedBy:currentUser.uid
+  });
+  toast('✓ Experience saved','ok');clearForm('experience');loadExpTable();loadAllCounts();
+};
+async function loadExpTable(){
+  const el=document.getElementById('expTable');
+  try{
+    const snap=await getDocs(collection(db,'experiences'));
+    if(snap.empty){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No experiences yet</div></div>';return;}
+    el.innerHTML=`<div class="data-table-wrap"><table><thead><tr><th>TAB</th><th>TITLE</th><th>LOCATION</th><th></th></tr></thead><tbody>
+      ${snap.docs.map(d=>{const e=d.data();return`<tr>
+        <td class="mono" style="text-transform:uppercase">${e.tab||'—'}</td>
+        <td>${e.title||'—'}</td><td class="muted">${e.loc||'—'}</td>
+        <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('experiences','${d.id}',loadExpTable)">DEL</button></div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// ADVENTURES
+// ══════════════════════════════════════════════════════════════════
+window.addAdventure=async function(){
+  const title=document.getElementById('adv-title').value.trim();
+  if(!title){toast('Title required','err');return;}
+  await addDoc(collection(db,'adventures'),{
+    title,location:document.getElementById('adv-loc').value.trim()||null,
+    country:document.getElementById('adv-country').value.toUpperCase().trim()||null,
+    date:document.getElementById('adv-date').value||null,
+    category:document.getElementById('adv-cat').value,
+    story:document.getElementById('adv-story').value.trim()||null,
+    trip_id:document.getElementById('adv-trip').value||null,
+    addedAt:serverTimestamp(),addedBy:currentUser.uid
+  });
+  toast('✓ Adventure saved','ok');clearForm('adventure');loadAdvTable();loadAllCounts();
+};
+async function loadAdvTable(){
+  const el=document.getElementById('advTable');
+  try{
+    const snap=await getDocs(collection(db,'adventures'));
+    if(snap.empty){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No adventures yet</div></div>';return;}
+    el.innerHTML=`<div class="data-table-wrap"><table><thead><tr><th>TITLE</th><th>LOCATION</th><th>CATEGORY</th><th>DATE</th><th></th></tr></thead><tbody>
+      ${snap.docs.map(d=>{const a=d.data();return`<tr>
+        <td>${a.title}</td><td class="muted">${a.location||'—'}</td>
+        <td class="muted">${a.category||'—'}</td><td class="muted">${a.date||'—'}</td>
+        <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('adventures','${d.id}',loadAdvTable)">DEL</button></div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PEOPLE
+// ══════════════════════════════════════════════════════════════════
+window.addPerson=async function(){
+  const name=document.getElementById('p-name').value.trim();
+  if(!name){toast('Name required','err');return;}
+  await addDoc(collection(db,'people'),{
+    name,met_at:document.getElementById('p-met').value.trim()||null,
+    country:document.getElementById('p-country').value.toUpperCase().trim()||null,
+    story:document.getElementById('p-story').value.trim()||null,
+    trip_id:document.getElementById('p-trip').value||null,
+    addedAt:serverTimestamp(),addedBy:currentUser.uid
+  });
+  toast('✓ Person saved','ok');clearForm('person');loadPeopleTable();
+};
+async function loadPeopleTable(){
+  const el=document.getElementById('peopleTable');
+  try{
+    const snap=await getDocs(collection(db,'people'));
+    if(snap.empty){el.innerHTML='<div class="empty-state"><div class="empty-state-text">No people yet</div></div>';return;}
+    el.innerHTML=`<div class="data-table-wrap"><table><thead><tr><th>NAME</th><th>MET AT</th><th>COUNTRY</th><th></th></tr></thead><tbody>
+      ${snap.docs.map(d=>{const p=d.data();return`<tr>
+        <td>${p.name}</td><td class="muted">${p.met_at||'—'}</td><td class="muted">${p.country||'—'}</td>
+        <td><div class="tbl-actions"><button class="tbl-btn del" onclick="deleteEntry('people','${d.id}',loadPeopleTable)">DEL</button></div></td>
+      </tr>`;}).join('')}</tbody></table></div>`;
+  }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
+}
+
+// ══════════════════════════════════════════════════════════════════
+// PHOTOGRAPHY — Firebase Storage upload
+// ══════════════════════════════════════════════════════════════════
+let selectedPhotoFile=null;
+
+window.handlePhotoDrop=function(e){
+  e.preventDefault();document.getElementById('photoDropZone').classList.remove('over');
+  const file=e.dataTransfer.files[0];if(file)handlePhotoSelect(file);
+};
+window.handlePhotoSelect=function(file){
+  if(!file)return;
+  if(file.size>10*1024*1024){toast('Max 10MB','err');return;}
+  selectedPhotoFile=file;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const preview=document.getElementById('photoPreview');
+    preview.innerHTML=`<div class="upload-preview-item"><img src="${e.target.result}" alt="preview"><button class="remove-btn" onclick="selectedPhotoFile=null;document.getElementById('photoPreview').innerHTML=''">×</button></div>`;
+  };
+  reader.readAsDataURL(file);
+  // Pre-fill date
+  if(!document.getElementById('ph-date').value)document.getElementById('ph-date').value=new Date().toISOString().split('T')[0];
+};
+window.uploadPhoto=async function(){
+  const title=document.getElementById('ph-title').value.trim();
+  const story=document.getElementById('ph-story').value.trim();
+  if(!title){toast('Title required','err');return;}
+  if(!selectedPhotoFile&&!document.getElementById('ph-title').value){toast('Select a photo first','err');return;}
+  const btn=document.getElementById('uploadBtn');btn.disabled=true;btn.textContent='UPLOADING…';
+  try{
+    let imageUrl=null;
+    if(selectedPhotoFile){
+      const ext=selectedPhotoFile.name.split('.').pop();
+      const path=`photos/${Date.now()}_${title.toLowerCase().replace(/\s+/g,'-').substring(0,40)}.${ext}`;
+      const storageRef=ref(storage,path);
+      const uploadTask=uploadBytesResumable(storageRef,selectedPhotoFile);
+      imageUrl=await new Promise((resolve,reject)=>{
+        uploadTask.on('state_changed',
+          snap=>{
+            const pct=Math.round((snap.bytesTransferred/snap.totalBytes)*100);
+            document.getElementById('uploadProgress').style.display='block';
+            document.getElementById('uploadBar').style.width=pct+'%';
+            document.getElementById('uploadPercent').textContent=pct+'%';
+          },
+          reject,
+          async()=>{ resolve(await getDownloadURL(uploadTask.snapshot.ref)); }
+        );
+      });
+    }
+    const exif={};
+    ['camera','lens','settings'].forEach(k=>{const v=document.getElementById(`ph-${k}`).value.trim();if(v)exif[k]=v;});
+    await addDoc(collection(db,'photos'),{
+      title,story:story||null,
+      image_url:imageUrl,
+      location:document.getElementById('ph-location').value.trim()||null,
+      country_id:document.getElementById('ph-country').value.toUpperCase().trim()||null,
+      date:document.getElementById('ph-date').value||null,
+      element:document.getElementById('ph-element').value,
+      featured:document.getElementById('ph-featured').value==='true',
+      trip_id:document.getElementById('ph-trip').value||null,
+      exif:Object.keys(exif).length?exif:null,
+      addedAt:serverTimestamp(),addedBy:currentUser.uid
+    });
+    toast('✓ Photo saved','ok');clearForm('photo');
+    document.getElementById('uploadProgress').style.display='none';
+    document.getElementById('uploadBar').style.width='0%';
+    loadPhotoGrid();loadAllCounts();
+  }catch(e){toast('✗ '+e.message,'err');}
+  finally{btn.disabled=false;btn.textContent='UPLOAD & SAVE';}
 };
 async function loadPhotoGrid(){
   const grid=document.getElementById('photoGrid');
@@ -1829,151 +2098,6 @@ window.checkCors = async function() {
     }
   } catch(e) {
     if(el) { el.textContent = '✗ CORS blocked — run the gcloud command below'; el.style.color = 'var(--red)'; }
-  }
-};
-
-
-// ── ENRICH ALL FLIGHTS via Cloud Function ────────────────────────────
-let enrichAllUnsubscribe = null;
-
-window.runEnrichAll = async function(force = false) {
-  const btn      = document.getElementById(force ? 'forceEnrichAllBtn' : 'enrichAllBtn');
-  const progress = document.getElementById('enrichAllProgress');
-  const statusEl = document.getElementById('enrichAllStatus');
-  const counterEl= document.getElementById('enrichAllCounter');
-  const barEl    = document.getElementById('enrichAllBar');
-  const enrichedEl= document.getElementById('enrichAllEnriched');
-  const skippedEl = document.getElementById('enrichAllSkipped');
-  const failedEl  = document.getElementById('enrichAllFailed');
-  const errorsBox = document.getElementById('enrichAllErrors');
-  const errorList = document.getElementById('enrichAllErrorList');
-
-  // Disable buttons during run
-  document.getElementById('enrichAllBtn').disabled = true;
-  document.getElementById('forceEnrichAllBtn').disabled = true;
-  progress.style.display = 'block';
-  statusEl.textContent = 'Calling Cloud Function…';
-  counterEl.textContent = '0 / 0';
-  barEl.style.width = '0%';
-  enrichedEl.textContent = skippedEl.textContent = failedEl.textContent = '0';
-  errorsBox.style.display = 'none';
-  errorList.innerHTML = '';
-
-  try {
-    // Call the Cloud Function — it returns immediately with a jobId
-    const callFn = httpsCallable(functions, 'enrichAllFlights', { timeout: 560000 });
-    const { data } = await callFn({ force });
-    const { jobId } = data;
-
-    statusEl.textContent = `Job ${jobId.slice(0,8)}… running`;
-
-    // Poll the enrichJobs/{jobId} doc for live progress
-    const jobRef = doc(db, 'enrichJobs', jobId);
-
-    // Unsubscribe any existing listener
-    if (enrichAllUnsubscribe) enrichAllUnsubscribe();
-
-    enrichAllUnsubscribe = onSnapshot(jobRef, snap => {
-      if (!snap.exists()) return;
-      const j = snap.data();
-      const total     = j.total     || 0;
-      const processed = j.processed || 0;
-      const pct       = total > 0 ? Math.round((processed / total) * 100) : 0;
-
-      counterEl.textContent  = `${processed} / ${total}`;
-      barEl.style.width      = pct + '%';
-      enrichedEl.textContent = j.enriched || 0;
-      skippedEl.textContent  = j.skipped  || 0;
-      failedEl.textContent   = j.failed   || 0;
-
-      if (j.status === 'running') {
-        statusEl.textContent = `Enriching… ${pct}%`;
-      } else if (j.status === 'done') {
-        statusEl.textContent = `✓ Done — ${j.enriched} enriched, ${j.skipped} skipped, ${j.failed} failed`;
-        barEl.style.width = '100%';
-        // Stop polling
-        if (enrichAllUnsubscribe) { enrichAllUnsubscribe(); enrichAllUnsubscribe = null; }
-        // Show errors if any
-        if (j.errors && j.errors.length > 0) {
-          errorsBox.style.display = 'block';
-          errorList.innerHTML = j.errors.map(e => `<div>${e.fn||e.flightId}: ${e.error}</div>`).join('');
-        }
-        // Re-enable buttons
-        document.getElementById('enrichAllBtn').disabled = false;
-        document.getElementById('forceEnrichAllBtn').disabled = false;
-        // Refresh flights list
-        // flights reload handled by user
-        toast(`Enriched ${j.enriched} flight${j.enriched!==1?'s':''}`, 'success');
-      }
-    });
-  } catch(err) {
-    statusEl.textContent = `✗ Error: ${err.message}`;
-    document.getElementById('enrichAllBtn').disabled = false;
-    document.getElementById('forceEnrichAllBtn').disabled = false;
-    console.error('enrichAllFlights error:', err);
-    toast('Enrichment failed — check console', 'error');
-  }
-};
-
-
-// ── ENRICH HISTORICAL via Cloud Function ─────────────────────────
-let enrichHistUnsubscribe = null;
-
-window.runEnrichHistorical = async function(force = false) {
-  const progress   = document.getElementById('enrichHistProgress');
-  const statusEl   = document.getElementById('enrichHistStatus');
-  const counterEl  = document.getElementById('enrichHistCounter');
-  const barEl      = document.getElementById('enrichHistBar');
-  const enrichedEl = document.getElementById('enrichHistEnriched');
-  const skippedEl  = document.getElementById('enrichHistSkipped');
-  const failedEl   = document.getElementById('enrichHistFailed');
-
-  document.getElementById('enrichHistBtn').disabled = true;
-  document.getElementById('forceEnrichHistBtn').disabled = true;
-  progress.style.display = 'block';
-  statusEl.textContent = 'Calling Cloud Function…';
-  counterEl.textContent = '0 / 0';
-  barEl.style.width = '0%';
-  enrichedEl.textContent = skippedEl.textContent = failedEl.textContent = '0';
-
-  try {
-    const callFn = httpsCallable(functions, 'enrichAllHistorical', { timeout: 560000 });
-    const { data } = await callFn({ force });
-    const { jobId } = data;
-
-    statusEl.textContent = `Job ${jobId.slice(0,8)}… running`;
-
-    if (enrichHistUnsubscribe) enrichHistUnsubscribe();
-
-    enrichHistUnsubscribe = onSnapshot(doc(db, 'enrichJobs', jobId), snap => {
-      if (!snap.exists()) return;
-      const j = snap.data();
-      const total     = j.total     || 0;
-      const processed = j.processed || 0;
-      const pct       = total > 0 ? Math.round((processed / total) * 100) : 0;
-
-      counterEl.textContent  = `${processed} / ${total}`;
-      barEl.style.width      = pct + '%';
-      enrichedEl.textContent = j.enriched || 0;
-      skippedEl.textContent  = j.skipped  || 0;
-      failedEl.textContent   = j.failed   || 0;
-
-      if (j.status === 'running') {
-        statusEl.textContent = `Enriching… ${pct}%`;
-      } else if (j.status === 'done') {
-        statusEl.textContent = `✓ Done — ${j.enriched} enriched, ${j.skipped} skipped, ${j.failed} failed`;
-        barEl.style.width = '100%';
-        if (enrichHistUnsubscribe) { enrichHistUnsubscribe(); enrichHistUnsubscribe = null; }
-        document.getElementById('enrichHistBtn').disabled = false;
-        document.getElementById('forceEnrichHistBtn').disabled = false;
-        toast(`Enriched ${j.enriched} historical flight${j.enriched!==1?'s':''}`, 'success');
-      }
-    });
-  } catch(err) {
-    statusEl.textContent = `✗ Error: ${err.message}`;
-    document.getElementById('enrichHistBtn').disabled = false;
-    document.getElementById('forceEnrichHistBtn').disabled = false;
-    toast('Historical enrichment failed — check console', 'error');
   }
 };
 
