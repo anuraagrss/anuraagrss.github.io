@@ -1808,30 +1808,42 @@ function updateStats() {
 }
 
 // ── LETTERS ──
-const LETTERS = [
+const letters = [
   {
     from: 'Anuraag, age 17', fromSub: 'Small town, Andhra Pradesh',
     to: 'To: Himself', postmark: 'INDIA\n2008', stampIcon: '🇮🇳', stampLabel: 'ORIGINS',
-    body: `Growing up, our world fit inside one town. I watched planes from rooftops and wondered where they were going. The horizon felt like a wall, not a door. I didn't know then that every road that left town was an invitation — and that the only thing between me and the whole world was the decision to go.`,
+    body: `Growing up, our world fit inside one town. I watched planes from far and felt they are very far for me to get on. The horizon felt like a wall, not a door. I didn't know then that every road that left town was an invitation — and that the only thing between me and the whole world was the decision to go.`,
     cite: '— Age 17, Andhra Pradesh'
   },
   {
-    from: 'Anuraag, first flight', fromSub: 'Changi Airport, Singapore',
-    to: 'To: The boy on the rooftop', postmark: 'SINGAPORE\n2016', stampIcon: '🇸🇬', stampLabel: 'FIRST FLIGHT',
-    body: `I landed in Singapore at 3am and stood outside Changi Airport watching the city glow in the dark. The air smelled different — humid and electric. Nobody knew who I was here. I could be anyone. That was the most terrifying and freeing thing I'd ever felt.`,
-    cite: '— Changi Airport, Singapore, 2016'
+    from: 'Anuraag, learning slowly', fromSub: 'No specific place — just time',
+    to: 'To: 18-year-old Anuraag', postmark: 'INDIA\n2010s', stampIcon: '🪞', stampLabel: 'PERMISSION',
+    body: `You are exhausting yourself for a version of you that nobody asked for.\n\nYou are doing it all — laughing loudest, answering first, dancing when you don't want to dance, staying when you want to leave. You think if you stop performing, people will see what's actually there and find it insufficient. A boy who likes silence. Who can sit still. Who doesn't always have something clever to say.\n\nHere is what took me years to tell you: that boy is not the problem. That boy is the whole point.\n\nYou are allowed to be boring. You are allowed to sit at the edge of a party and feel nothing and go home early. You are allowed to not top the class, not lead the room, not fill every silence with something impressive. Stillness is not emptiness. Quiet is not failure.\n\nThe exhausting version of you — the one who performed — he didn't disappear all at once. He faded slowly, the way a habit does, once you stop feeding it. And what was underneath was just you. Plain. Unhurried. Enough.\n\nI found peace with it. You will too.`,
+    cite: '— Looking back, with relief'
   },
   {
-    from: 'Anuraag, crossing continents', fromSub: 'JFK Airport, New York',
-    to: 'To: Everyone who said "you can\'t"', postmark: 'NEW YORK\n2019', stampIcon: '🇺🇸', stampLabel: 'CONTINENTS',
+    from: 'Anuraag, crossing continents', fromSub: 'Ushuaia',
+    to: 'To: Everyone who said "you can\'t"', postmark: 'USHUAIA\n2024', stampIcon: '✈️', stampLabel: 'CONTINENTS',
     body: `I've now stood on every continent. Antarctica was last — a six-day voyage with 40-foot swells, penguins, and no phone signal. The world is enormous and also somehow small. The most important education happens when you sit across from someone whose life looks nothing like yours — and you realise you are the same.`,
     cite: '— JFK Airport, New York, 2019'
+  },
+  {
+    from: 'Anuraag, somewhere unhurried', fromSub: 'A city I didn\'t fully see',
+    to: 'To: Anyone who feels like they\'re doing travel wrong', postmark: 'SOMEWHERE\nALWAYS', stampIcon: '🧭', stampLabel: 'PERMISSION II',
+    body: `You don't owe the Eiffel Tower a photograph.\n\nNobody told you this, so I will. You can stand at the most famous spot in the world, feel nothing in particular, put your phone away, and go find a plastic chair outside a small café and eat something familiar — something that tastes like home — and that can be the whole day. That can be the whole trip. And it will have been enough.\n\nTravel is not a checklist. It is not the dinner that looks good on a screen, or the schedule packed so tight there's no room to get lost, or the version of yourself performing wonder for an audience that isn't even there.\n\nThe realest travel I ever did was the day I skipped the thing I was supposed to see. I stayed in. I sat with myself. And something quiet opened up — a thought I hadn't had before, a question about who I was when nobody was watching, an answer that only arrives when you stop rushing toward the next thing.\n\nThat is what travel is for. Not the monuments. The interior ones.\n\nYou can wear the same t-shirt every day. You can eat dal in Barcelona. You can stay in your hotel room and stare at the ceiling of a city you flew twelve hours to reach — and come home having learned something true about yourself that no itinerary could have scheduled.\n\nThe world doesn't need your content. It needs your presence. There's a difference.`,
+    cite: '— From someone who finally stopped performing tourism'
   },
   {
     from: 'Anuraag, to the future', fromSub: 'Somewhere at 38,000 feet',
     to: 'To: Future-Anuraag', postmark: 'IN FLIGHT\n∞', stampIcon: '✈️', stampLabel: 'STILL GOING',
     body: `You're reading this somewhere I haven't been yet. Keep going. The passport fills, the stories multiply, but the feeling of arriving somewhere new — that never gets old. Every takeoff is still a small act of faith. You are proof that curiosity, when followed all the way, becomes a life.`,
     cite: '— 38,000 feet, still counting'
+  },
+  {
+    from: 'Anuraag, still standing', fromSub: 'Every room that ever had an opinion',
+    to: 'To: Future-Anuraag', postmark: 'ALWAYS\nEVERYWHERE', stampIcon: '⚔️', stampLabel: 'DEFINE YOURSELF',
+    body: `Jab jab badal garajte hain — whenever the clouds roar — we flinch. We assume they have come for us.\n\nJaved Akhtar wrote about fear the way only someone who has sat with it honestly could. The clouds boom and darken and the instinct is to shrink, to run, to let the noise decide something about you. But the poem knows what we forget in the moment — that the clouds pass. That the roar was never a verdict. It was just weather.\n\nOther people's judgment is like that. It comes from all directions, loud and certain. The ones who called you too much. The ones who called you not enough. The ones who watched one afternoon of your life and built a whole courthouse around it — judge, jury, verdict — before you even opened your mouth. It arrives with thunder. It feels permanent.\n\nIt is not permanent.\n\nThey are not wrong about what they saw. They are just not qualified to define what it means. A perspective built from one side of a coin is not a truth — it is a guess dressed in confidence. You are not the sum of what people needed you to be in the moments they observed you.\n\nYou are the only one who has lived every chapter. The quiet failures nobody witnessed. The private victories nobody clapped for. The decisions that cost something real — paid for alone, in full, with no audience. That is the only account that has earned the right to define you.\n\nThis is a war you will fight mostly alone. The clouds will come back. Some of them will be loud enough to make you doubt yourself for a while — and that is okay. Sit with it. Let the thunder pass. Then look around and notice you are still standing.\n\nStay honest to yourself. Not as a declaration. Not as defiance. Just quietly, consistently, in the way you make decisions when nobody is watching.\n\nBadal garajte hain — par tum wahi ho jo tum ho.\nThe clouds roar. But you remain who you are.`,
+    cite: '— From the version of you that chose not to be defined'
   }
 ];
 
