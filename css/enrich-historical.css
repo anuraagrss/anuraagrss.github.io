@@ -1,0 +1,54 @@
+
+    :root {
+      --bg:#0d1117;--bg2:#161c28;--bg3:#1e2738;--border:rgba(91,192,190,0.15);
+      --teal:#5bc0be;--gold:#f59e0b;--red:#f85149;--green:#3fb950;
+      --text:#e6edf3;--muted:rgba(230,237,243,0.45);
+      --mono:'JetBrains Mono',monospace;--disp:'Bebas Neue',sans-serif;
+    }
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:var(--bg);color:var(--text);font-family:var(--mono);font-size:13px;min-height:100vh;padding:32px}
+    .header{display:flex;align-items:baseline;gap:16px;margin-bottom:32px;padding-bottom:16px;border-bottom:1px solid var(--border)}
+    .header h1{font-family:var(--disp);font-size:36px;color:var(--teal);letter-spacing:2px}
+    .header span{color:var(--muted);font-size:11px;letter-spacing:2px}
+    .grid{display:grid;grid-template-columns:340px 1fr;gap:20px;align-items:start}
+    .card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:20px}
+    .card-title{font-size:10px;letter-spacing:3px;color:var(--teal);margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)}
+    label{display:block;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:6px;margin-top:14px}
+    label:first-of-type{margin-top:0}
+    input,select{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:12px;padding:9px 12px;border-radius:4px;outline:none;transition:border-color 0.2s}
+    input:focus,select:focus{border-color:var(--teal)}
+    input::placeholder{color:var(--muted)}
+    .btn{width:100%;padding:11px;border-radius:4px;border:none;font-family:var(--mono);font-size:11px;letter-spacing:2px;cursor:pointer;transition:all 0.2s;margin-top:14px}
+    .btn-primary{background:var(--teal);color:var(--bg);font-weight:700}
+    .btn-primary:hover{background:#7dd3d1}
+    .btn-primary:disabled{background:rgba(91,192,190,0.3);color:rgba(91,192,190,0.5);cursor:not-allowed}
+    .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);margin-top:8px}
+    .btn-ghost:hover{border-color:var(--teal);color:var(--teal)}
+    .progress-wrap{margin-top:16px;display:none}
+    .progress-wrap.visible{display:block}
+    .progress-header{display:flex;justify-content:space-between;margin-bottom:8px}
+    .progress-label{font-size:11px;color:var(--text)}
+    .progress-counter{font-size:11px;color:var(--teal)}
+    .progress-bar-track{background:var(--bg3);border-radius:3px;height:6px;overflow:hidden}
+    .progress-bar-fill{height:100%;background:linear-gradient(to right,var(--teal),var(--gold));border-radius:3px;width:0%;transition:width 0.3s ease}
+    .progress-stats{display:flex;gap:20px;margin-top:10px;font-size:10px;color:var(--muted)}
+    .log-wrap{background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:14px;height:500px;overflow-y:auto;font-size:11px;line-height:1.9}
+    .log-wrap::-webkit-scrollbar{width:3px}
+    .log-wrap::-webkit-scrollbar-thumb{background:rgba(91,192,190,0.2);border-radius:2px}
+    .log-line{display:flex;gap:10px;padding:1px 0}
+    .log-time{color:rgba(91,192,190,0.4);flex-shrink:0;width:60px}
+    .log-msg{color:var(--text);flex:1;word-break:break-all}
+    .log-ok   .log-msg{color:var(--green)}
+    .log-err  .log-msg{color:var(--red)}
+    .log-skip .log-msg{color:var(--muted)}
+    .log-info .log-msg{color:var(--teal)}
+    .log-warn .log-msg{color:var(--gold)}
+    .summary-box{background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:14px;margin-top:14px;display:none}
+    .summary-box.visible{display:block}
+    .summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+    .summary-item{text-align:center}
+    .summary-num{font-family:var(--disp);font-size:32px;line-height:1}
+    .summary-lbl{font-size:9px;letter-spacing:2px;color:var(--muted);margin-top:3px}
+    .s-green{color:var(--green)}.s-gold{color:var(--gold)}.s-red{color:var(--red)}.s-muted{color:var(--muted)}
+    @media(max-width:900px){.grid{grid-template-columns:1fr}}
+  

@@ -1,0 +1,290 @@
+@import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
+:root {
+  --bg-main: #F3F1EF;
+  --primary: #3a506b;
+  --secondary: #5bc0be;
+  --accent: #1c2541;
+  --bubble-bg: #5bc0be;
+  --bubble-hover: #3a506b;
+  --font-main: "Cute Font", Roboto, sans-serif;
+  --base-font-size: 2vw;
+  --h1-font-size: 2.8vw;
+  --desc-font-size: 1.3vw;
+  --menu-font-size: 2vw;
+  --btn-size: 40px;
+  --bubble-size: 7vw;
+  --transition: 0.4s ease;
+}
+body {
+  font-family: var(--font-main);
+  background: var(--bg-main);
+  color: var(--primary);
+  margin: 0;
+  padding: 0;
+}
+/* Bubble Overlay Menu styles from nomad.html */
+.nav-toggle {
+  position: absolute;
+  left: -9999px;
+}
+.nav-btn.up-arrow-btn {
+  position: fixed !important;
+  left: 50% !important;
+  bottom: 32px !important;
+  top: auto !important;
+  right: auto !important;
+  transform: translateX(-50%) !important;
+  width: 60px;
+  height: 60px;
+  z-index: 10001 !important;
+  background: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(65,40,22,0.08);
+}
+.up-arrow {
+  display: block;
+  width: 40px;
+  height: 40px;
+  background: none;
+  position: relative;
+  z-index: 1;
+  transition: opacity 0.4s;
+}
+.up-arrow::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: none;
+  mask: url('data:image/svg+xml;utf8,<svg width="40" height="40" xmlns="http://www.w3.org/2000/svg"><circle cx="20" cy="28" r="7" stroke="black" stroke-width="3" fill="none"/><polyline points="12,22 20,14 28,22" stroke="black" stroke-width="4" fill="none"/><polyline points="14,18 20,12 26,18" stroke="black" stroke-width="2" fill="none"/></svg>') no-repeat center/contain;
+  background-color: var(--accent);
+}
+.hamburger {
+  display: none;
+}
+.nav-toggle:not(:checked) + .nav-btn .up-arrow {
+  opacity: 1;
+}
+.nav-toggle:checked + .nav-btn .up-arrow {
+  opacity: 0;
+}
+.nav-toggle:checked + .nav-btn .hamburger {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 4px;
+  background: transparent;
+}
+.nav-toggle:checked + .nav-btn .hamburger::before {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 4px;
+  top: 0;
+  transform: rotate(45deg);
+}
+.nav-toggle:checked + .nav-btn .hamburger::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: var(--accent);
+  border-radius: 4px;
+  top: 0;
+  transform: rotate(-45deg);
+}
+.overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  background: rgba(243, 241, 239, 0.95);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s;
+  z-index: 9999;
+}
+.nav-toggle:checked ~ .overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+.menu {
+  list-style: none;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+.menu li {
+  position: absolute;
+  width: 7vw;
+  height: 7vw;
+  min-width: 120px;
+  border-radius: 50%;
+  background: var(--bubble-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent);
+  font-weight: bold;
+  opacity: 0;
+  transform: scale(0.6);
+  transition: opacity 0.4s, transform 0.4s, background 0.4s, color 0.4s;
+  box-shadow: 0 2px 12px rgba(60,80,107,0.12);
+}
+.menu li.about,
+.menu li.professional {
+  background: var(--bubble-hover);
+  color: #fff;
+}
+.menu li a {
+  color: inherit;
+  text-decoration: none;
+  width: 100%; height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s;
+  font-size: 2vw;
+  font-family: "Cute Font", Roboto, sans-serif;
+  white-space: nowrap;
+}
+.menu li a:hover {
+  transform: scale(1.1);
+}
+.nav-toggle:checked ~ .overlay .menu li {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+}
+.menu li.home     { top: 15%;  left: 30%; }
+.menu li.about    { top:  5%;  left: 70%; background: var(--bubble-hover); color: #fff;}
+.menu li.nomad    { top: 45%;  left: 85%; }
+.menu li.professional { top: 75%;  left: 65%; background: var(--bubble-hover); color: #fff;}
+.menu li.contact  { top: 70%;  left: 20%; }
+.contact-top {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 48px;
+  padding: 48px 5vw 24px 5vw;
+}
+.contact-left,
+.contact-right {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.contact-image img {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 0;
+  border: none;
+  background: transparent;
+}
+.contact-form-section {
+  padding: 32px 5vw 48px 5vw;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(60,80,107,0.04);
+  max-width: 700px;
+  margin: 32px auto;
+  background: rgba(243,241,239,0.4);
+  border: none;
+}
+.contact-container h2 {
+  font-size: 2.2vw;
+  margin-bottom: 12px;
+  color: var(--primary);
+}
+.contact-form-row {
+  display: flex;
+  gap: 18px;
+  margin-bottom: 18px;
+}
+.contact-form input,
+.contact-form textarea {
+  font-family: var(--font-main);
+  font-size: 1.2vw;
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid var(--bubble-bg);
+  outline: none;
+  width: 100%;
+  margin-bottom: 12px;
+  resize: vertical;
+}
+.contact-form button {
+  background: var(--bubble-bg);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 32px;
+  font-size: 1.2vw;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.contact-form button:hover {
+  background: var(--bubble-hover);
+}
+.social-bar-horizontal {
+  display: flex;
+  gap: 24px;
+  margin-top: 18px;
+}
+.social-bar-horizontal a svg {
+  width: 56px;
+  height: 56px;
+  filter: drop-shadow(0 1px 2px rgba(60,80,107,0.10));
+}
+@media (max-width: 900px) {
+  body {
+    font-size: 3vw;
+  }
+  .contact-top {
+    flex-direction: column;
+    gap: 24px;
+    padding: 32px 2vw 16px 2vw;
+  }
+  .contact-image img {
+    width: 160px;
+    height: 160px;
+  }
+  .contact-form-section {
+    padding: 24px 2vw 32px 2vw;
+    margin: 24px auto;
+  }
+  .menu li {
+    width: 10vw;
+    height: 10vw;
+  }
+  .menu li a {
+    font-size: 3vw;
+  }
+}
+@media (max-width: 500px) {
+  body {
+    font-size: 4vw;
+  }
+  .contact-image img {
+    width: 100px;
+    height: 100px;
+  }
+  .contact-form-section {
+    padding: 12px 1vw 16px 1vw;
+    margin: 12px auto;
+  }
+  .menu li {
+    width: 14vw;
+    height: 14vw;
+  }
+  .menu li a {
+    font-size: 4vw;
+  }
+}

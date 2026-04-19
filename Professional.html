@@ -7,309 +7,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="About Anuraag Gravulaparthi - Product designer & traveler">
   <link rel="shortcut icon" href="favicon.ico">
- <link rel="stylesheet" href="styles/main.css">
-  <style>
-    @import url("https://fonts.googleapis.com/css?family=Cute+Font&display=swap");
-    /* Make text more readable by darkening secondary/accent colors and increasing contrast */
-    :root {
-      --primary: #444444;
-      --secondary: #666666;
-      --accent: #222222;
-      --bubble-bg: #F3F1EF;
-      --bubble-hover: #e0e0e0;
-      --bg-main: #F3F1EF;
-    }
-    body {
-      background: var(--bg-main);
-      font-family: "Cute Font", Roboto, sans-serif;
-      color: var(--primary);
-      margin: 0;
-      padding: 0;
-    }
-    .content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 32px 16px 0 16px;
-    }
-    .main .row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 32px;
-      margin-bottom: 32px;
-    }
-    .col-5 {
-      flex: 1 1 340px;
-      max-width: 420px;
-    }
-    .col-7 {
-      flex: 2 1 480px;
-      max-width: 680px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    h1 {
-      font-size: 2.8vw;
-      color: var(--primary);
-      margin-bottom: 18px;
-      letter-spacing: 2px;
-    }
-    .intro {
-      font-size: 1.3vw;
-      color: var(--secondary);
-      margin-bottom: 12px;
-    }
-    .description {
-      font-size: 1.1vw;
-      color: var(--accent);
-      margin-bottom: 18px;
-    }
-    .major {
-      border-radius: 18px;
-      box-shadow: none;
-      max-width: 100%;
-      height: auto;
-    }
-    .snaps {
-      display: flex;
-      gap: 18px;
-      flex-wrap: wrap;
-      margin: 24px 0;
-      justify-content: center;
-    }
-    .snaps a img {
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
-      width: 120px;
-      height: 120px;
-      object-fit: cover;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .snaps a:hover img {
-      transform: scale(1.05);
-      box-shadow: 0 4px 16px rgba(65,40,22,0.14);
-    }
-    section.dark {
-      background: #F3F1EF;
-      border-radius: 18px;
-      margin: 32px 0;
-      padding: 32px 0;
-    }
-    section.light {
-      background: #fff;
-      border-radius: 18px;
-      margin: 32px 0;
-      padding: 32px 0;
-    }
-    h2 {
-      font-size: 2vw;
-      color: var(--primary);
-      margin-bottom: 16px;
-      letter-spacing: 1px;
-    }
-    ul.ul {
-      list-style: none;
-      padding: 0;
-      margin: 0;
-      font-size: 1.1vw;
-      color: var(--secondary);
-    }
-    ul.ul li {
-      margin-bottom: 8px;
-      padding-left: 12px;
-      position: relative;
-    }
-    ul.ul li::before {
-      content: "•";
-      color: var(--accent);
-      position: absolute;
-      left: 0;
-    }
-    .pie-chart {
-      display: flex;
-      gap: 48px;
-      align-items: flex-start;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-    .designer, .coder {
-      min-width: 180px;
-    }
-    .pie-chart img {
-      max-width: 220px;
-      border-radius: 12px;
-      box-shadow: 0 2px 8px rgba(68,68,68,0.10);
-    }
-    .bar-chart {
-      list-style: none;
-      padding: 0;
-      margin: 24px 0 0 0;
-      width: 100%;
-      max-width: 600px;
-    }
-    .bar-chart li {
-      display: flex;
-      align-items: center;
-      margin-bottom: 18px;
-    }
-    .bar-chart .skill {
-      flex: 1;
-      font-size: 1.1vw;
-      color: #444;
-      padding-right: 18px;
-      min-width: 180px;
-    }
-    .bar-chart .percent {
-      position: relative;
-      height: 22px;
-      border-radius: 11px;
-      background: linear-gradient(90deg, #bfa07a 0%, #5bc0be 100%);
-      color: #fff;
-      font-weight: bold;
-      font-size: 1vw;
-      line-height: 22px;
-      text-align: right;
-      padding-right: 16px;
-      box-shadow: 0 2px 8px rgba(68,68,68,0.08);
-      transition: width 0.4s;
-      min-width: 80px;
-      overflow: hidden;
-    }
-    @media (max-width: 900px) {
-      .main .row, .pie-chart {
-        flex-direction: column;
-        gap: 18px;
-      }
-      .col-5, .col-7 {
-        max-width: 100vw;
-        flex: 1 1 100vw;
-      }
-      h1 { font-size: 6vw; }
-      h2 { font-size: 4vw; }
-      .intro, .description, ul.ul, .bar-chart, .bar-chart .label, .bar-chart .skill, .bar-chart .percent, .top, .footer .left {
-        font-size: 3vw;
-      }
-      .snaps a img { width: 80px; height: 80px; }
-      .bar-chart .skill {
-        font-size: 3vw;
-        min-width: 100px;
-      }
-      .bar-chart .percent {
-        font-size: 2vw;
-        min-width: 50px;
-        height: 18px;
-        line-height: 18px;
-        padding-right: 8px;
-      }
-    }
-    #img-main img.major {
-      max-width: 280px;
-      height: auto;
-      border-radius: 18px;
-      box-shadow: 0 2px 12px rgba(68,68,68,0.10);
-      margin: 0 auto;
-      display: block;
-    }
-    #text-main {
-      font-size: 1.5vw;
-    }
-    #text-main h1 {
-      font-size: 3vw;
-    }
-    #text-main .intro {
-      font-size: 2vw;
-    }
-    #text-main .description {
-      font-size: 1.5vw;
-    }
-    @media (max-width: 900px) {
-      #img-main img.major {
-        max-width: 100px;
-      }
-      #text-main {
-        font-size: 3vw;
-      }
-      #text-main h1 {
-        font-size: 6vw;
-      }
-      #text-main .intro {
-        font-size: 4vw;
-      }
-      #text-main .description {
-        font-size: 3vw;
-      }
-    }
-    /* Add to your <style> block for vertical bar chart styling */
-    .vertical-bar-chart {
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      margin: 32px 0 0 0;
-      min-height: 260px;
-    }
-    .bar-axis {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      font-size: 1em;
-      color: #888;
-      margin-bottom: 8px;
-      padding-right: 32px;
-    }
-    .bars {
-      display: flex;
-      align-items: flex-end;
-      gap: 18px;
-      width: 100%;
-    }
-    .bar-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      width: 38px;
-    }
-    .bar {
-      width: 38px;
-      border-radius: 8px 8px 0 0;
-      transition: height 0.4s;
-      box-shadow: 0 2px 8px rgba(68,68,68,0.10);
-    }
-    .bar-label {
-      margin-top: 8px;
-      font-size: 0.95em;
-      color: #444;
-      text-align: center;
-      word-break: break-word;
-      max-width: 80px;
-    }
-    @media (max-width: 900px) {
-      .bars {
-        height: 120px;
-        gap: 8px;
-        padding-right: 0;
-      }
-      .bar-item {
-        width: 22px;
-      }
-      .bar {
-        width: 22px;
-      }
-      .bar-label {
-        font-size: 0.8em;
-        max-width: 40px;
-      }
-    }
-    .bar-axis-vertical {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 200px;
-      margin-right: 16px;
-      font-size: 1em;
-      color: #888;
-      align-items: flex-end;
-    }
-  </style>
+  <link rel="stylesheet" href="css/professional.css">
+  <link rel="stylesheet" href="css/terminal.css">
 </head>
 <body>
   <div class="content about clearfix">
@@ -416,5 +115,58 @@
       </section>
     </div>
   </div>
+
+<!-- Terminal -->
+<button class="term-trigger" id="termTrigger" onclick="openTerm()">
+  <svg viewBox="0 0 34 34" fill="none">
+    <circle cx="17" cy="17" r="15" fill="rgba(91,192,190,0.15)" opacity="0.85"/>
+    <path d="M10 13 L15 17 L10 21" stroke="#5bc0be" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M17 21 L24 21" stroke="#5bc0be" stroke-width="1.8" stroke-linecap="round"/>
+  </svg>
+  <div class="term-trigger-dot"></div>
+  <span class="term-trigger-label">TERMINAL</span>
+</button>
+<div class="term-backdrop" id="termBackdrop" onclick="closeTerm()"></div>
+<div class="term-drawer" id="termDrawer">
+  <div class="term-bar">
+    <div class="t-dot t-red" onclick="closeTerm()"></div>
+    <div class="t-dot t-yellow"></div>
+    <div class="t-dot t-green"></div>
+    <span class="t-title">anuraag.sh</span>
+    <span class="t-clock" id="tClock"></span>
+  </div>
+  <div class="term-body" id="tBody"></div>
+  <div class="term-foot">
+    <span class="t-ps">anuraag@world:~$</span>
+    <input class="t-in" id="tIn" placeholder="type or click a chip…" autocomplete="off" spellcheck="false">
+    <div class="t-cur"></div>
+  </div>
+</div>
+
+<script src="js/terminal.js"></script>
+<script>
+initTerminal({
+  bootLines: [
+    [200, 'Initializing about.sh ...'],
+    [360, 'Loading story .................. <span class="cok">OK</span>'],
+    [300, 'Mounting random facts .......... <span class="cok">OK</span>'],
+  ],
+  bootChips: [
+    ['engineer', 'nomad', 'contact'],
+    ['whoami', 'story', 'skills'],
+  ],
+  pageHelp: {
+    title: 'THIS PAGE',
+    items: [
+      ['facts',  'scroll to random facts section'],
+      ['skills', 'scroll to skills chart'],
+    ],
+  },
+  pageCommands: {
+    facts:  function () { closeTerm(); var el = document.querySelector('.ten-things'); if (el) el.scrollIntoView({behavior:'smooth'}); },
+    skills: function () { closeTerm(); var el = document.getElementById('bar-chart'); if (el) el.scrollIntoView({behavior:'smooth'}); },
+  },
+});
+</script>
 </body>
 </html>
