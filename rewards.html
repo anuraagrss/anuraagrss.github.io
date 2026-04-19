@@ -14,30 +14,26 @@
 
 <style>
   :root {
-    --cream: #ede0d4;
-    --warm0: #e8d5c8;
-    --warm1: #dfc8b6;
-    --warm2: #c9a888;
-    --brown1: #b07a52;
-    --brown2: #7a4f30;
-    --brown3: #4e2f18;
-    --text: #2e1a0e;
-    --muted: #8a6450;
-    --border: #d4bba6;
-    --white: #fdf7f2;
+    --bg: #f7f7f5;
+    --white: #ffffff;
+    --grey0: #f0f0ee;
+    --grey1: #e2e2e0;
+    --grey2: #c8c8c6;
+    --grey3: #9a9a98;
+    --text: #1c1c1a;
+    --muted: #888886;
     --yellow: #f5c842;
-    --yellow-soft: #fdf0c0;
-    --radius: 20px;
-    --radius-sm: 12px;
+    --yellow-soft: #fdf5d0;
+    --yellow-mid: #f9df7a;
+    --radius: 18px;
+    --radius-sm: 10px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    background: var(--cream);
-    background-image: radial-gradient(ellipse at 20% 10%, rgba(245,200,66,0.06) 0%, transparent 50%),
-                      radial-gradient(ellipse at 80% 90%, rgba(176,122,82,0.08) 0%, transparent 50%);
+    background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     padding-bottom: 3rem;
@@ -46,81 +42,79 @@
   /* ── HERO ── */
   .hero {
     position: relative;
-    background: var(--warm0);
-    border-bottom: 1px solid var(--border);
-    padding: 2.5rem 1.5rem 1.75rem;
-    overflow: hidden;
+    background: var(--white);
+    border-bottom: 1px solid var(--grey1);
+    padding: 2.75rem 1.5rem 2rem;
     text-align: center;
   }
 
   .hero-bg {
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 70% 0%, rgba(245,200,66,0.12) 0%, transparent 55%),
-                radial-gradient(ellipse at 15% 100%, rgba(176,122,82,0.1) 0%, transparent 50%);
+    background: radial-gradient(ellipse at 50% 0%, rgba(245,200,66,0.10) 0%, transparent 65%);
     pointer-events: none;
   }
 
   .char-wrap {
     position: relative;
     display: inline-block;
-    margin-bottom: 0.75rem;
+    margin-bottom: 1rem;
   }
 
   .char-img {
-    width: 110px;
-    height: 110px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     object-fit: cover;
-    border: 3px solid var(--white);
-    box-shadow: 0 4px 20px rgba(160,100,40,0.18);
+    border: 2px solid var(--grey1);
   }
 
   .char-halo {
-    position: absolute; inset: -8px;
+    position: absolute; inset: -7px;
     border-radius: 50%;
-    border: 2px dashed var(--yellow);
-    animation: spin 18s linear infinite;
-    opacity: 0.7;
+    border: 1.5px dashed var(--yellow);
+    animation: spin 20s linear infinite;
+    opacity: 0.6;
   }
 
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .hero h1 {
     font-family: 'Lora', serif;
-    font-size: 1.6rem;
+    font-size: 1.55rem;
     font-weight: 500;
-    color: var(--brown3);
+    color: var(--text);
     margin-bottom: 0.3rem;
     position: relative;
   }
 
   .hero-sub {
-    font-size: 0.82rem;
+    font-size: 0.8rem;
     color: var(--muted);
     position: relative;
   }
 
   /* ── QUOTE BAND ── */
   .quote-band {
-    background: linear-gradient(135deg, var(--brown3) 0%, #3a1f0c 100%);
+    background: var(--white);
+    border-bottom: 1px solid var(--grey1);
+    border-top: 3px solid var(--yellow);
     padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
     gap: 12px;
     cursor: pointer;
     transition: background 0.2s;
-    border-top: 2px solid rgba(245,200,66,0.15);
   }
 
-  .quote-band:hover { background: var(--brown2); }
+  .quote-band:hover { background: var(--yellow-soft); }
 
   .quote-mark {
     font-family: 'Lora', serif;
-    font-size: 2.5rem;
-    color: var(--warm2);
+    font-size: 2.2rem;
+    color: var(--yellow);
     line-height: 1;
     flex-shrink: 0;
-    margin-top: -8px;
+    margin-top: -6px;
   }
 
   .quote-inner { flex: 1; }
@@ -129,26 +123,25 @@
     font-family: 'Lora', serif;
     font-style: italic;
     font-size: 0.82rem;
-    color: #f5e6cc;
+    color: var(--text);
     line-height: 1.6;
     transition: opacity 0.3s;
   }
 
   .quote-src {
-    font-size: 0.7rem;
-    color: var(--warm2);
+    font-size: 0.68rem;
+    color: var(--muted);
     margin-top: 3px;
   }
 
   .quote-tap {
-    font-size: 0.68rem;
-    color: var(--warm2);
+    font-size: 0.65rem;
+    color: var(--grey3);
     flex-shrink: 0;
-    opacity: 0.7;
   }
 
   /* ── MAIN ── */
-  .main { max-width: 680px; margin: 0 auto; padding: 1.25rem 1rem; }
+  .main { max-width: 680px; margin: 0 auto; padding: 1.5rem 1rem; }
 
   /* ── WEEK HEADER ── */
   .week-header {
@@ -160,18 +153,18 @@
 
   .week-label {
     font-family: 'Lora', serif;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: 500;
-    color: var(--brown3);
+    color: var(--text);
   }
 
   .week-date {
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     color: var(--muted);
-    background: var(--warm1);
+    background: var(--grey0);
     padding: 3px 10px;
     border-radius: 99px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--grey1);
   }
 
   /* ── POINTS STRIP ── */
@@ -184,7 +177,7 @@
   .pts-box {
     flex: 1;
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--grey1);
     border-radius: var(--radius-sm);
     padding: 0.85rem 1rem;
     text-align: center;
@@ -194,12 +187,12 @@
     font-family: 'Lora', serif;
     font-size: 1.8rem;
     font-weight: 500;
-    color: var(--brown2);
+    color: var(--text);
     line-height: 1;
   }
 
   .pts-box .lbl {
-    font-size: 0.7rem;
+    font-size: 0.68rem;
     color: var(--muted);
     margin-top: 3px;
   }
@@ -207,10 +200,10 @@
   /* ── PROGRESS ── */
   .prog-wrap {
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--grey1);
     border-radius: var(--radius-sm);
     padding: 0.85rem 1rem;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
   }
 
   .prog-top {
@@ -222,15 +215,15 @@
   }
 
   .prog-bar {
-    height: 8px;
-    background: var(--warm1);
+    height: 6px;
+    background: var(--grey0);
     border-radius: 99px;
     overflow: hidden;
   }
 
   .prog-fill {
     height: 100%;
-    background: linear-gradient(90deg, var(--yellow), var(--brown1));
+    background: var(--yellow);
     border-radius: 99px;
     transition: width 0.6s cubic-bezier(.4,0,.2,1);
   }
@@ -238,9 +231,9 @@
   /* ── ACHIEVEMENT CARDS ── */
   .section-title {
     font-family: 'Lora', serif;
-    font-size: 1rem;
+    font-size: 0.95rem;
     font-weight: 500;
-    color: var(--brown3);
+    color: var(--text);
     margin-bottom: 0.85rem;
     display: flex;
     align-items: center;
@@ -251,20 +244,20 @@
     content: '';
     flex: 1;
     height: 1px;
-    background: var(--border);
+    background: var(--grey1);
   }
 
-  .ach-list { display: flex; flex-direction: column; gap: 14px; margin-bottom: 1.5rem; }
+  .ach-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 1.5rem; }
 
   .ach-card {
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--grey1);
     border-radius: var(--radius);
     overflow: hidden;
     transition: box-shadow 0.2s;
   }
 
-  .ach-card:hover { box-shadow: 0 4px 18px rgba(160,100,40,0.08); }
+  .ach-card:hover { box-shadow: 0 3px 16px rgba(0,0,0,0.05); }
 
   .ach-top {
     display: flex;
@@ -274,36 +267,36 @@
   }
 
   .ach-char {
-    width: 42px; height: 42px;
+    width: 40px; height: 40px;
     border-radius: 50%;
     object-fit: cover;
-    border: 2px solid var(--warm1);
+    border: 1.5px solid var(--grey1);
     flex-shrink: 0;
   }
 
   .ach-body { flex: 1; }
 
   .ach-title {
-    font-size: 0.9rem;
+    font-size: 0.88rem;
     font-weight: 500;
     color: var(--text);
     line-height: 1.4;
   }
 
   .ach-meta {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
     color: var(--muted);
     margin-top: 3px;
   }
 
   .ach-pts {
     font-family: 'Lora', serif;
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: 500;
-    color: var(--brown1);
+    color: var(--text);
     flex-shrink: 0;
-    background: var(--warm0);
-    border: 1px solid var(--border);
+    background: var(--yellow-soft);
+    border: 1px solid var(--yellow-mid);
     border-radius: 99px;
     padding: 2px 12px;
     align-self: flex-start;
@@ -314,29 +307,29 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 0.6rem 1.1rem;
-    background: linear-gradient(90deg, var(--yellow-soft), var(--warm0));
-    border-top: 1px solid rgba(201,168,136,0.4);
+    padding: 0.55rem 1.1rem;
+    background: var(--yellow-soft);
+    border-top: 1px solid var(--yellow-mid);
     cursor: pointer;
     transition: background 0.15s;
     user-select: none;
   }
 
-  .ach-teaser:hover { background: linear-gradient(90deg, #fce99a, var(--warm1)); }
+  .ach-teaser:hover { background: #faedb8; }
 
-  .minion-svg { width: 28px; height: 28px; flex-shrink: 0; }
+  .minion-svg { width: 26px; height: 26px; flex-shrink: 0; }
 
   .teaser-msg {
     font-family: 'Lora', serif;
     font-style: italic;
-    font-size: 0.78rem;
-    color: var(--brown2);
+    font-size: 0.76rem;
+    color: var(--text);
     flex: 1;
   }
 
   .teaser-cta {
-    font-size: 0.7rem;
-    color: var(--brown1);
+    font-size: 0.68rem;
+    color: var(--muted);
     font-weight: 500;
     white-space: nowrap;
   }
@@ -345,8 +338,8 @@
   .ach-reveal {
     display: none;
     padding: 1rem 1.1rem;
-    border-top: 1px solid var(--border);
-    background: #fffdf9;
+    border-top: 1px solid var(--grey1);
+    background: var(--white);
     animation: fadeIn 0.25s ease;
   }
 
@@ -363,11 +356,11 @@
 
   .img-slot {
     border-radius: var(--radius-sm);
-    border: 1.5px dashed var(--border);
+    border: 1.5px dashed var(--grey2);
     aspect-ratio: 4/3;
     overflow: hidden;
     position: relative;
-    background: var(--warm0);
+    background: var(--grey0);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -405,9 +398,9 @@
     font-family: 'Lora', serif;
     font-style: italic;
     font-size: 0.78rem;
-    color: var(--brown2);
+    color: var(--text);
     line-height: 1.6;
-    border-left: 2px solid var(--warm2);
+    border-left: 2px solid var(--yellow);
     padding-left: 10px;
   }
 
@@ -444,8 +437,8 @@
     position: fixed;
     bottom: 1.5rem; left: 50%;
     transform: translateX(-50%) translateY(80px);
-    background: var(--brown3);
-    color: var(--cream);
+    background: var(--text);
+    color: var(--white);
     padding: 10px 20px;
     border-radius: 99px;
     font-size: 0.8rem;
@@ -466,25 +459,26 @@
   /* ── AUTH SCREEN ── */
   #auth-screen {
     position: fixed; inset: 0;
-    background: var(--cream);
+    background: var(--bg);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999;
     padding: 1.5rem;
   }
   .auth-card {
     background: var(--white);
-    border: 1px solid var(--border);
+    border: 1px solid var(--grey1);
+    border-top: 3px solid var(--yellow);
     border-radius: var(--radius);
     padding: 2rem 1.75rem;
     max-width: 340px; width: 100%;
     text-align: center;
-    box-shadow: 0 8px 40px rgba(107,63,32,0.08);
+    box-shadow: 0 4px 24px rgba(0,0,0,0.05);
   }
   .auth-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
   .auth-title {
     font-family: 'Lora', serif;
     font-size: 1.25rem; font-weight: 500;
-    color: var(--brown3);
+    color: var(--text);
     margin-bottom: 0.3rem;
   }
   .auth-sub {
@@ -498,7 +492,7 @@
   .btn-google {
     display: flex; align-items: center; justify-content: center; gap: 10px;
     width: 100%; padding: 11px 16px;
-    border: 1.5px solid var(--border);
+    border: 1.5px solid var(--grey1);
     border-radius: var(--radius-sm);
     background: var(--white);
     font-family: 'DM Sans', sans-serif;
@@ -506,7 +500,7 @@
     cursor: pointer;
     transition: background 0.2s, border-color 0.2s;
   }
-  .btn-google:hover { background: var(--warm0); border-color: var(--brown1); }
+  .btn-google:hover { background: var(--yellow-soft); border-color: var(--yellow-mid); }
   .btn-google:disabled { opacity: 0.5; cursor: not-allowed; }
   .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
 
@@ -538,7 +532,7 @@
   <div class="hero-bg"></div>
   <div class="char-wrap">
     <!-- Replace src with actual path to the cute girl image in your repo, e.g. ./assets/sarah-char.jpg -->
-    <img class="char-img" id="heroChar" src="./assets/chinni-char.jpg"
+    <img class="char-img" id="heroChar" src="./images/chinni.png"
          onerror="this.style.display='none';document.getElementById('charFallback').style.display='flex'"
          alt="Chinni" />
     <div id="charFallback" style="display:none;width:110px;height:110px;border-radius:50%;background:var(--yellow-soft);border:3px solid var(--white);align-items:center;justify-content:center;font-size:3rem;">🌸</div>
@@ -731,7 +725,7 @@ function renderCard(doc, weekMode) {
 
   card.innerHTML = `
     <div class="ach-top">
-      <img class="ach-char" src="./assets/chinni-char.jpg"
+      <img class="ach-char" src="./images/chinni.png"
            onerror="this.style.display='none'"
            alt="Chinni" />
       <div class="ach-body">
