@@ -1,0 +1,17 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+
+    // Chinni's reward images — rewards role only
+    match /sarah_achievements/{allPaths=**} {
+      allow read, write: if request.auth != null
+        && (firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data.role == 'rewards'
+         || firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data.role == 'super-admin');
+    }
+
+    // Everything else — any authenticated user
+    match /{allPaths=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "firestore": {
+    "rules": "firestore.rules"
+  },
+  "storage": [
+    {
+      "bucket": "nomad-404.firebasestorage.app",
+      "rules": "storage.rules"
+    }
+  ]
+}

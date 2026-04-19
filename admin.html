@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Admin · Chinni's Moments</title>
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+
+<style>
+  :root {
+    --cream: #ede0d4;
+    --warm0: #e8d5c8;
+    --warm1: #dfc8b6;
+    --warm2: #c9a888;
+    --brown1: #b07a52;
+    --brown2: #7a4f30;
+    --brown3: #4e2f18;
+    --text: #2e1a0e;
+    --muted: #8a6450;
+    --border: #d4bba6;
+    --white: #fdf7f2;
+    --yellow: #f5c842;
+    --yellow-soft: #fdf0c0;
+    --radius: 20px;
+    --radius-sm: 12px;
+    --green: #4a7c59;
+    --green-light: #eaf4ee;
+    --green-border: #b8dbc4;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 4rem;
+  }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--brown3);
+    padding: 0.9rem 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .topbar h1 {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--warm1);
+  }
+
+  .topbar-pill {
+    font-size: 0.65rem;
+    background: rgba(255,255,255,0.12);
+    color: var(--warm2);
+    padding: 2px 8px;
+    border-radius: 99px;
+    letter-spacing: 0.04em;
+  }
+
+  .view-link {
+    font-size: 0.75rem;
+    color: var(--warm2);
+    text-decoration: none;
+    border: 1px solid rgba(255,255,255,0.2);
+    padding: 4px 12px;
+    border-radius: 99px;
+    transition: background 0.2s;
+  }
+
+  .view-link:hover { background: rgba(255,255,255,0.1); }
+
+  /* ── MAIN ── */
+  .main { max-width: 640px; margin: 0 auto; padding: 1.5rem 1rem; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.25rem 1.3rem;
+    margin-bottom: 1.25rem;
+  }
+
+  .card-title {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    font-weight: 500;
+    color: var(--brown3);
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title .icon { font-size: 1rem; }
+
+  /* ── FIELDS ── */
+  .field { margin-bottom: 0.9rem; }
+
+  .field label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .field input[type=text],
+  .field input[type=number],
+  .field textarea,
+  .field select {
+    width: 100%;
+    background: var(--warm0);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 13px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    resize: none;
+    appearance: none;
+  }
+
+  .field input:focus, .field textarea:focus, .field select:focus {
+    border-color: var(--brown1);
+    box-shadow: 0 0 0 3px rgba(200,148,106,0.12);
+  }
+
+  .row2 { display: grid; grid-template-columns: 1fr 100px; gap: 10px; }
+
+  /* ── IMAGE UPLOAD SLOTS ── */
+  .img-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 0.9rem; }
+
+  .img-upload {
+    border: 1.5px dashed var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--warm0);
+    aspect-ratio: 4/3;
+    position: relative;
+    overflow: hidden;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .img-upload:hover {
+    border-color: var(--brown1);
+    background: var(--warm1);
+  }
+
+  .img-upload.has-img { border-style: solid; border-color: var(--border); }
+
+  .img-upload input[type=file] {
+    position: absolute; inset: 0;
+    opacity: 0;
+    width: 100%; height: 100%;
+    cursor: pointer;
+  }
+
+  .img-upload img {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+  }
+
+  .img-upload .up-icon { font-size: 1.5rem; pointer-events: none; }
+  .img-upload .up-label { font-size: 0.72rem; color: var(--muted); text-align: center; padding: 0 10px; line-height: 1.4; pointer-events: none; }
+  .img-upload .up-type { font-size: 0.65rem; color: var(--brown1); font-weight: 500; pointer-events: none; }
+
+  .img-upload .img-overlay {
+    position: absolute; inset: 0;
+    background: rgba(60,20,0,0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.2s;
+    border-radius: var(--radius-sm);
+    pointer-events: none;
+  }
+
+  .img-upload:hover .img-overlay { opacity: 1; }
+  .img-overlay span { font-size: 0.72rem; color: white; font-weight: 500; }
+
+  /* ── SUBMIT ── */
+  .submit-btn {
+    width: 100%;
+    padding: 13px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--brown2);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .submit-btn:hover { background: var(--brown3); }
+  .submit-btn:active { transform: scale(0.98); }
+  .submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* ── PROGRESS BAR (upload) ── */
+  .upload-prog {
+    display: none;
+    margin-top: 10px;
+  }
+
+  .upload-prog.visible { display: block; }
+
+  .upload-prog-bar {
+    height: 5px;
+    background: var(--warm1);
+    border-radius: 99px;
+    overflow: hidden;
+  }
+
+  .upload-prog-fill {
+    height: 100%;
+    background: var(--brown1);
+    border-radius: 99px;
+    width: 0%;
+    transition: width 0.3s ease;
+  }
+
+  .upload-prog-label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-align: center;
+  }
+
+  /* ── SUCCESS STATE ── */
+  .success-banner {
+    display: none;
+    background: var(--green-light);
+    border: 1px solid var(--green-border);
+    border-radius: var(--radius-sm);
+    padding: 1rem;
+    text-align: center;
+    margin-top: 12px;
+  }
+
+  .success-banner.show { display: block; }
+  .success-banner p { font-size: 0.88rem; color: var(--green); font-weight: 500; }
+  .success-banner small { font-size: 0.75rem; color: #6aab82; display: block; margin-top: 3px; }
+
+  /* ── RECENT LIST ── */
+  .recent-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .recent-item:last-child { border-bottom: none; }
+
+  .recent-thumb {
+    width: 48px; height: 48px;
+    border-radius: 8px;
+    object-fit: cover;
+    background: var(--warm1);
+    border: 1px solid var(--border);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    color: var(--muted);
+    overflow: hidden;
+  }
+
+  .recent-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+  .recent-body { flex: 1; }
+  .recent-desc { font-size: 0.85rem; color: var(--text); font-weight: 500; line-height: 1.4; }
+  .recent-meta { font-size: 0.7rem; color: var(--muted); margin-top: 2px; }
+
+  .recent-pts {
+    font-family: 'Lora', serif;
+    font-size: 1rem;
+    color: var(--brown1);
+    flex-shrink: 0;
+    font-weight: 500;
+  }
+
+  .img-status {
+    display: flex;
+    gap: 6px;
+    margin-top: 5px;
+  }
+
+  .img-pill {
+    font-size: 0.62rem;
+    padding: 2px 7px;
+    border-radius: 99px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  .img-pill.done { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+
+  /* ── LOADING / EMPTY ── */
+  .loading, .empty-state {
+    text-align: center;
+    padding: 1.5rem;
+    font-family: 'Lora', serif;
+    font-style: italic;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  /* ── TOAST ── */
+  .toast {
+    position: fixed;
+    bottom: 1.5rem; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--brown3);
+    color: var(--cream);
+    padding: 10px 20px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    transition: transform 0.3s cubic-bezier(.4,0,.2,1);
+    z-index: 999;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  @media (max-width: 480px) {
+    .img-grid { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* ── AUTH SCREEN ── */
+  #auth-screen {
+    position: fixed; inset: 0;
+    background: var(--cream);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    padding: 1.5rem;
+  }
+  .auth-card {
+    background: var(--white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.75rem;
+    max-width: 340px; width: 100%;
+    text-align: center;
+    box-shadow: 0 8px 40px rgba(107,63,32,0.08);
+  }
+  .auth-icon { font-size: 2.5rem; margin-bottom: 0.75rem; }
+  .auth-title {
+    font-family: 'Lora', serif;
+    font-size: 1.25rem; font-weight: 500;
+    color: var(--brown3); margin-bottom: 0.3rem;
+  }
+  .auth-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 1.5rem; line-height: 1.5; }
+  .auth-error { font-size: 0.78rem; color: #c0392b; min-height: 1.2rem; margin-bottom: 0.75rem; }
+  .btn-google {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 11px 16px;
+    border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+    background: var(--white);
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem; font-weight: 500; color: var(--text);
+    cursor: pointer; transition: background 0.2s, border-color 0.2s;
+  }
+  .btn-google:hover { background: var(--warm0); border-color: var(--brown1); }
+  .btn-google:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-google svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+  #app-content { display: none; }
+  #app-content.visible { display: block; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-icon">✦</div>
+    <div class="auth-title">Admin · Chinni's Moments</div>
+    <div class="auth-sub">Sign in with your authorised Google account to add and manage her moments.</div>
+    <div class="auth-error" id="auth-error"></div>
+    <button class="btn-google" id="googleBtn" onclick="signIn()">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      Sign in with Google
+    </button>
+  </div>
+</div>
+
+<!-- APP CONTENT -->
+<div id="app-content">
+
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar h1" style="font-family:'Lora',serif;font-size:1rem;font-weight:500;color:#f5e6cc;">Chinni's Moments ✦</div>
+    <div class="topbar-pill">Admin</div>
+  </div>
+  <a class="view-link" href="./rewards.html">View her page →</a>
+</div>
+
+<div class="main">
+
+  <!-- ADD FORM -->
+  <div class="card">
+    <div class="card-title"><span class="icon">✦</span> Add a new moment for Chinni</div>
+
+    <div class="field">
+      <label>What did she do?</label>
+      <textarea id="descIn" rows="3" placeholder="e.g. She checked in on me when I was having a hard week and somehow said exactly the right thing..."></textarea>
+    </div>
+
+    <div class="row2">
+      <div class="field">
+        <label>Your note to her</label>
+        <input type="text" id="noteTextIn" placeholder="A heartfelt line she'll see in the reveal..." />
+      </div>
+      <div class="field">
+        <label>Points</label>
+        <input type="number" id="ptsIn" value="10" min="1" max="99" />
+      </div>
+    </div>
+
+    <!-- IMAGE UPLOADS -->
+    <div class="field">
+      <label>Attach images</label>
+      <div class="img-grid">
+
+        <div class="img-upload" id="noteUploadBox" onclick="triggerFile('noteFileIn')">
+          <input type="file" id="noteFileIn" accept="image/*" onchange="previewImg(event,'noteUploadBox','notePreview')" />
+          <img id="notePreview" style="display:none" alt="Note preview" />
+          <div class="img-overlay"><span>Change photo</span></div>
+          <span class="up-icon" id="noteIcon">✍️</span>
+          <span class="up-label" id="noteLabel">Handwritten note photo</span>
+          <span class="up-type">Note</span>
+        </div>
+
+        <div class="img-upload" id="ssUploadBox" onclick="triggerFile('ssFileIn')">
+          <input type="file" id="ssFileIn" accept="image/*" onchange="previewImg(event,'ssUploadBox','ssPreview')" />
+          <img id="ssPreview" style="display:none" alt="Screenshot preview" />
+          <div class="img-overlay"><span>Change photo</span></div>
+          <span class="up-icon" id="ssIcon">📱</span>
+          <span class="up-label" id="ssLabel">Screenshot of achievement</span>
+          <span class="up-type">Screenshot</span>
+        </div>
+
+      </div>
+    </div>
+
+    <button class="submit-btn" id="submitBtn" onclick="submitAch()">
+      <span id="submitLabel">Save this moment</span>
+    </button>
+
+    <div class="upload-prog" id="uploadProg">
+      <div class="upload-prog-bar"><div class="upload-prog-fill" id="uploadProgFill"></div></div>
+      <div class="upload-prog-label" id="uploadProgLabel">Uploading images...</div>
+    </div>
+
+    <div class="success-banner" id="successBanner">
+      <p>Moment saved for Chinni! 🌸</p>
+      <small>She'll see it when she opens her page.</small>
+    </div>
+  </div>
+
+  <!-- RECENT MOMENTS -->
+  <div class="card">
+    <div class="card-title"><span class="icon">🕐</span> Recent moments for Chinni</div>
+    <div id="recentList"><div class="loading">Loading...</div></div>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+</div><!-- /app-content -->
+
+<script>
+const firebaseConfig = {apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",authDomain:"nomad-404.firebaseapp.com",projectId:"nomad-404",storageBucket:"nomad-404.firebasestorage.app",messagingSenderId:"638331724572",appId:"1:638331724572:web:baa0d70108e920099150d9"};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+const COL = "sarah_achievements";
+const provider = new firebase.auth.GoogleAuthProvider();
+
+/* ── AUTH ── */
+firebase.auth().onAuthStateChanged(async user => {
+  if (!user) { showAuthScreen(); return; }
+  const snap = await db.collection('admins').doc(user.uid).get().catch(() => null);
+  const role = snap && snap.exists ? snap.data().role : null;
+  if (!role || (role !== 'rewards' && role !== 'super-admin')) {
+    document.getElementById('auth-error').textContent = '✗ Access denied. Not authorised.';
+    document.getElementById('googleBtn').disabled = false;
+    await firebase.auth().signOut();
+    return;
+  }
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-content').classList.add('visible');
+  loadRecent();
+});
+
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-content').classList.remove('visible');
+}
+
+function signIn() {
+  document.getElementById('googleBtn').disabled = true;
+  document.getElementById('auth-error').textContent = '';
+  firebase.auth().signInWithPopup(provider).catch(e => {
+    document.getElementById('auth-error').textContent = '✗ ' + e.message;
+    document.getElementById('googleBtn').disabled = false;
+  });
+}
+
+/* ── IMAGE PREVIEW ── */
+function triggerFile(id) {
+  document.getElementById(id).click();
+}
+
+function previewImg(event, boxId, previewId) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const box = document.getElementById(boxId);
+  const img = document.getElementById(previewId);
+  const reader = new FileReader();
+  reader.onload = e => {
+    img.src = e.target.result;
+    img.style.display = 'block';
+    box.classList.add('has-img');
+    const type = previewId === 'notePreview' ? 'note' : 'ss';
+    document.getElementById(type === 'note' ? 'noteIcon' : 'ssIcon').style.display = 'none';
+    document.getElementById(type === 'note' ? 'noteLabel' : 'ssLabel').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ── UPLOAD FILE ── */
+async function uploadFile(file, path, onProgress) {
+  return new Promise((resolve, reject) => {
+    const ref = storage.ref(path);
+    const task = ref.put(file);
+    task.on('state_changed',
+      snap => onProgress(Math.round((snap.bytesTransferred / snap.totalBytes) * 100)),
+      reject,
+      async () => resolve(await ref.getDownloadURL())
+    );
+  });
+}
+
+/* ── SUBMIT ── */
+async function submitAch() {
+  const desc = document.getElementById('descIn').value.trim();
+  const noteText = document.getElementById('noteTextIn').value.trim();
+  const pts = parseInt(document.getElementById('ptsIn').value) || 10;
+
+  if (!desc) { showToast('Please describe the moment!'); return; }
+
+  const btn = document.getElementById('submitBtn');
+  const label = document.getElementById('submitLabel');
+  const prog = document.getElementById('uploadProg');
+  const progFill = document.getElementById('uploadProgFill');
+  const progLabel = document.getElementById('uploadProgLabel');
+  const success = document.getElementById('successBanner');
+
+  btn.disabled = true;
+  label.textContent = 'Saving...';
+  prog.classList.add('visible');
+  success.classList.remove('show');
+
+  const noteFile = document.getElementById('noteFileIn').files[0];
+  const ssFile = document.getElementById('ssFileIn').files[0];
+
+  try {
+    const docRef = await db.collection(COL).add({
+      desc,
+      noteText: noteText || '',
+      pts,
+      noteImg: null,
+      screenshotImg: null,
+      who: 'you',
+      createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+    });
+
+    const docId = docRef.id;
+    let noteUrl = null, ssUrl = null;
+    let uploadsDone = 0;
+    const total = (noteFile ? 1 : 0) + (ssFile ? 1 : 0);
+
+    if (noteFile) {
+      progLabel.textContent = 'Uploading handwritten note...';
+      noteUrl = await uploadFile(noteFile, `sarah_achievements/${docId}/note_${Date.now()}`, pct => {
+        progFill.style.width = Math.round(pct / (total * 1.0)) + '%';
+      });
+      uploadsDone++;
+    }
+
+    if (ssFile) {
+      progLabel.textContent = 'Uploading screenshot...';
+      ssUrl = await uploadFile(ssFile, `sarah_achievements/${docId}/screenshot_${Date.now()}`, pct => {
+        progFill.style.width = Math.round((uploadsDone + pct / 100) / total * 100) + '%';
+      });
+    }
+
+    const update = {};
+    if (noteUrl) update.noteImg = noteUrl;
+    if (ssUrl) update.screenshotImg = ssUrl;
+    if (Object.keys(update).length) await docRef.update(update);
+
+    progFill.style.width = '100%';
+    progLabel.textContent = 'Done!';
+    setTimeout(() => prog.classList.remove('visible'), 1500);
+
+    document.getElementById('descIn').value = '';
+    document.getElementById('noteTextIn').value = '';
+    document.getElementById('ptsIn').value = '10';
+    resetImgSlot('noteFileIn', 'notePreview', 'noteUploadBox', 'noteIcon', 'noteLabel');
+    resetImgSlot('ssFileIn', 'ssPreview', 'ssUploadBox', 'ssIcon', 'ssLabel');
+
+    success.classList.add('show');
+    setTimeout(() => success.classList.remove('show'), 4000);
+
+  } catch (e) {
+    showToast('Error. Check Firebase rules.');
+    console.error(e);
+    prog.classList.remove('visible');
+  }
+
+  btn.disabled = false;
+  label.textContent = 'Save this moment';
+}
+
+function resetImgSlot(fileId, previewId, boxId, iconId, labelId) {
+  document.getElementById(fileId).value = '';
+  const img = document.getElementById(previewId);
+  img.src = ''; img.style.display = 'none';
+  document.getElementById(boxId).classList.remove('has-img');
+  document.getElementById(iconId).style.display = '';
+  document.getElementById(labelId).style.display = '';
+}
+
+/* ── FORMAT DATE ── */
+function formatDate(ts) {
+  if (!ts) return 'just now';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+}
+
+/* ── RECENT LIST ── */
+function loadRecent() {
+  db.collection(COL).orderBy('createdAt', 'desc').limit(10).onSnapshot(snap => {
+    const el = document.getElementById('recentList');
+    if (!snap.docs.length) {
+      el.innerHTML = '<div class="empty-state">No moments yet — add the first one above!</div>';
+      return;
+    }
+    el.innerHTML = '';
+    snap.docs.forEach(doc => {
+      const d = doc.data();
+      const item = document.createElement('div');
+      item.className = 'recent-item';
+
+      const thumbHTML = d.noteImg
+        ? `<div class="recent-thumb"><img src="${escHtml(d.noteImg)}" alt="note" /></div>`
+        : `<div class="recent-thumb">✍️</div>`;
+
+      const notePill = d.noteImg
+        ? `<div class="img-pill done">Note ✓</div>`
+        : `<div class="img-pill">Note —</div>`;
+
+      const ssPill = d.screenshotImg
+        ? `<div class="img-pill done">Screenshot ✓</div>`
+        : `<div class="img-pill">Screenshot —</div>`;
+
+      item.innerHTML = `
+        ${thumbHTML}
+        <div class="recent-body">
+          <div class="recent-desc">${escHtml(d.desc)}</div>
+          <div class="recent-meta">${formatDate(d.createdAt)}</div>
+          <div class="img-status">${notePill}${ssPill}</div>
+        </div>
+        <div class="recent-pts">+${d.pts}</div>
+      `;
+      el.appendChild(item);
+    });
+  });
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+</script>
+</body>
+</html>
