@@ -499,35 +499,181 @@ window.editPerson=function(id){
 };
 
 // ─── PHOTOGRAPHY ─────────────────────────────────────────────────
-let selectedPhotoFile=null;
-window.handlePhotoDrop=function(e){e.preventDefault();document.getElementById('photoDropZone').classList.remove('over');const file=e.dataTransfer.files[0];if(file)handlePhotoSelect(file);};
-window.handlePhotoSelect=function(file){
-  if(!file)return;if(file.size>10*1024*1024){toast('Max 10MB','err');return;}
-  selectedPhotoFile=file;
-  const reader=new FileReader();reader.onload=e=>{document.getElementById('photoPreview').innerHTML=`<div class="upload-preview-item"><img src="${e.target.result}" alt="preview"><button class="remove-btn" onclick="selectedPhotoFile=null;document.getElementById('photoPreview').innerHTML=''">×</button></div>`;};reader.readAsDataURL(file);
-  if(!document.getElementById('ph-date').value)document.getElementById('ph-date').value=new Date().toISOString().split('T')[0];
+let photoQueue=[];
+const DEFAULT_PHOTO_DESCRIPTION_PROMPT="Generate a concise, poetic description of this photography. Focus on mood, lighting, and what story the technical settings tell about the moment captured.";
+
+async function getClaudeApiKey(){
+  try{const snap=await getDoc(doc(db,'config','claude'));if(!snap.exists()||!snap.data().api_key){return null;}return snap.data().api_key;}catch(_){return null;}
+}
+
+window.handlePhotoDrop=function(e){e.preventDefault();document.getElementById('photoDropZone').classList.remove('over');const files=e.dataTransfer.files;if(files.length)handlePhotoSelectMultiple(files);};
+
+window.handlePhotoSelectMultiple=function(files){
+  const validFiles=Array.from(files).filter(f=>{if(!f.type.startsWith('image/')){toast('Only image files supported','err');return false;}if(f.size>10*1024*1024){toast(`${f.name} exceeds 10MB`,'err');return false;}return true;});
+  validFiles.forEach(file=>{
+    const id=`photo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+    const reader=new FileReader();reader.onload=e=>{
+      photoQueue.push({id,file,preview:e.target.result,metadata:{camera:'',lens:'',settings:'',title:'',story:'',location:'',country_id:'',element:'ice',trip_id:'',featured:false},description:'',status:'preview'});
+      renderPhotoQueue();
+    };reader.readAsDataURL(file);
+  });
 };
-window.uploadPhoto=async function(){
-  const title=document.getElementById('ph-title').value.trim();if(!title){toast('Title required','err');return;}if(!selectedPhotoFile){toast('Select a photo first','err');return;}
-  const btn=document.getElementById('uploadBtn');btn.disabled=true;btn.textContent='UPLOADING…';
+
+function renderPhotoQueue(){
+  const qEl=document.getElementById('photoQueue');
+  if(!photoQueue.length){qEl.style.display='none';document.getElementById('claudePromptEditor').style.display='none';document.getElementById('uploadBtn').style.display='none';return;}
+  qEl.style.display='grid';document.getElementById('claudePromptEditor').style.display='block';document.getElementById('uploadBtn').style.display='inline-block';
+  qEl.innerHTML=photoQueue.map(item=>`
+    <div class="photo-queue-card" id="card-${item.id}">
+      <div class="queue-preview"><img src="${item.preview}" alt=""></div>
+      <div class="queue-details">
+        <input type="text" class="queue-title-input" placeholder="Title*" value="${item.metadata.title}" onchange="updatePhotoMetadata('${item.id}','title',this.value)" oninput="updatePhotoMetadata('${item.id}','title',this.value)">
+        <div class="queue-meta-row">
+          <input type="text" class="queue-meta-input" placeholder="Camera" value="${item.metadata.camera}" onchange="updatePhotoMetadata('${item.id}','camera',this.value)" oninput="updatePhotoMetadata('${item.id}','camera',this.value)">
+          <input type="text" class="queue-meta-input" placeholder="Lens" value="${item.metadata.lens}" onchange="updatePhotoMetadata('${item.id}','lens',this.value)" oninput="updatePhotoMetadata('${item.id}','lens',this.value)">
+        </div>
+        <input type="text" class="queue-meta-input" placeholder="Settings (f/8 · 1/250s · ISO 400)" value="${item.metadata.settings}" onchange="updatePhotoMetadata('${item.id}','settings',this.value)" oninput="updatePhotoMetadata('${item.id}','settings',this.value)">
+        <input type="text" class="queue-meta-input" placeholder="Location" value="${item.metadata.location}" onchange="updatePhotoMetadata('${item.id}','location',this.value)" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
+        <textarea class="queue-meta-input" placeholder="Description (auto-generated or manual)" style="min-height:60px" onchange="updatePhotoMetadata('${item.id}','description',this.value)" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${item.description}</textarea>
+        <div style="display:flex;gap:6px;margin-top:8px;font-size:9px">
+          <select class="form-select" style="flex:1;padding:4px 6px;font-size:9px" onchange="updatePhotoMetadata('${item.id}','element',this.value)">
+            <option value="ice" ${item.metadata.element==='ice'?'selected':''}>ICE</option>
+            <option value="sky" ${item.metadata.element==='sky'?'selected':''}>SKY</option>
+            <option value="water" ${item.metadata.element==='water'?'selected':''}>WATER</option>
+            <option value="fire" ${item.metadata.element==='fire'?'selected':''}>FIRE</option>
+            <option value="earth" ${item.metadata.element==='earth'?'selected':''}>EARTH</option>
+          </select>
+          <button onclick="removeFromQueue('${item.id}')" style="padding:4px 8px;border:1px solid var(--red);color:var(--red);background:transparent;border-radius:3px;cursor:pointer;font-size:9px">×</button>
+        </div>
+        <div style="margin-top:6px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${item.file.name} · ${(item.file.size/1024/1024).toFixed(1)}MB</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.updatePhotoMetadata=function(queueId,key,value){
+  const item=photoQueue.find(p=>p.id===queueId);if(!item)return;
+  if(key==='description'){item.description=value;}else{item.metadata[key]=value;}
+};
+
+window.removeFromQueue=function(queueId){
+  photoQueue=photoQueue.filter(p=>p.id!==queueId);
+  renderPhotoQueue();
+};
+
+window.clearPhotoQueue=function(){
+  if(!photoQueue.length){toast('Queue already empty','info');return;}
+  if(confirm('Clear all photos from queue?')){photoQueue=[];renderPhotoQueue();toast('Queue cleared');}
+};
+
+async function generatePhotoDescription(item,customPrompt){
+  const apiKey=await getClaudeApiKey();if(!apiKey){return null;}
+  const metadataStr=JSON.stringify({title:item.metadata.title,camera:item.metadata.camera,lens:item.metadata.lens,settings:item.metadata.settings,location:item.metadata.location});
+  const prompt=customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT;
   try{
-    const ext=selectedPhotoFile.name.split('.').pop();const path=`photos/${Date.now()}_${title.toLowerCase().replace(/\s+/g,'-').slice(0,40)}.${ext}`;
-    const storageRef=ref(storage,path);const task=uploadBytesResumable(storageRef,selectedPhotoFile);
-    const imageUrl=await new Promise((resolve,reject)=>{task.on('state_changed',snap=>{const pct=Math.round(snap.bytesTransferred/snap.totalBytes*100);document.getElementById('uploadProgress').style.display='block';document.getElementById('uploadBar').style.width=pct+'%';document.getElementById('uploadPercent').textContent=pct+'%';},reject,async()=>resolve(await getDownloadURL(task.snapshot.ref)));});
-    const exif={};['camera','lens','settings'].forEach(k=>{const v=document.getElementById(`ph-${k}`).value.trim();if(v)exif[k]=v;});
-    await addDoc(collection(db,'photos'),{title,story:document.getElementById('ph-story').value.trim()||null,image_url:imageUrl,location:document.getElementById('ph-location').value.trim()||null,country_id:dropdowns['ph-country'].getValue()||null,date:document.getElementById('ph-date').value||null,element:document.getElementById('ph-element').value,featured:document.getElementById('ph-featured').value==='true',trip_id:document.getElementById('ph-trip').value||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid});
-    toast('✓ Photo saved');clearForm('photo');document.getElementById('uploadProgress').style.display='none';loadPhotoGrid();loadAllCounts();
-  }catch(e){toast('✗ '+e.message,'err');}
-  finally{btn.disabled=false;btn.textContent='UPLOAD & SAVE';}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:'You are a photography description specialist. Create vivid, poetic descriptions based on photo metadata and settings.',messages:[{role:'user',content:`${prompt}\n\nPhoto metadata: ${metadataStr}`}]})});
+    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'Claude API error');}
+    const data=await res.json();
+    return data.content[0].text;
+  }catch(e){console.error('Claude error:',e);return null;}
+}
+
+window.generateDescriptionsForQueue=async function(){
+  if(!photoQueue.length){toast('No photos in queue','info');return;}
+  const customPrompt=document.getElementById('claudePrompt').value.trim();
+  const btn=event.target;btn.disabled=true;btn.textContent='GENERATING…';
+  let generated=0;
+  for(let i=0;i<photoQueue.length;i++){
+    const item=photoQueue[i];
+    const description=await generatePhotoDescription(item,customPrompt);
+    if(description){item.description=description;generated++;}
+    const ta=document.querySelector(`#card-${item.id} textarea`);if(ta)ta.value=item.description;
+  }
+  btn.disabled=false;btn.textContent='GENERATE DESCRIPTIONS';
+  toast(`✓ ${generated}/${photoQueue.length} descriptions generated`);
 };
+
+window.uploadPhotosQueue=async function(){
+  const missing=photoQueue.filter(p=>!p.metadata.title);if(missing.length){toast('All photos need a title','err');return;}
+  if(!photoQueue.length){toast('No photos to upload','err');return;}
+  const btn=document.getElementById('uploadBtn');btn.disabled=true;btn.textContent='UPLOADING…';
+  document.getElementById('uploadProgress').style.display='block';
+  document.getElementById('uploadLog').innerHTML='';
+  let done=0,failed=0;
+  for(let i=0;i<photoQueue.length;i++){
+    const item=photoQueue[i];
+    const label=document.getElementById('uploadProgressLabel');label.textContent=`${i+1} / ${photoQueue.length}`;
+    document.getElementById('uploadBar').style.width=`${Math.round((i/photoQueue.length)*100)}%`;
+    const logEl=document.getElementById('uploadLog');const logMsg=document.createElement('div');logMsg.textContent=`⬆ ${item.metadata.title}…`;logMsg.style.color='var(--muted)';logMsg.style.fontSize='10px';logEl.appendChild(logMsg);
+    try{
+      const ext=item.file.name.split('.').pop();const path=`photos/${Date.now()}_${item.metadata.title.toLowerCase().replace(/\s+/g,'-').slice(0,40)}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+      const storageRef=ref(storage,path);const task=uploadBytesResumable(storageRef,item.file);
+      const imageUrl=await new Promise((resolve,reject)=>{task.on('state_changed',snap=>{},reject,async()=>resolve(await getDownloadURL(task.snapshot.ref)));});
+      const exif={};if(item.metadata.camera)exif.camera=item.metadata.camera;if(item.metadata.lens)exif.lens=item.metadata.lens;if(item.metadata.settings)exif.settings=item.metadata.settings;
+      const photoDoc={title:item.metadata.title,description:item.description||null,story:item.metadata.story||null,image_url:imageUrl,location:item.metadata.location||null,country_id:item.metadata.country_id||null,date:item.metadata.date||new Date().toISOString().split('T')[0],element:item.metadata.element,featured:item.metadata.featured===true||item.metadata.featured==='true',trip_id:item.metadata.trip_id||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid};
+      await addDoc(collection(db,'photos'),photoDoc);
+      done++;logMsg.textContent=`✓ ${item.metadata.title}`;logMsg.style.color='var(--green)';
+    }catch(e){failed++;logMsg.textContent=`✗ ${item.metadata.title} - ${e.message}`;logMsg.style.color='var(--red)';}
+  }
+  document.getElementById('uploadBar').style.width='100%';label.textContent=`${done} saved · ${failed} failed`;
+  btn.disabled=false;btn.textContent='UPLOAD ALL & SAVE';
+  toast(`✓ ${done}/${photoQueue.length} photos uploaded`);
+  photoQueue=[];renderPhotoQueue();loadPhotoGrid();loadAllCounts();
+};
+
 async function loadPhotoGrid(){
   const grid=document.getElementById('photoGrid');grid.innerHTML='<div class="loading-row"><div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div><span>Loading…</span></div>';
   try{
     const snap=await getDocs(collection(db,'photos'));
     if(snap.empty){grid.innerHTML='<div class="empty-state"><div class="empty-state-text">No photos yet</div></div>';return;}
-    grid.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="photo-thumb">${p.image_url?`<img src="${p.image_url}" alt="${p.title||''}" loading="lazy">`:'<div style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)">NO IMG</div>'}${p.featured?'<div class="photo-featured-badge">FEATURED</div>':''}<div class="photo-thumb-overlay"><div class="photo-thumb-title">${p.title||'—'}</div><button class="tbl-btn del" style="font-size:9px" onclick="deleteEntry('photos','${d.id}',loadPhotoGrid)">DELETE</button></div></div>`;}).join('');
+    grid.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="photo-thumb">${p.image_url?`<img src="${p.image_url}" alt="${p.title||''}" loading="lazy">`:'<div style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)">NO IMG</div>'}${p.featured?'<div class="photo-featured-badge">FEATURED</div>':''}<div class="photo-thumb-overlay"><div class="photo-thumb-title">${p.title||'—'}</div><button class="tbl-btn edit" style="font-size:9px" onclick="editPhoto('${d.id}')">EDIT</button><button class="tbl-btn del" style="font-size:9px" onclick="deleteEntry('photos','${d.id}',loadPhotoGrid)">DELETE</button></div></div>`;}).join('');
   }catch(e){grid.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
 }
+
+window.editPhoto=function(photoId){
+  const allPhotos=[];getDocs(collection(db,'photos')).then(snap=>{
+    const photo=snap.docs.find(d=>d.id===photoId)?.data();if(!photo)return;
+    const exif=photo.exif||{};
+    openModal(`EDIT — ${photo.title}`,`
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div>
+          ${photo.image_url?`<img src="${photo.image_url}" alt="" style="width:100%;border-radius:8px;border:1px solid var(--border);margin-bottom:12px">`:''}
+          <div style="font-size:10px;color:var(--muted);line-height:1.6">
+            <div><strong>Camera:</strong> ${exif.camera||'—'}</div>
+            <div><strong>Lens:</strong> ${exif.lens||'—'}</div>
+            <div><strong>Settings:</strong> ${exif.settings||'—'}</div>
+            <div><strong>Location:</strong> ${photo.location||'—'}</div>
+            <div><strong>Element:</strong> ${photo.element||'—'}</div>
+            <div><strong>Date:</strong> ${photo.date||'—'}</div>
+          </div>
+        </div>
+        <div>
+          <div class="form-group"><label class="form-label">DESCRIPTION</label><textarea class="form-textarea" id="m-description" style="min-height:140px">${photo.description||''}</textarea></div>
+          <div class="form-group"><label class="form-label" style="font-size:9px">or</label><button class="btn btn-ghost" style="width:100%;font-size:9px;padding:8px" onclick="regeneratePhotoDescription('${photoId}')">REGENERATE WITH CLAUDE</button></div>
+        </div>
+      </div>
+    `,async()=>{
+      await updateDoc(doc(db,'photos',photoId),{description:document.getElementById('m-description').value.trim()||null});
+      toast('✓ Photo updated');loadPhotoGrid();
+    });
+  });
+};
+
+window.regeneratePhotoDescription=async function(photoId){
+  const btn=event.target;btn.disabled=true;btn.textContent='GENERATING…';
+  try{
+    const snap=await getDoc(doc(db,'photos',photoId));const photo=snap.data();
+    const customPrompt=document.getElementById('claudePrompt')?.value.trim();
+    const exif=photo.exif||{};const metadataStr=JSON.stringify({title:photo.title,camera:exif.camera,lens:exif.lens,settings:exif.settings,location:photo.location});
+    const apiKey=await getClaudeApiKey();if(!apiKey){toast('Claude API key not configured','err');btn.disabled=false;btn.textContent='REGENERATE WITH CLAUDE';return;}
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:'You are a photography description specialist. Create vivid, poetic descriptions based on photo metadata and settings.',messages:[{role:'user',content:`${customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT}\n\nPhoto metadata: ${metadataStr}`}]})});
+    if(!res.ok){throw new Error('Claude API error');}
+    const data=await res.json();const newDesc=data.content[0].text;
+    document.getElementById('m-description').value=newDesc;
+    toast('✓ Description generated');
+  }catch(e){toast('✗ '+e.message,'err');}finally{btn.disabled=false;btn.textContent='REGENERATE WITH CLAUDE';}
+};
+
 
 // ─── TRIPS ───────────────────────────────────────────────────────
 let allTripDocs=[];
