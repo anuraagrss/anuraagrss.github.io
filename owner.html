@@ -272,31 +272,18 @@
       <div class="panel" id="panel-photos">
         <div class="panel-header"><div class="panel-eyebrow">// PHOTOGRAPHY</div><div class="panel-title">PHOTOS.</div><div class="panel-sub">Upload to Firebase Storage · tag element · goes live on photography.html</div></div>
         <div class="section-card">
-          <div class="section-card-title">// UPLOAD PHOTO</div>
+          <div class="section-card-title">// UPLOAD PHOTOS</div>
           <div class="drop-zone" id="photoDropZone" onclick="document.getElementById('photoFileInput').click()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')" ondrop="handlePhotoDrop(event)">
-            <div class="drop-zone-icon">◎</div><div class="drop-zone-text">DROP PHOTO HERE</div><div class="drop-zone-sub">jpg, png, webp · max 10MB</div>
-            <input type="file" id="photoFileInput" accept="image/*" style="display:none" onchange="handlePhotoSelect(this.files[0])">
+            <div class="drop-zone-icon">◎</div><div class="drop-zone-text">DROP PHOTOS HERE</div><div class="drop-zone-sub">jpg, png, webp · max 10MB each · multiple files ok</div>
+            <input type="file" id="photoFileInput" accept="image/*" multiple style="display:none" onchange="handlePhotoSelectMultiple(this.files)">
           </div>
-          <div class="upload-preview" id="photoPreview"></div>
-          <div class="form-grid cols-1"><div class="form-group"><label class="form-label">TITLE</label><input class="form-input" id="ph-title" placeholder="What you saw"></div></div>
-          <div class="form-grid cols-1"><div class="form-group"><label class="form-label">STORY</label><textarea class="form-textarea" id="ph-story" style="min-height:120px" placeholder="Not technical info. What did this landscape tell you?"></textarea></div></div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label class="form-label">LOCATION</label><input class="form-input" id="ph-location" placeholder="Ahu Tongariki, Easter Island"></div>
-            <div class="form-group"><label class="form-label">COUNTRY</label><div class="country-search-wrap" id="ph-country-wrap"></div><input type="hidden" id="ph-country"></div>
-            <div class="form-group"><label class="form-label">DATE</label><input class="form-input" id="ph-date" type="date"></div>
+          <div class="photo-queue" id="photoQueue" style="display:none;margin-top:16px"></div>
+          <div id="claudePromptEditor" style="display:none;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:16px;margin:16px 0">
+            <div class="form-group"><label class="form-label">CLAUDE PROMPT — DESCRIPTION GENERATION</label><textarea class="form-textarea" id="claudePrompt" style="min-height:80px" placeholder="Generate a concise, poetic description of this photography based on the technical settings and location...">Generate a concise, poetic description of this photography. Focus on mood, lighting, and what story the technical settings tell about the moment captured.</textarea></div>
+            <div class="btn-row"><button class="btn btn-primary" onclick="generateDescriptionsForQueue()">GENERATE DESCRIPTIONS</button></div>
           </div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label class="form-label">ELEMENT</label><select class="form-select" id="ph-element"><option value="ice">ICE</option><option value="sky">SKY</option><option value="water">WATER</option><option value="fire">FIRE (golden hour)</option><option value="earth">EARTH</option></select></div>
-            <div class="form-group"><label class="form-label">TRIP</label><select class="form-select" id="ph-trip"><option value="">— no trip —</option></select></div>
-            <div class="form-group"><label class="form-label">FEATURED</label><select class="form-select" id="ph-featured"><option value="false">No</option><option value="true">Yes — hero</option></select></div>
-          </div>
-          <div class="form-grid cols-3">
-            <div class="form-group"><label class="form-label">CAMERA</label><input class="form-input" id="ph-camera" placeholder="Sony A7III"></div>
-            <div class="form-group"><label class="form-label">LENS</label><input class="form-input" id="ph-lens" placeholder="24-70mm f/2.8"></div>
-            <div class="form-group"><label class="form-label">SETTINGS</label><input class="form-input" id="ph-settings" placeholder="f/8 · 1/250s · ISO 400"></div>
-          </div>
-          <div id="uploadProgress" style="display:none"><div class="progress-label">// UPLOADING <span id="uploadPercent">0%</span></div><div class="progress-track"><div class="progress-bar" id="uploadBar"></div></div></div>
-          <div class="btn-row"><button class="btn btn-primary" id="uploadBtn" onclick="uploadPhoto()">UPLOAD &amp; SAVE</button><button class="btn btn-ghost" onclick="clearForm('photo')">CLEAR</button></div>
+          <div id="uploadProgress" style="display:none;margin:16px 0"><div class="progress-label">// UPLOADING <span id="uploadProgressLabel">0 / 0</span></div><div class="progress-track"><div class="progress-bar" id="uploadBar"></div></div><div class="progress-log" id="uploadLog"></div></div>
+          <div class="btn-row"><button class="btn btn-primary" id="uploadBtn" onclick="uploadPhotosQueue()" style="display:none">UPLOAD ALL &amp; SAVE</button><button class="btn btn-ghost" onclick="clearPhotoQueue()">CLEAR QUEUE</button></div>
         </div>
         <div class="section-card"><div class="section-card-title">// PHOTO LIBRARY</div><div class="photo-grid" id="photoGrid"></div></div>
       </div>
