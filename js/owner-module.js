@@ -513,7 +513,7 @@ window.handlePhotoSelectMultiple=function(files){
   validFiles.forEach(file=>{
     const id=`photo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
     const reader=new FileReader();reader.onload=e=>{
-      photoQueue.push({id,file,preview:e.target.result,metadata:{camera:'',lens:'',settings:'',title:'',story:'',location:'',country_id:'',element:'ice',trip_id:'',featured:false},description:'',status:'preview'});
+      photoQueue.push({id,file,preview:e.target.result,metadata:{camera:'',lens:'',settings:'',title:'',story:'',location:'',country_id:'',tags:'',trip_id:'',featured:false},description:'',status:'preview'});
       renderPhotoQueue();
     };reader.readAsDataURL(file);
   });
@@ -536,13 +536,8 @@ function renderPhotoQueue(){
         <input type="text" class="queue-meta-input" placeholder="Location" value="${item.metadata.location}" onchange="updatePhotoMetadata('${item.id}','location',this.value)" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
         <textarea class="queue-meta-input" placeholder="Description (auto-generated or manual)" style="min-height:60px" onchange="updatePhotoMetadata('${item.id}','description',this.value)" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${item.description}</textarea>
         <div style="display:flex;gap:6px;margin-top:8px;font-size:9px">
-          <select class="form-select" style="flex:1;padding:4px 6px;font-size:9px" onchange="updatePhotoMetadata('${item.id}','element',this.value)">
-            <option value="ice" ${item.metadata.element==='ice'?'selected':''}>ICE</option>
-            <option value="sky" ${item.metadata.element==='sky'?'selected':''}>SKY</option>
-            <option value="water" ${item.metadata.element==='water'?'selected':''}>WATER</option>
-            <option value="fire" ${item.metadata.element==='fire'?'selected':''}>FIRE</option>
-            <option value="earth" ${item.metadata.element==='earth'?'selected':''}>EARTH</option>
-          </select>
+          <input type="text" class="queue-meta-input tags-input" placeholder="Tags — Claude-generated or manual" style="flex:1;font-size:9px" value="${item.metadata.tags||''}" oninput="updatePhotoMetadata('${item.id}','tags',this.value)">
+          <button class="gen-btn" onclick="generateDescriptionForCard('${item.id}')" style="padding:4px 8px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:3px;cursor:pointer;font-size:9px;white-space:nowrap">✦ GEN</button>
           <button onclick="removeFromQueue('${item.id}')" style="padding:4px 8px;border:1px solid var(--red);color:var(--red);background:transparent;border-radius:3px;cursor:pointer;font-size:9px">×</button>
         </div>
         <div style="margin-top:6px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${item.file.name} · ${(item.file.size/1024/1024).toFixed(1)}MB</div>
@@ -566,17 +561,41 @@ window.clearPhotoQueue=function(){
   if(confirm('Clear all photos from queue?')){photoQueue=[];renderPhotoQueue();toast('Queue cleared');}
 };
 
+function _deriveElement(tags){
+  if(!tags)return'earth';const t=tags.toLowerCase();
+  if(t.includes('ice')||t.includes('snow')||t.includes('winter')||t.includes('glacier')||t.includes('frost'))return'ice';
+  if(t.includes('sky')||t.includes('cloud')||t.includes('aerial')||t.includes('stars')||t.includes('aurora'))return'sky';
+  if(t.includes('water')||t.includes('ocean')||t.includes('sea')||t.includes('lake')||t.includes('river')||t.includes('waterfall'))return'water';
+  if(t.includes('fire')||t.includes('sunset')||t.includes('sunrise')||t.includes('golden hour')||t.includes('lava'))return'fire';
+  return'earth';
+}
+
 async function generatePhotoDescription(item,customPrompt){
   const apiKey=await getClaudeApiKey();if(!apiKey){return null;}
   const metadataStr=JSON.stringify({title:item.metadata.title,camera:item.metadata.camera,lens:item.metadata.lens,settings:item.metadata.settings,location:item.metadata.location});
-  const prompt=customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT;
+  const descPrompt=customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:'You are a photography description specialist. Create vivid, poetic descriptions based on photo metadata and settings.',messages:[{role:'user',content:`${prompt}\n\nPhoto metadata: ${metadataStr}`}]})});
+    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a photography description specialist. Respond ONLY with valid JSON — no markdown, no explanation, no code fences.',messages:[{role:'user',content:`Based on the photo metadata below, generate a JSON object with exactly two fields:\n- "description": ${descPrompt}\n- "tags": 4-6 comma-separated tags describing the photo (subjects, mood, lighting conditions, location type, elements like water/ice/sky/fire/earth)\n\nPhoto metadata: ${metadataStr}`}]})});
     if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'Claude API error');}
     const data=await res.json();
-    return data.content[0].text;
+    const parsed=JSON.parse(data.content[0].text.trim());
+    return{description:parsed.description||'',tags:parsed.tags||''};
   }catch(e){console.error('Claude error:',e);return null;}
 }
+
+window.generateDescriptionForCard=async function(photoId){
+  const item=photoQueue.find(p=>p.id===photoId);if(!item)return;
+  const btn=document.querySelector(`#card-${photoId} .gen-btn`);
+  if(btn){btn.disabled=true;btn.textContent='…';}
+  const customPrompt=document.getElementById('claudePrompt')?.value.trim();
+  const result=await generatePhotoDescription(item,customPrompt);
+  if(result){
+    if(result.description){item.description=result.description;const ta=document.querySelector(`#card-${photoId} textarea`);if(ta)ta.value=result.description;}
+    if(result.tags){item.metadata.tags=result.tags;const ti=document.querySelector(`#card-${photoId} .tags-input`);if(ti)ti.value=result.tags;}
+    toast('✓ Generated');
+  }else{toast('✗ Claude error','err');}
+  if(btn){btn.disabled=false;btn.textContent='✦ GEN';}
+};
 
 window.generateDescriptionsForQueue=async function(){
   if(!photoQueue.length){toast('No photos in queue','info');return;}
@@ -585,9 +604,13 @@ window.generateDescriptionsForQueue=async function(){
   let generated=0;
   for(let i=0;i<photoQueue.length;i++){
     const item=photoQueue[i];
-    const description=await generatePhotoDescription(item,customPrompt);
-    if(description){item.description=description;generated++;}
-    const ta=document.querySelector(`#card-${item.id} textarea`);if(ta)ta.value=item.description;
+    const result=await generatePhotoDescription(item,customPrompt);
+    if(result){
+      if(result.description){item.description=result.description;generated++;}
+      if(result.tags){item.metadata.tags=result.tags;}
+      const ta=document.querySelector(`#card-${item.id} textarea`);if(ta)ta.value=item.description;
+      const ti=document.querySelector(`#card-${item.id} .tags-input`);if(ti)ti.value=item.metadata.tags||'';
+    }
   }
   btn.disabled=false;btn.textContent='GENERATE DESCRIPTIONS';
   toast(`✓ ${generated}/${photoQueue.length} descriptions generated`);
@@ -610,7 +633,7 @@ window.uploadPhotosQueue=async function(){
       const storageRef=ref(storage,path);const task=uploadBytesResumable(storageRef,item.file);
       const imageUrl=await new Promise((resolve,reject)=>{task.on('state_changed',snap=>{},reject,async()=>resolve(await getDownloadURL(task.snapshot.ref)));});
       const exif={};if(item.metadata.camera)exif.camera=item.metadata.camera;if(item.metadata.lens)exif.lens=item.metadata.lens;if(item.metadata.settings)exif.settings=item.metadata.settings;
-      const photoDoc={title:item.metadata.title,description:item.description||null,story:item.metadata.story||null,image_url:imageUrl,location:item.metadata.location||null,country_id:item.metadata.country_id||null,date:item.metadata.date||new Date().toISOString().split('T')[0],element:item.metadata.element,featured:item.metadata.featured===true||item.metadata.featured==='true',trip_id:item.metadata.trip_id||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid};
+      const photoDoc={title:item.metadata.title,description:item.description||null,story:item.metadata.story||null,image_url:imageUrl,location:item.metadata.location||null,country_id:item.metadata.country_id||null,date:item.metadata.date||new Date().toISOString().split('T')[0],tags:item.metadata.tags||null,element:_deriveElement(item.metadata.tags),featured:item.metadata.featured===true||item.metadata.featured==='true',trip_id:item.metadata.trip_id||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid};
       await addDoc(collection(db,'photos'),photoDoc);
       done++;logMsg.textContent=`✓ ${item.metadata.title}`;logMsg.style.color='var(--green)';
     }catch(e){failed++;logMsg.textContent=`✗ ${item.metadata.title} - ${e.message}`;logMsg.style.color='var(--red)';}
