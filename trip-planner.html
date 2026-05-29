@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Trip Planner — Anuraag</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Lora:ital,wght@0,400;0,600;1,400&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/trip-planner.css">
+  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-glow"></div>
+  <div id="authStars"></div>
+  <div class="auth-card">
+    <div class="auth-icon">✈</div>
+    <div class="auth-title">TRIP PLANNER</div>
+    <div class="auth-sub">// PERSONAL · RESTRICTED ACCESS</div>
+    <div class="auth-error" id="auth-error"></div>
+    <button class="btn-google" id="googleBtn" onclick="signIn()">
+      <svg viewBox="0 0 18 18" fill="none"><path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/><path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/><path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/><path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/></svg>
+      SIGN IN WITH GOOGLE
+    </button>
+    <div class="auth-back"><a href="owner.html">← back to dashboard</a></div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+
+  <!-- Offline banner -->
+  <div class="offline-banner" id="offlineBanner">⚠ OFFLINE MODE — changes will sync when back online</div>
+
+  <!-- Top bar -->
+  <div class="tp-topbar">
+    <a href="owner.html" class="tp-back">← DASHBOARD</a>
+    <div class="tp-topbar-name" id="topbarName">TRIP PLANNER</div>
+    <div class="tp-topbar-right">
+      <div class="sync-dot" id="syncDot" title="Online"></div>
+      <select class="tp-selector" id="tripSelector" onchange="loadTrip(this.value)">
+        <option value="">— Select Trip —</option>
+      </select>
+      <button class="btn btn-primary" onclick="toggleNewTripForm()">+ NEW TRIP</button>
+    </div>
+  </div>
+
+  <!-- Content -->
+  <div class="tp-content">
+
+    <!-- New trip form (hidden by default) -->
+    <div class="new-trip-card" id="newTripCard" style="display:none">
+      <div class="tp-eyebrow">// CREATE NEW TRIP</div>
+      <div class="form-grid cols-1"><div class="form-group"><label class="form-label">TRIP NAME</label><input class="form-input" id="nt-title" placeholder="Tokyo Summer 2025"></div></div>
+      <div class="form-grid cols-3">
+        <div class="form-group"><label class="form-label">DATE FROM</label><input class="form-input" id="nt-from" type="date"></div>
+        <div class="form-group"><label class="form-label">DATE TO</label><input class="form-input" id="nt-to" type="date"></div>
+        <div class="form-group"><label class="form-label">STATUS</label>
+          <select class="form-select" id="nt-status">
+            <option value="planning">Planning</option>
+            <option value="upcoming">Upcoming</option>
+            <option value="done">Done</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid cols-3">
+        <div class="form-group"><label class="form-label">ORIGIN AIRPORT</label><input class="form-input" id="nt-origin" placeholder="HYD" maxlength="3" style="text-transform:uppercase"></div>
+        <div class="form-group"><label class="form-label">DESTINATION AIRPORT</label><input class="form-input" id="nt-dest" placeholder="NRT" maxlength="3" style="text-transform:uppercase"></div>
+        <div class="form-group"><label class="form-label">APPLE FOLDER NAME</label><input class="form-input" id="nt-folder" placeholder="Tokyo 2025"></div>
+      </div>
+      <div class="form-grid cols-3">
+        <div class="form-group"><label class="form-label">BUDGET</label><input class="form-input" id="nt-budget" type="number" placeholder="5000"></div>
+        <div class="form-group"><label class="form-label">CURRENCY</label>
+          <select class="form-select" id="nt-currency">
+            <option value="USD">USD $</option>
+            <option value="EUR">EUR €</option>
+            <option value="GBP">GBP £</option>
+            <option value="INR">INR ₹</option>
+            <option value="AUD">AUD $</option>
+            <option value="CAD">CAD $</option>
+            <option value="JPY">JPY ¥</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">POINTS PROGRAM</label>
+          <select class="form-select" id="nt-points">
+            <option value="all">All programs</option>
+            <option value="Chase UR">Chase UR</option>
+            <option value="Amex MR">Amex MR</option>
+            <option value="Capital One">Capital One</option>
+            <option value="Citi TY">Citi ThankYou</option>
+            <option value="United MileagePlus">United MileagePlus</option>
+            <option value="AA AAdvantage">AA AAdvantage</option>
+            <option value="Delta SkyMiles">Delta SkyMiles</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-grid cols-3">
+        <div class="form-group"><label class="form-label">TRIP THEME</label>
+          <select class="form-select" id="nt-theme">
+            <option value="">✨ Auto (random)</option>
+            <option value="sakura">🌸 Sakura — Japan / Asia</option>
+            <option value="ocean">🌊 Ocean — Beach / Tropical</option>
+            <option value="desert">🏜 Desert — Middle East / Warm</option>
+            <option value="midnight">🌃 Midnight — City / Nightlife</option>
+            <option value="forest">🌿 Forest — Adventure / Nature</option>
+            <option value="neon">⚡ Neon — Urban / Cyberpunk</option>
+            <option value="ember">🔥 Ember — Mediterranean / Warm</option>
+          </select>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" onclick="createTrip()">CREATE TRIP</button>
+        <button class="btn btn-ghost" onclick="toggleNewTripForm()">CANCEL</button>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-icon">✦</div>
+      <div class="empty-title">SELECT A TRIP TO BEGIN PLANNING</div>
+      <div class="empty-sub">Or create a new trip using the button above</div>
+    </div>
+
+    <!-- Planner content (shown when trip selected) -->
+    <div id="plannerContent" style="display:none">
+
+      <!-- Trip hero -->
+      <div class="trip-hero" id="tripHero">
+        <div class="trip-hero-title" id="heroTitle">TRIP NAME</div>
+        <div class="trip-hero-meta" id="heroMeta"></div>
+        <div class="hero-stats-row">
+          <div class="hero-stat"><div class="hero-stat-num" id="heroDays">—</div><div class="hero-stat-label">DAYS UNTIL</div></div>
+          <div class="hero-stat"><div class="hero-stat-num" id="heroFlights">—</div><div class="hero-stat-label">FLIGHTS</div></div>
+          <div class="hero-stat" id="heroExpenseStat" onclick="openSimplifiReport()" style="cursor:pointer" title="Open Simplifi report"><div class="hero-stat-num" id="heroBudgetStat">💰</div><div class="hero-stat-label">EXPENSES</div></div>
+          <div class="hero-stat"><div class="hero-stat-num" id="heroPackedStat">—</div><div class="hero-stat-label">PACKED %</div></div>
+          <div class="hero-stat"><div class="hero-stat-num" id="heroReady">—</div><div class="hero-stat-label">READY %</div></div>
+        </div>
+      </div>
+
+      <!-- Destination facts (hidden until loaded) -->
+      <div id="destinationFacts" class="dest-facts-card" style="display:none">
+        <div class="dest-facts-header">
+          <span class="dest-facts-icon">🌍</span>
+          <div class="tp-eyebrow" id="factsHeading">// FUN FACTS</div>
+          <button class="btn btn-ghost" onclick="document.getElementById('destinationFacts').style.display='none'" style="font-size:10px;padding:4px 8px;margin-left:auto">✕</button>
+        </div>
+        <div id="factsList" class="facts-list"></div>
+      </div>
+
+      <!-- Quick actions -->
+      <div class="quick-grid">
+        <div class="qa-card primary" onclick="openPointMe()">
+          <div class="qa-card-icon">✈</div>
+          <div class="qa-card-label">SEARCH FLIGHTS</div>
+          <div class="qa-card-sub">Open point.me with your route</div>
+        </div>
+        <div class="qa-card" onclick="openSimplifiReport()">
+          <div class="qa-card-icon">💰</div>
+          <div class="qa-card-label">EXPENSE REPORT</div>
+          <div class="qa-card-sub">Open Quicken Simplifi report</div>
+        </div>
+        <div class="qa-card" onclick="downloadAllICS()">
+          <div class="qa-card-icon">📅</div>
+          <div class="qa-card-label">DOWNLOAD REMINDERS</div>
+          <div class="qa-card-sub">Pre-trip checklist as .ics</div>
+        </div>
+        <div class="qa-card" onclick="copyNotesTemplate()">
+          <div class="qa-card-icon">📝</div>
+          <div class="qa-card-label">COPY TRIP NOTE</div>
+          <div class="qa-card-sub">Paste into Apple Notes</div>
+        </div>
+      </div>
+
+      <!-- ── ITINERARY ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// DAY BY DAY</div>
+            <div class="tp-section-title">ITINERARY</div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-ghost" onclick="toggleAddItineraryForm()">+ ADD DAY</button>
+            <button class="btn btn-ghost" onclick="exportItineraryXLSX()" title="Export as Excel — opens in Apple Numbers">⬇ EXPORT .XLSX</button>
+          </div>
+        </div>
+
+        <!-- Add day form -->
+        <div id="addItineraryForm" class="add-itin-row" style="display:none">
+          <input class="form-input" id="itin-date" type="date" style="width:150px;flex-shrink:0">
+          <input class="form-input" id="itin-activity" placeholder="Activity (e.g. Frankfurt city tour)" style="flex:2;min-width:160px">
+          <input class="form-input" id="itin-location" placeholder="Location / Route" style="flex:1;min-width:100px">
+          <input class="form-input" id="itin-notes" placeholder="Notes / Airline" style="flex:1;min-width:80px">
+          <button class="btn btn-primary" onclick="saveItineraryRow()" style="flex-shrink:0">ADD</button>
+          <button class="btn btn-ghost" onclick="toggleAddItineraryForm()" style="flex-shrink:0">✕</button>
+        </div>
+
+        <!-- Itinerary table -->
+        <div class="itin-wrap" id="itineraryWrap">
+          <div style="font-size:11px;color:var(--muted);text-align:center;padding:24px 0" id="itinEmpty">No days planned yet — add your first day above.</div>
+          <table class="itin-table" id="itineraryTable" style="display:none">
+            <thead>
+              <tr>
+                <th style="width:130px">Date</th>
+                <th>Activity</th>
+                <th style="width:160px">Location</th>
+                <th style="width:180px">Notes</th>
+                <th style="width:32px"></th>
+              </tr>
+            </thead>
+            <tbody id="itineraryBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── FLIGHT SEARCH ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// AWARD + CASH COMPARISON</div>
+            <div class="tp-section-title">FLIGHT SEARCH</div>
+          </div>
+          <button class="btn btn-ghost" onclick="toggleFlightApiConfig()" style="font-size:10px;letter-spacing:1.5px">⚙ API KEYS</button>
+        </div>
+
+        <!-- API key config (hidden by default) -->
+        <div id="flightApiConfig" class="bf-form" style="display:none">
+          <div class="tp-eyebrow" style="margin-bottom:12px">// API CONFIGURATION — SAVED TO FIREBASE</div>
+          <div class="form-grid cols-1">
+            <div class="form-group">
+              <label class="form-label">SEATS.AERO PARTNER KEY <span style="color:var(--muted);font-size:9px">— seats.aero/partner (~$9/mo) · award availability</span></label>
+              <input class="form-input" id="sa-key" placeholder="sa_live_…" type="password">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group">
+              <label class="form-label">AMADEUS CLIENT ID <span style="color:var(--muted);font-size:9px">— free at developers.amadeus.com · cash fares</span></label>
+              <input class="form-input" id="am-id" placeholder="Client ID">
+            </div>
+            <div class="form-group">
+              <label class="form-label">AMADEUS CLIENT SECRET</label>
+              <input class="form-input" id="am-secret" placeholder="Client Secret" type="password">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:12px;max-width:260px">
+            <label class="form-label">AMADEUS ENVIRONMENT</label>
+            <select class="form-select" id="am-env">
+              <option value="test">Test (simulated fares)</option>
+              <option value="production">Production (live fares)</option>
+            </select>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveFlightApiKeys()">SAVE KEYS</button>
+            <button class="btn btn-ghost" onclick="toggleFlightApiConfig()">CANCEL</button>
+          </div>
+        </div>
+
+        <!-- Search fields -->
+        <div class="form-grid cols-3">
+          <div class="form-group"><label class="form-label">FROM</label><input class="form-input" id="fs-origin" placeholder="HYD" maxlength="3" style="text-transform:uppercase" oninput="updateFlightPreview()"></div>
+          <div class="form-group"><label class="form-label">TO</label><input class="form-input" id="fs-dest" placeholder="NRT" maxlength="3" style="text-transform:uppercase" oninput="updateFlightPreview()"></div>
+          <div class="form-group"><label class="form-label">DEPARTURE DATE</label><input class="form-input" id="fs-date" type="date" oninput="updateFlightPreview()"></div>
+        </div>
+        <div class="form-grid cols-3">
+          <div class="form-group"><label class="form-label">CABIN</label>
+            <select class="form-select" id="fs-cabin" onchange="updateFlightPreview()">
+              <option value="Y">Economy</option>
+              <option value="W">Premium Economy</option>
+              <option value="J" selected>Business</option>
+              <option value="F">First Class</option>
+            </select>
+          </div>
+          <div class="form-group"><label class="form-label">PASSENGERS</label>
+            <select class="form-select" id="fs-pax">
+              <option value="1">1 passenger</option>
+              <option value="2">2 passengers</option>
+              <option value="3">3 passengers</option>
+              <option value="4">4 passengers</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">&nbsp;</label>
+            <button class="btn btn-primary" onclick="searchAllFlights()" style="letter-spacing:2px;width:100%">🔍 SEARCH BOTH</button>
+          </div>
+        </div>
+
+        <!-- Route preview + quick links -->
+        <div id="flightPreviewRow" class="pointme-result" style="display:none">
+          <div>
+            <div class="pointme-route" id="fsRoute">HYD → NRT</div>
+            <div class="pointme-meta" id="fsMeta"></div>
+          </div>
+          <div class="flight-search-btns">
+            <button class="btn btn-ghost" onclick="openPointMe()" style="font-size:10px">POINT.ME →</button>
+            <button class="btn btn-ghost" onclick="openGoogleFlights()" style="font-size:10px">GOOGLE →</button>
+          </div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="saveFlightSearchConfig()" style="font-size:10px">SAVE AS TRIP DEFAULT</button>
+        </div>
+
+        <!-- Results panel -->
+        <div id="flightResults" style="display:none">
+          <div class="divider" style="margin:20px 0 16px"></div>
+          <div class="pack-tabs" id="flightTabs">
+            <button class="pack-tab active" onclick="showFlightTab('award')">🎯 AWARD FLIGHTS</button>
+            <button class="pack-tab" onclick="showFlightTab('cash')">💵 CASH FARES</button>
+            <button class="pack-tab" onclick="showFlightTab('value')">⚡ BEST VALUE</button>
+          </div>
+          <div id="ftAward"></div>
+          <div id="ftCash" style="display:none"></div>
+          <div id="ftValue" style="display:none"></div>
+        </div>
+      </div>
+
+      <!-- ── BOOKED FLIGHTS ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// CONFIRMED BOOKINGS</div>
+            <div class="tp-section-title">BOOKED FLIGHTS</div>
+          </div>
+          <button class="btn btn-ghost" onclick="toggleAddFlightForm()">+ ADD FLIGHT</button>
+        </div>
+        <!-- Add form -->
+        <div id="addFlightForm" class="bf-form" style="display:none">
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">FLIGHT NO.</label><input class="form-input" id="bf-num" placeholder="EK 568"></div>
+            <div class="form-group"><label class="form-label">AIRLINE</label><input class="form-input" id="bf-airline" placeholder="Emirates"></div>
+            <div class="form-group"><label class="form-label">BOOKING REF / PNR</label><input class="form-input" id="bf-ref" placeholder="XYZ123"></div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">FROM (IATA)</label><input class="form-input" id="bf-origin" placeholder="HYD" maxlength="3" style="text-transform:uppercase"></div>
+            <div class="form-group"><label class="form-label">TO (IATA)</label><input class="form-input" id="bf-dest" placeholder="NRT" maxlength="3" style="text-transform:uppercase"></div>
+            <div class="form-group"><label class="form-label">CABIN</label>
+              <select class="form-select" id="bf-cabin">
+                <option value="Economy">Economy</option>
+                <option value="Premium Economy">Premium Economy</option>
+                <option value="Business">Business</option>
+                <option value="First Class">First Class</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">DEP DATE</label><input class="form-input" id="bf-dep-date" type="date"></div>
+            <div class="form-group"><label class="form-label">DEP TIME</label><input class="form-input" id="bf-dep-time" type="time"></div>
+            <div class="form-group"><label class="form-label">ARR TIME</label><input class="form-input" id="bf-arr-time" type="time"></div>
+          </div>
+          <div class="form-grid cols-3">
+            <div class="form-group"><label class="form-label">ARR DATE</label><input class="form-input" id="bf-arr-date" type="date"></div>
+            <div class="form-group"><label class="form-label">EMAIL CONFIRMATION REF</label><input class="form-input" id="bf-email-ref" placeholder="EK Booking #…"></div>
+            <div class="form-group"><label class="form-label">DOCUMENT IN FOLDER</label><input class="form-input" id="bf-doc" placeholder="EK568_ticket.pdf"></div>
+          </div>
+          <div class="form-grid cols-1">
+            <div class="form-group"><label class="form-label">AIRLINE RESERVATION URL</label><input class="form-input" id="bf-url" placeholder="https://manage.emirates.com/…" type="url"></div>
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-primary" onclick="saveBookedFlight()">SAVE FLIGHT</button>
+            <button class="btn btn-ghost" onclick="toggleAddFlightForm()">CANCEL</button>
+          </div>
+        </div>
+        <div id="bookedFlightsList"></div>
+      </div>
+
+      <!-- ── PACKING LIST ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// TRIP PREPARATION</div>
+            <div class="tp-section-title">PACKING LIST</div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-ghost" onclick="resetPacking()">RESET</button>
+            <button class="btn btn-ghost" onclick="copyPackingList()">COPY LIST</button>
+            <button class="btn btn-ghost" onclick="downloadPackingICS()">EXPORT .ICS</button>
+          </div>
+        </div>
+        <div class="pack-progress">
+          <div class="pack-progress-label">
+            <span id="packProgressLabel">0 / 0 packed</span>
+            <span id="packProgressPct">0%</span>
+          </div>
+          <div class="pack-progress-bar-track">
+            <div class="pack-progress-bar" id="packProgressBar" style="width:0%"></div>
+          </div>
+        </div>
+        <div class="pack-tabs" id="packTabs"></div>
+        <div class="pack-list" id="packList"></div>
+        <div class="pack-add-row">
+          <input class="form-input" id="packNewItem" placeholder="Add item to this category…" onkeydown="if(event.key==='Enter')addPackingItem()">
+          <button class="btn btn-ghost" onclick="addPackingItem()">+ ADD</button>
+        </div>
+      </div>
+
+      <!-- ── APPLE INTEGRATION ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// NATIVE APPLE TOOLS</div>
+            <div class="tp-section-title">APPLE INTEGRATION</div>
+          </div>
+        </div>
+        <div class="apple-grid">
+
+          <!-- Reminders -->
+          <div class="apple-card">
+            <div class="apple-card-icon">⏰</div>
+            <div class="apple-card-title">APPLE REMINDERS</div>
+            <div class="apple-card-desc">Pre-trip reminders auto-generated from your departure date. Download as .ics and open on any Apple device to add to Reminders.</div>
+            <div class="reminder-list" id="reminderPreviewList"></div>
+            <div class="apple-card-actions">
+              <button class="btn btn-ghost btn-apple" onclick="downloadRemindersICS()">
+                ⬇ DOWNLOAD REMINDERS (.ICS)
+              </button>
+              <button class="btn btn-ghost btn-apple" onclick="openAppleReminders()">
+                OPEN REMINDERS APP →
+              </button>
+            </div>
+          </div>
+
+          <!-- Calendar Events -->
+          <div class="apple-card">
+            <div class="apple-card-icon">📆</div>
+            <div class="apple-card-title">CALENDAR EVENTS</div>
+            <div class="apple-card-desc">Departure and return as calendar events with 3-hour flight alarms. Download and open on iPhone to add to your calendar.</div>
+            <div class="apple-card-actions">
+              <button class="btn btn-ghost btn-apple" onclick="downloadCalendarICS()">
+                ⬇ DOWNLOAD EVENTS (.ICS)
+              </button>
+              <button class="btn btn-ghost btn-apple" onclick="openAppleCalendar()">
+                OPEN CALENDAR APP →
+              </button>
+            </div>
+          </div>
+
+          <!-- Apple Notes -->
+          <div class="apple-card">
+            <div class="apple-card-icon">📝</div>
+            <div class="apple-card-title">APPLE NOTES</div>
+            <div class="apple-card-desc">Trip summary with packing list, links, and budget — formatted for Apple Notes. Copy and paste directly into a note.</div>
+            <div class="notes-preview" id="notesPreview"></div>
+            <div class="apple-card-actions">
+              <button class="btn btn-ghost btn-apple" onclick="copyNotesTemplate()">
+                ⊕ COPY TRIP NOTE
+              </button>
+              <button class="btn btn-ghost btn-apple" onclick="openAppleNotes()">
+                OPEN NOTES APP →
+              </button>
+            </div>
+          </div>
+
+          <!-- Apple Shortcuts -->
+          <div class="apple-card">
+            <div class="apple-card-icon">⚡</div>
+            <div class="apple-card-title">APPLE SHORTCUTS</div>
+            <div class="apple-card-desc">Run a pre-built shortcut that creates all reminders and opens your trip note automatically.</div>
+            <div class="shortcut-setup">
+              <div class="shortcut-setup-title">// ONE-TIME SETUP</div>
+              <ol class="shortcut-steps">
+                <li>Open Shortcuts app on iPhone/Mac</li>
+                <li>Create shortcut named "Trip Planner"</li>
+                <li>Action: <em>Receive Text</em> input → Create Reminder from each line</li>
+                <li>Come back here and hit Run Shortcut below</li>
+              </ol>
+            </div>
+            <div class="apple-card-actions" style="margin-top:12px">
+              <button class="btn btn-ghost btn-apple" onclick="runShortcut()">
+                ⚡ RUN SHORTCUT WITH TRIP DATA
+              </button>
+              <button class="btn btn-ghost btn-apple" onclick="copyShortcutInput()">
+                COPY SHORTCUT INPUT TEXT
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- ── CURRENCY CONVERTER ── -->
+      <div class="tp-section">
+        <div class="tp-section-header" style="margin-bottom:14px">
+          <div>
+            <div class="tp-eyebrow">// QUICK CONVERTER</div>
+            <div class="tp-section-title">CURRENCY</div>
+          </div>
+          <div id="convRateDisplay" style="font-size:10px;color:var(--muted);letter-spacing:1px;text-align:right;line-height:1.6"></div>
+        </div>
+        <div class="converter-row">
+          <div class="conv-group">
+            <input class="conv-amount" id="conv-from" type="number" value="100" oninput="convertFromTo()">
+            <select class="conv-cur" id="conv-from-cur" onchange="onConvCurrencyChange()"></select>
+          </div>
+          <button class="conv-swap" onclick="swapCurrencies()" title="Swap">⇄</button>
+          <div class="conv-group">
+            <input class="conv-amount" id="conv-to" type="number" oninput="convertToFrom()">
+            <select class="conv-cur" id="conv-to-cur" onchange="onConvCurrencyChange()"></select>
+          </div>
+        </div>
+        <div class="conv-rate" id="convStatus"></div>
+      </div>
+
+      <!-- ── EXPENSES — QUICKEN SIMPLIFI ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// BUDGET TRACKER</div>
+            <div class="tp-section-title">EXPENSES</div>
+          </div>
+          <div class="section-actions">
+            <button class="btn btn-ghost" id="editSimplifiUrlBtn" onclick="toggleSimplifiUrlEdit()">EDIT URL</button>
+            <button class="btn btn-ghost" id="openSimplifiBtn" onclick="openSimplifiReport()" style="display:none">OPEN REPORT →</button>
+          </div>
+        </div>
+
+        <!-- URL setup / edit -->
+        <div id="simplifiSetup">
+          <div style="font-size:11px;color:var(--muted);margin-bottom:14px;line-height:1.8">
+            Create a report in Quicken Simplifi filtered to this trip, then paste its shareable URL below.<br>
+            Format: <code style="color:var(--teal);font-size:10px">https://simplifi.quicken.com/reports/…</code>
+          </div>
+          <div style="display:flex;gap:8px">
+            <input class="form-input" id="simplifi-url" placeholder="https://simplifi.quicken.com/reports/540533140815215104" type="url" style="flex:1">
+            <button class="btn btn-primary" onclick="saveSimplifiUrl()">SAVE & EMBED</button>
+          </div>
+        </div>
+
+        <!-- Embed area (shown once URL is saved) -->
+        <div id="simplifiEmbed" style="display:none">
+          <!-- Loading -->
+          <div id="simplifiLoading" class="simplifi-loading">
+            <div class="loading-dot"></div><div class="loading-dot"></div><div class="loading-dot"></div>
+            <span style="font-size:11px;color:var(--muted);margin-left:8px">Loading Simplifi report…</span>
+          </div>
+          <!-- iframe -->
+          <iframe id="simplifiFrame"
+            src=""
+            class="simplifi-frame"
+            style="display:none"
+            onload="onSimplifiFrameLoad()"
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-top-navigation">
+          </iframe>
+          <!-- Fallback — shown if iframe is blocked by X-Frame-Options -->
+          <div id="simplifiFallback" class="simplifi-fallback" style="display:none">
+            <div class="simplifi-fallback-icon">💰</div>
+            <div class="simplifi-fallback-title">QUICKEN SIMPLIFI REPORT</div>
+            <div class="simplifi-fallback-sub">Simplifi restricts embedding for security — open your report directly in a new tab.</div>
+            <a id="simplifiOpenLink" href="#" target="_blank" rel="noopener" class="btn btn-primary simplifi-open-btn">
+              OPEN EXPENSE REPORT →
+            </a>
+            <div class="simplifi-url-chip" id="simplifiUrlChip"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── DOCUMENTS & LINKS ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// FOLDER STRUCTURE</div>
+            <div class="tp-section-title">DOCUMENTS & LINKS</div>
+          </div>
+        </div>
+        <div class="form-grid cols-3" style="margin-bottom:8px">
+          <div class="form-group"><label class="form-label">LABEL</label><input class="form-input" id="lnk-label" placeholder="Hotel booking confirmation"></div>
+          <div class="form-group"><label class="form-label">URL</label><input class="form-input" id="lnk-url" placeholder="https://…" type="url"></div>
+          <div class="form-group"><label class="form-label">TYPE</label>
+            <select class="form-select" id="lnk-type">
+              <option value="hotel">Hotel</option><option value="flight">Flight</option>
+              <option value="visa">Visa</option><option value="insurance">Insurance</option>
+              <option value="transport">Transport</option><option value="activity">Activity</option>
+              <option value="document">Document</option><option value="other">Other</option>
+            </select>
+          </div>
+        </div>
+        <div class="btn-row" style="margin-bottom:16px">
+          <button class="btn btn-primary" onclick="addLink()">+ ADD LINK</button>
+        </div>
+        <!-- Cloud folder link -->
+        <div id="folderLinkSetup" style="margin-bottom:14px">
+          <div class="form-group">
+            <label class="form-label">CLOUD FOLDER LINK <span style="color:var(--muted);font-size:9px">— iCloud Drive, Google Drive, Dropbox, etc.</span></label>
+            <div style="display:flex;gap:8px">
+              <input class="form-input" id="folder-url-input" placeholder="https://www.icloud.com/iclouddrive/…" type="url" style="flex:1">
+              <button class="btn btn-primary" onclick="saveFolderLink()" style="white-space:nowrap">SAVE LINK</button>
+            </div>
+          </div>
+        </div>
+        <div id="folderLinkSaved" class="folder-link-row" style="display:none">
+          <span class="folder-link-icon">📁</span>
+          <span class="folder-link-url" id="folderLinkDisplay"></span>
+          <a id="folderLinkOpen" href="#" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:10px;padding:5px 12px;text-decoration:none;flex-shrink:0">OPEN →</a>
+          <button class="btn btn-ghost" onclick="toggleFolderLinkEdit()" style="font-size:10px;padding:5px 10px;flex-shrink:0">CHANGE</button>
+        </div>
+
+        <!-- Apple folder suggestion -->
+        <div id="folderSuggestion" style="background:rgba(91,192,190,0.05);border:1px solid rgba(91,192,190,0.15);border-radius:8px;padding:12px 14px;margin-bottom:14px;display:none">
+          <div style="font-size:10px;letter-spacing:2px;color:var(--teal);margin-bottom:6px">// SUGGESTED APPLE NOTES FOLDER</div>
+          <div style="font-size:13px;color:var(--text)" id="folderName"></div>
+          <div style="font-size:10px;color:var(--muted);margin-top:4px">Create a folder with this name in Apple Notes to keep all trip documents organised</div>
+        </div>
+        <div class="links-list" id="linksList"></div>
+      </div>
+
+      <!-- ── LINKED FLIGHTS & EXPERIENCES ── -->
+      <div class="tp-section">
+        <div class="tp-section-header">
+          <div>
+            <div class="tp-eyebrow">// TAGGED CONTENT</div>
+            <div class="tp-section-title">LINKED FLIGHTS</div>
+          </div>
+        </div>
+        <div id="linkedFlights">
+          <div style="font-size:11px;color:var(--muted);text-align:center;padding:24px 0">Loading…</div>
+        </div>
+      </div>
+
+    </div><!-- /plannerContent -->
+  </div><!-- /tp-content -->
+</div><!-- /app -->
+
+<div id="toast"></div>
+
+<script type="module" src="js/trip-planner-module.js"></script>
+</body>
+</html>
