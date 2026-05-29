@@ -24,6 +24,20 @@ service cloud.firestore {
       allow read, write: if hasRole('rewards') || hasRole('super-admin');
     }
 
+    // Public read — photos, flights, countries (public portfolio pages)
+    match /photos/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /flights/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+    match /countries/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
     // Everything else — any authenticated admin
     match /{document=**} {
       allow read, write: if isAdmin();
