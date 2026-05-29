@@ -529,20 +529,20 @@ function renderPhotoQueue(){
     <div class="photo-queue-card" id="card-${item.id}">
       <div class="queue-preview"><img src="${item.preview}" alt=""></div>
       <div class="queue-details">
-        <input type="text" class="queue-title-input" placeholder="Title*" value="${item.metadata.title}" onchange="updatePhotoMetadata('${item.id}','title',this.value)" oninput="updatePhotoMetadata('${item.id}','title',this.value)">
+        <input type="text" class="queue-title-input" placeholder="Title *" value="${item.metadata.title}" oninput="updatePhotoMetadata('${item.id}','title',this.value)">
         <div class="queue-meta-row">
-          <input type="text" class="queue-meta-input" placeholder="Camera" value="${item.metadata.camera}" onchange="updatePhotoMetadata('${item.id}','camera',this.value)" oninput="updatePhotoMetadata('${item.id}','camera',this.value)">
-          <input type="text" class="queue-meta-input" placeholder="Lens" value="${item.metadata.lens}" onchange="updatePhotoMetadata('${item.id}','lens',this.value)" oninput="updatePhotoMetadata('${item.id}','lens',this.value)">
+          <input type="text" class="queue-meta-input" placeholder="Camera" value="${item.metadata.camera}" oninput="updatePhotoMetadata('${item.id}','camera',this.value)">
+          <input type="text" class="queue-meta-input" placeholder="Lens" value="${item.metadata.lens}" oninput="updatePhotoMetadata('${item.id}','lens',this.value)">
         </div>
-        <input type="text" class="queue-meta-input" placeholder="Settings (f/8 · 1/250s · ISO 400)" value="${item.metadata.settings}" onchange="updatePhotoMetadata('${item.id}','settings',this.value)" oninput="updatePhotoMetadata('${item.id}','settings',this.value)">
-        <input type="text" class="queue-meta-input" placeholder="Location" value="${item.metadata.location}" onchange="updatePhotoMetadata('${item.id}','location',this.value)" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
-        <textarea class="queue-meta-input" placeholder="Description (auto-generated or manual)" style="min-height:60px" onchange="updatePhotoMetadata('${item.id}','description',this.value)" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${item.description}</textarea>
-        <div style="display:flex;gap:6px;margin-top:8px;font-size:9px">
-          <input type="text" class="queue-meta-input tags-input" placeholder="Tags — Claude-generated or manual" style="flex:1;font-size:9px" value="${item.metadata.tags||''}" oninput="updatePhotoMetadata('${item.id}','tags',this.value)">
-          <button class="gen-btn" onclick="generateDescriptionForCard('${item.id}')" style="padding:4px 8px;border:1px solid var(--teal);color:var(--teal);background:transparent;border-radius:3px;cursor:pointer;font-size:9px;white-space:nowrap">✦ GEN</button>
-          <button onclick="removeFromQueue('${item.id}')" style="padding:4px 8px;border:1px solid var(--red);color:var(--red);background:transparent;border-radius:3px;cursor:pointer;font-size:9px">×</button>
+        <input type="text" class="queue-meta-input" placeholder="Settings  f/8 · 1/250s · ISO 400" value="${item.metadata.settings}" oninput="updatePhotoMetadata('${item.id}','settings',this.value)">
+        <input type="text" class="queue-meta-input" placeholder="Location" value="${item.metadata.location}" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
+        <textarea class="queue-meta-input" placeholder="Description — auto-generated or manual" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${item.description}</textarea>
+        <div class="queue-card-footer">
+          <input type="text" class="queue-meta-input tags-input" placeholder="Tags — Claude-generated or manual" value="${item.metadata.tags||''}" oninput="updatePhotoMetadata('${item.id}','tags',this.value)">
+          <button class="gen-btn" onclick="generateDescriptionForCard('${item.id}')">✦ GEN</button>
+          <button class="rem-btn" onclick="removeFromQueue('${item.id}')">×</button>
         </div>
-        <div style="margin-top:6px;font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">${item.file.name} · ${(item.file.size/1024/1024).toFixed(1)}MB</div>
+        <div class="queue-file-info">${item.file.name} · ${(item.file.size/1024/1024).toFixed(1)}MB</div>
       </div>
     </div>
   `).join('');
