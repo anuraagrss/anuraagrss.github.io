@@ -301,6 +301,7 @@
       home:     function () { cmdGo('home'); },
       profile:  function () { cmdGo('engineer'); },
       chinni:   function () { window.location.href = 'rewards.html'; },
+      pseudo:   function () { window.location.href = 'owner.html'; },
       pwd:  function () { out([['cd', '/anuraag/world/portfolio']]); },
       date: function () { out([['ct', new Date().toDateString() + ' · ' + new Date().toLocaleTimeString()]]); },
       ping: function () {
