@@ -38,7 +38,7 @@ exports.generatePhotoDescription = onCall({ region: 'us-central1' }, async (requ
   const descPrompt = prompt || 'Generate a concise, poetic description of this photography. Focus on mood, lighting, and what story the technical settings tell about the moment captured.';
 
   const anthropicBody = {
-    model: 'claude-sonnet-4-20250514',
+    model: 'claude-sonnet-4-6',
     max_tokens: 400,
     system: 'You are a photography description specialist. Respond ONLY with valid JSON — no markdown, no explanation, no code fences.',
     messages: [{
