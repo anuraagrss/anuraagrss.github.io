@@ -649,9 +649,10 @@ async function loadPhotoGrid(){
   try{
     const snap=await getDocs(collection(db,'photos'));
     if(snap.empty){grid.innerHTML='<div class="empty-state"><div class="empty-state-text">No photos yet</div></div>';return;}
-    grid.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="photo-thumb">${p.image_url?`<img src="${p.image_url}" alt="${p.title||''}" loading="lazy">`:'<div style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)">NO IMG</div>'}${p.featured?'<div class="photo-featured-badge">FEATURED</div>':''}<div class="photo-thumb-overlay"><div class="photo-thumb-title">${p.title||'—'}</div><button class="tbl-btn edit" style="font-size:9px" onclick="editPhoto('${d.id}')">EDIT</button><button class="tbl-btn del" style="font-size:9px" onclick="deleteEntry('photos','${d.id}',loadPhotoGrid)">DELETE</button></div></div>`;}).join('');
+    grid.innerHTML=snap.docs.map(d=>{const p=d.data();return`<div class="photo-thumb">${p.image_url?`<img src="${p.image_url}" alt="${p.title||''}" loading="lazy">`:'<div style="width:100%;height:100%;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:10px;color:var(--muted)">NO IMG</div>'}${p.featured?'<div class="photo-featured-badge">FEATURED</div>':''}<div class="photo-thumb-overlay"><div class="photo-thumb-title">${p.title||'—'}</div><button class="tbl-btn edit" style="font-size:9px" onclick="editPhoto('${d.id}')">EDIT</button><button class="tbl-btn del" style="font-size:9px" onclick="window.deleteEntry('photos','${d.id}',window.loadPhotoGrid)">DELETE</button></div></div>`;}).join('');
   }catch(e){grid.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
 }
+window.loadPhotoGrid=loadPhotoGrid;
 
 window.editPhoto=function(photoId){
   const allPhotos=[];getDocs(collection(db,'photos')).then(snap=>{
