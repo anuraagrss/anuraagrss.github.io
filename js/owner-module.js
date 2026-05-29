@@ -861,7 +861,7 @@ async function loadUsers(){
 window.deleteEntry=async function(col,docId,reloadFn){if(!confirm('Delete? Cannot be undone.'))return;try{await deleteDoc(doc(db,col,docId));toast('✓ Deleted');if(typeof reloadFn==='function')reloadFn();}catch(e){toast('✗ '+e.message,'err');}};
 
 // ─── CONFIG ──────────────────────────────────────────────────────
-const SERVICE_LABELS={fr24:'FR24 — FlightRadar24',seats_aero:'Seats.aero',planespotters:'Planespotters',unsplash:'Unsplash',google_maps:'Google Maps',openai:'OpenAI'};
+const SERVICE_LABELS={fr24:'FR24 — FlightRadar24',seats_aero:'Seats.aero',planespotters:'Planespotters',unsplash:'Unsplash',google_maps:'Google Maps',claude:'Claude — Anthropic',openai:'OpenAI'};
 async function loadConfig(){if(currentRole!=='super-admin')return;loadApiKeys();loadSiteSettings();}
 async function loadApiKeys(){
   const el=document.getElementById('apiKeysList');if(!el)return;
