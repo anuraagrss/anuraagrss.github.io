@@ -1,0 +1,13 @@
+{
+  "name": "nomad-404-functions",
+  "description": "Firebase Cloud Functions for nomad-404",
+  "scripts": {
+    "deploy": "firebase deploy --only functions"
+  },
+  "engines": { "node": "18" },
+  "main": "index.js",
+  "dependencies": {
+    "firebase-admin": "^12.0.0",
+    "firebase-functions": "^5.0.0"
+  }
+}

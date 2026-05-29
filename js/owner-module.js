@@ -6,9 +6,11 @@ import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
 import { getStorage, ref, uploadBytesResumable, getDownloadURL }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
+import { getFunctions, httpsCallable }
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 const FB={apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",authDomain:"nomad-404.firebaseapp.com",projectId:"nomad-404",storageBucket:"nomad-404.firebasestorage.app",messagingSenderId:"638331724572",appId:"1:638331724572:web:baa0d70108e920099150d9"};
-const app=initializeApp(FB),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),provider=new GoogleAuthProvider();
+const app=initializeApp(FB),auth=getAuth(app),db=getFirestore(app),storage=getStorage(app),fns=getFunctions(app,'us-central1'),provider=new GoogleAuthProvider();
 let currentUser=null,currentRole=null,tripsCache=[];
 
 // ─── COUNTRY DATA ────────────────────────────────────────────────
@@ -571,15 +573,11 @@ function _deriveElement(tags){
 }
 
 async function generatePhotoDescription(item,customPrompt){
-  const apiKey=await getClaudeApiKey();if(!apiKey){return null;}
-  const metadataStr=JSON.stringify({title:item.metadata.title,camera:item.metadata.camera,lens:item.metadata.lens,settings:item.metadata.settings,location:item.metadata.location});
-  const descPrompt=customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT;
   try{
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,system:'You are a photography description specialist. Respond ONLY with valid JSON — no markdown, no explanation, no code fences.',messages:[{role:'user',content:`Based on the photo metadata below, generate a JSON object with exactly two fields:\n- "description": ${descPrompt}\n- "tags": 4-6 comma-separated tags describing the photo (subjects, mood, lighting conditions, location type, elements like water/ice/sky/fire/earth)\n\nPhoto metadata: ${metadataStr}`}]})});
-    if(!res.ok){const err=await res.json();throw new Error(err.error?.message||'Claude API error');}
-    const data=await res.json();
-    const parsed=JSON.parse(data.content[0].text.trim());
-    return{description:parsed.description||'',tags:parsed.tags||''};
+    const metadata={title:item.metadata.title,camera:item.metadata.camera,lens:item.metadata.lens,settings:item.metadata.settings,location:item.metadata.location};
+    const fn=httpsCallable(fns,'generatePhotoDescription');
+    const result=await fn({metadata,prompt:customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT});
+    return result.data;
   }catch(e){console.error('Claude error:',e);return null;}
 }
 
@@ -687,13 +685,12 @@ window.regeneratePhotoDescription=async function(photoId){
   const btn=event.target;btn.disabled=true;btn.textContent='GENERATING…';
   try{
     const snap=await getDoc(doc(db,'photos',photoId));const photo=snap.data();
+    const exif=photo.exif||{};
+    const metadata={title:photo.title,camera:exif.camera,lens:exif.lens,settings:exif.settings,location:photo.location};
     const customPrompt=document.getElementById('claudePrompt')?.value.trim();
-    const exif=photo.exif||{};const metadataStr=JSON.stringify({title:photo.title,camera:exif.camera,lens:exif.lens,settings:exif.settings,location:photo.location});
-    const apiKey=await getClaudeApiKey();if(!apiKey){toast('Claude API key not configured','err');btn.disabled=false;btn.textContent='REGENERATE WITH CLAUDE';return;}
-    const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:200,system:'You are a photography description specialist. Create vivid, poetic descriptions based on photo metadata and settings.',messages:[{role:'user',content:`${customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT}\n\nPhoto metadata: ${metadataStr}`}]})});
-    if(!res.ok){throw new Error('Claude API error');}
-    const data=await res.json();const newDesc=data.content[0].text;
-    document.getElementById('m-description').value=newDesc;
+    const fn=httpsCallable(fns,'generatePhotoDescription');
+    const result=await fn({metadata,prompt:customPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT});
+    if(result.data?.description){document.getElementById('m-description').value=result.data.description;}
     toast('✓ Description generated');
   }catch(e){toast('✗ '+e.message,'err');}finally{btn.disabled=false;btn.textContent='REGENERATE WITH CLAUDE';}
 };
