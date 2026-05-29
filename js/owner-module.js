@@ -510,15 +510,30 @@ async function getClaudeApiKey(){
 
 window.handlePhotoDrop=function(e){e.preventDefault();document.getElementById('photoDropZone').classList.remove('over');const files=e.dataTransfer.files;if(files.length)handlePhotoSelectMultiple(files);};
 
-window.handlePhotoSelectMultiple=function(files){
+window.handlePhotoSelectMultiple=async function(files){
   const validFiles=Array.from(files).filter(f=>{if(!f.type.startsWith('image/')){toast('Only image files supported','err');return false;}if(f.size>10*1024*1024){toast(`${f.name} exceeds 10MB`,'err');return false;}return true;});
-  validFiles.forEach(file=>{
+  for(const file of validFiles){
     const id=`photo-${Date.now()}-${Math.random().toString(36).slice(2)}`;
-    const reader=new FileReader();reader.onload=e=>{
-      photoQueue.push({id,file,preview:e.target.result,metadata:{camera:'',lens:'',settings:'',title:'',story:'',location:'',country_id:'',tags:'',trip_id:'',featured:false},description:'',status:'preview'});
-      renderPhotoQueue();
-    };reader.readAsDataURL(file);
-  });
+    // Read preview
+    const preview=await new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});
+    // Extract EXIF
+    let camera='',lens='',settings='',dateTaken='';
+    try{
+      const exif=await window.exifr?.parse(file,{tiff:true,exif:true,gps:false,iptc:false}).catch(()=>null);
+      if(exif){
+        const make=(exif.Make||'').trim(),model=(exif.Model||'').trim();
+        camera=make&&model?(model.startsWith(make)?model:`${make} ${model}`).trim():model||make;
+        lens=exif.LensModel||exif.Lens||'';
+        const f=exif.FNumber?`f/${exif.FNumber}`:'';
+        const s=exif.ExposureTime?(exif.ExposureTime<1?`1/${Math.round(1/exif.ExposureTime)}s`:`${exif.ExposureTime}s`):'';
+        const iso=exif.ISO?`ISO ${exif.ISO}`:'';
+        settings=[f,s,iso].filter(Boolean).join(' · ');
+        if(exif.DateTimeOriginal){const d=new Date(exif.DateTimeOriginal);if(!isNaN(d))dateTaken=d.toISOString().split('T')[0];}
+      }
+    }catch(_){}
+    photoQueue.push({id,file,preview,metadata:{camera,lens,settings,title:'',story:'',location:'',country_id:'',tags:'',trip_id:'',featured:false,date:dateTaken},description:'',status:'preview'});
+    renderPhotoQueue();
+  }
 };
 
 function renderPhotoQueue(){
@@ -585,7 +600,12 @@ window.generateDescriptionForCard=async function(photoId){
   const item=photoQueue.find(p=>p.id===photoId);if(!item)return;
   const btn=document.querySelector(`#card-${photoId} .gen-btn`);
   if(btn){btn.disabled=true;btn.textContent='…';}
-  const customPrompt=document.getElementById('claudePrompt')?.value.trim();
+  // If the user typed something in the description field, treat it as the prompt/direction
+  const userNotes=document.querySelector(`#card-${photoId} textarea`)?.value.trim();
+  const globalPrompt=document.getElementById('claudePrompt')?.value.trim();
+  const customPrompt=userNotes
+    ? `The photographer describes this photo as: "${userNotes}". Based on this and the technical metadata, write a vivid poetic description and generate tags.`
+    : (globalPrompt||DEFAULT_PHOTO_DESCRIPTION_PROMPT);
   const result=await generatePhotoDescription(item,customPrompt);
   if(result){
     if(result.description){item.description=result.description;const ta=document.querySelector(`#card-${photoId} textarea`);if(ta)ta.value=result.description;}
