@@ -207,7 +207,6 @@ window.saveModal=async function(){if(modalSaveFn){await modalSaveFn();closeModal
 const mval=id=>{const el=document.getElementById(id);return el?(el.value||'').trim():'';};
 
 // ─── FR24 ────────────────────────────────────────────────────────
-const FR24_BASE='https://fr24api.flightradar24.com/api';
 let adbApiKey=null;
 async function loadAdbKey(){
   try{const s=await getDoc(doc(db,'config','fr24'));if(s.exists()&&s.data().api_key){adbApiKey=s.data().api_key;document.getElementById('adbKey').placeholder='FR24 token saved ✓';}}catch(_){}
@@ -226,13 +225,9 @@ const AIRLINE_NAMES={AF:'Air France',UA:'United Airlines',W6:'Wizz Air',JU:'Air 
 async function enrichFlight(flightNum,date){
   if(!adbApiKey||!flightNum||!date)return null;
   try{
-    const fn=flightNum.replace(/\s+/g,'').toUpperCase(),dateStr=date.split('T')[0];
-    const url=`${FR24_BASE}/v1/historic/flight-summaries/full?flight_number=${encodeURIComponent(fn)}&date_from=${encodeURIComponent(dateStr+'T00:00:00Z')}&date_to=${encodeURIComponent(dateStr+'T23:59:59Z')}`;
-    const res=await fetch(url,{headers:{'Authorization':`Bearer ${adbApiKey}`,'Accept':'application/json'}});
-    if(!res.ok)return null;
-    const data=await res.json();const flights=data.data||data.results||data;const flight=Array.isArray(flights)?flights[0]:flights;if(!flight)return null;
-    const dep=flight.departure||flight.orig||{},arr=flight.arrival||flight.dest||{};
-    return{fr24_id:flight.fr24_id||flight.fid||flight.id||null,aircraft_type:(flight.aircraft?.model||flight.aircraft?.type)||null,tail_number:(flight.aircraft?.registration||flight.aircraft?.reg)||null,duration_mins:flight.duration||null,dep_terminal:dep.terminal||null,dep_gate:dep.gate||null,arr_terminal:arr.terminal||null,arr_gate:arr.gate||null};
+    const fn=httpsCallable(fns,'enrichFlight');
+    const res=await fn({flightNum,date});
+    return res.data;
   }catch(_){return null;}
 }
 

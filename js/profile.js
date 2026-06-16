@@ -1,3 +1,15 @@
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getFunctions, httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
+
+const fbApp = initializeApp({
+  apiKey: "AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+  authDomain: "nomad-404.firebaseapp.com",
+  projectId: "nomad-404",
+  appId: "1:638331724572:web:baa0d70108e920099150d9"
+});
+const fns = getFunctions(fbApp, 'us-central1');
+const chatWithClaude = httpsCallable(fns, 'chatWithClaude');
+
 // Nav scroll effect
 const nav = document.getElementById('main-nav');
 window.addEventListener('scroll', () => {
@@ -96,6 +108,7 @@ async function askQuestion(q) {
   document.getElementById('chat-input').value = '';
   await processQuestion(q);
 }
+window.askQuestion = askQuestion;
 
 async function sendChat() {
   const input = document.getElementById('chat-input');
@@ -104,6 +117,7 @@ async function sendChat() {
   input.value = '';
   await processQuestion(q);
 }
+window.sendChat = sendChat;
 
 async function processQuestion(q) {
   addMessage('user', q);
@@ -111,18 +125,12 @@ async function processQuestion(q) {
   addTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 300,
-        system: SYSTEM_PROMPT,
-        messages: messages.slice(-8)
-      })
+    const res = await chatWithClaude({
+      system: SYSTEM_PROMPT,
+      max_tokens: 300,
+      messages: messages.slice(-8)
     });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || "I'm having trouble connecting right now. Please email rssanuraag@gmail.com directly.";
+    const reply = res.data?.reply || "I'm having trouble connecting right now. Please email rssanuraag@gmail.com directly.";
     removeTyping();
     addMessage('ai', reply);
     messages.push({ role: 'assistant', content: reply });
@@ -169,6 +177,7 @@ function scrollProj(dir) {
   const cardW = 320;
   wrap.scrollBy({ left: dir * cardW, behavior: 'smooth' });
 }
+window.scrollProj = scrollProj;
 
 (function() {
   const wrap = document.querySelector('.proj-track-wrap');

@@ -1,6 +1,8 @@
 import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs }
                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFunctions, httpsCallable }
+                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 // ── FIREBASE ──
 const app = initializeApp({
@@ -10,6 +12,8 @@ const app = initializeApp({
   appId:"1:638331724572:web:baa0d70108e920099150d9"
 });
 const db = getFirestore(app);
+const fns = getFunctions(app, 'us-central1');
+const chatWithClaude = httpsCallable(fns, 'chatWithClaude');
 
 // ── STATE ──
 let countriesData=[], flightsData=[], cafesData=[], experiencesData=[];
@@ -1157,19 +1161,13 @@ Answer only from this lived life.`;
       { role: 'user', content: q }
     ];
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 700,
-        system: systemPrompt,
-        messages
-      })
+    const response = await chatWithClaude({
+      system: systemPrompt,
+      max_tokens: 700,
+      messages
     });
 
-    const data   = await response.json();
-    const answer = data.content?.[0]?.text || 'The road goes quiet sometimes. Ask me something else.';
+    const answer = response.data?.reply || 'The road goes quiet sometimes. Ask me something else.';
 
     // Save to history
     aiConvoHistory.push({ role: 'user', content: q });

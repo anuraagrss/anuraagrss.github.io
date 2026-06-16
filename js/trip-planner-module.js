@@ -5,6 +5,8 @@ import { initializeFirestore, persistentLocalCache, persistentMultipleTabManager
          doc, getDoc, setDoc, updateDoc, addDoc, deleteDoc,
          collection, getDocs, serverTimestamp }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFunctions, httpsCallable }
+                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 // ── FIREBASE ──
 const FB = {
@@ -21,6 +23,9 @@ const db       = initializeFirestore(app, {
   localCache: persistentLocalCache({ tabManager: persistentMultipleTabManager() }),
 });
 const provider = new GoogleAuthProvider();
+const fns      = getFunctions(app, 'us-central1');
+const callSearchSeatsAero = httpsCallable(fns, 'searchSeatsAero');
+const callSearchAmadeus   = httpsCallable(fns, 'searchAmadeus');
 
 // ── ONLINE/OFFLINE ──
 const syncDot     = document.getElementById('syncDot');
@@ -41,8 +46,6 @@ let currentTripId = null;
 let tripsCache   = [];
 let linkedFlightsCache = [];
 let activePackCategory = 'Documents';
-let _amToken = null;
-let _amTokenExpiry = 0;
 let _flightKeys = { saKey: '', amId: '', amSecret: '', amEnv: 'test' };
 let _awardResults = [];
 let _cashResults  = [];
@@ -807,7 +810,6 @@ window.saveFlightApiKeys = async function() {
   _flightKeys.amEnv = amEnv;
   try {
     await setDoc(doc(db, 'settings', 'api_keys'), _flightKeys);
-    _amToken = null; // reset cached token
     toast('API keys saved');
     document.getElementById('flightApiConfig').style.display = 'none';
   } catch(e) { toast('Save failed', 'err'); }
@@ -820,22 +822,6 @@ window.toggleFlightApiConfig = function() {
   el.style.display = show ? 'block' : 'none';
   if (show && _flightKeys.saKey) document.getElementById('sa-key').value = '••••••••';
 };
-
-// ── AMADEUS TOKEN ──
-async function getAmadeusToken() {
-  if (_amToken && Date.now() < _amTokenExpiry) return _amToken;
-  const base = _flightKeys.amEnv === 'production' ? 'https://api.amadeus.com' : 'https://test.api.amadeus.com';
-  const resp = await fetch(`${base}/v1/security/oauth2/token`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `grant_type=client_credentials&client_id=${encodeURIComponent(_flightKeys.amId)}&client_secret=${encodeURIComponent(_flightKeys.amSecret)}`,
-  });
-  if (!resp.ok) throw new Error(`Amadeus auth ${resp.status}: ${await resp.text()}`);
-  const d = await resp.json();
-  _amToken = d.access_token;
-  _amTokenExpiry = Date.now() + (d.expires_in - 60) * 1000;
-  return _amToken;
-}
 
 // ── SEARCH ORCHESTRATOR ──
 const AWARD_PROGRAMS = {
@@ -926,33 +912,18 @@ window.searchAllFlights = async function() {
 
 async function searchSeatsAero({ origin, dest, date, cabin }) {
   const cabinMap = { Y:'economy', W:'premium', J:'business', F:'first' };
-  const params = new URLSearchParams({
-    origin_airport: origin, destination_airport: dest,
+  const res = await callSearchSeatsAero({
+    origin, destination: dest,
     cabin: cabinMap[cabin] || 'business',
     start_date: date, end_date: date,
+    endpoint: 'availability',
   });
-  const resp = await fetch(`https://seats.aero/partnerapi/availability?${params}`, {
-    headers: { 'Partner-Authorization': _flightKeys.saKey },
-  });
-  if (!resp.ok) throw new Error(`seats.aero ${resp.status}`);
-  return resp.json();
+  return res.data;
 }
 
 async function searchAmadeus({ origin, dest, date, cabin, pax }) {
-  const cabinMap = { Y:'ECONOMY', W:'PREMIUM_ECONOMY', J:'BUSINESS', F:'FIRST' };
-  const token = await getAmadeusToken();
-  const base  = _flightKeys.amEnv === 'production' ? 'https://api.amadeus.com' : 'https://test.api.amadeus.com';
-  const params = new URLSearchParams({
-    originLocationCode: origin, destinationLocationCode: dest,
-    departureDate: date, adults: String(pax),
-    travelClass: cabinMap[cabin] || 'BUSINESS',
-    max: '10', currencyCode: 'USD',
-  });
-  const resp = await fetch(`${base}/v2/shopping/flight-offers?${params}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!resp.ok) throw new Error(`Amadeus ${resp.status}: ${await resp.text()}`);
-  return resp.json();
+  const res = await callSearchAmadeus({ origin, dest, date, cabin, pax });
+  return res.data;
 }
 
 // ── RESULT RENDERERS ──

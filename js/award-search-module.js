@@ -4,6 +4,8 @@ import { getAuth, onAuthStateChanged }
                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
 import { getFirestore, doc, getDoc, setDoc }
                           from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { getFunctions, httpsCallable }
+                          from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
 
 const app  = initializeApp({
   apiKey:"AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
@@ -13,6 +15,8 @@ const app  = initializeApp({
 });
 const auth = getAuth(app);
 const db   = getFirestore(app);
+const fns  = getFunctions(app,'us-central1');
+const searchSeatsAero = httpsCallable(fns,'searchSeatsAero');
 
 let API_KEY = null, currentUID = null;
 let tripType = 'one-way', cabin = 'business';
@@ -33,7 +37,7 @@ async function loadApiKey() {
   try {
     const snap = await getDoc(doc(db,'config','seats_aero'));
     if (snap.exists() && snap.data().api_key) {
-      API_KEY = snap.data().api_key;
+      API_KEY = true;
       setStatus('ok','seats.aero connected');
       document.getElementById('keyNotice').classList.remove('show');
       updateSearchBtn();
@@ -49,7 +53,7 @@ window.saveApiKey = async function() {
   if (!key) return;
   try {
     await setDoc(doc(db,'config','seats_aero'),{api_key:key,saved_by:currentUID,saved_at:new Date().toISOString()});
-    API_KEY = key;
+    API_KEY = true;
     setStatus('ok','seats.aero connected');
     document.getElementById('keyNotice').classList.remove('show');
     document.getElementById('keyInput').value = '';
@@ -229,21 +233,11 @@ window.runSearch=async function(){
 
   const all=await Promise.all(combos.map(async(combo,i)=>{
     try{
-      const params=new URLSearchParams({
-        origin_airport:combo.from.code,
-        destination_airport:combo.to.code,
-        cabin:ca, start_date:ds, end_date:de
+      const res=await searchSeatsAero({
+        origin:combo.from.code, destination:combo.to.code,
+        cabin:ca, start_date:ds, end_date:de, endpoint:'search'
       });
-      const res=await fetch(`https://seats.aero/partnerapi/search?${params}`,{
-        headers:{'Partner-Authorization':API_KEY}
-      });
-      if(!res.ok){
-        document.getElementById('pb-'+i).classList.add('err');
-        document.getElementById('ps-'+i).textContent=res.status===401?'invalid key':'error';
-        document.getElementById('ps-'+i).className='p-status err';
-        done++;upd();return{combo,results:[],error:true};
-      }
-      const data=await res.json();
+      const data=res.data||{};
       const rows=(data.data||[]).filter(r=>r[cc+'Available']);
       document.getElementById('pb-'+i).classList.add('done');
       document.getElementById('ps-'+i).textContent=rows.length>0?`${rows.length} found`:'none';
@@ -251,7 +245,7 @@ window.runSearch=async function(){
       done++;upd();return{combo,results:rows};
     }catch(e){
       document.getElementById('pb-'+i).classList.add('err');
-      document.getElementById('ps-'+i).textContent='failed';
+      document.getElementById('ps-'+i).textContent=e.code==='functions/failed-precondition'?'invalid key':'failed';
       document.getElementById('ps-'+i).className='p-status err';
       done++;upd();return{combo,results:[],error:true};
     }

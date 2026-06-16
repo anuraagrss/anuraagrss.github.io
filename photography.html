@@ -7,12 +7,18 @@
   <title>Through My Eyes — Anuraag Ravulaparthi</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex">
+  <meta name="description" content="Through My Eyes — a photography journal by Anuraag Ravulaparthi.">
+  <meta property="og:title" content="Through My Eyes — Anuraag Ravulaparthi">
+  <meta property="og:description" content="A photography journal by Anuraag Ravulaparthi.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://404-nomad.com/photography.html">
+  <meta name="twitter:card" content="summary_large_image">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/photography.css">
 </head>
 <body>
 
-<!-- ══ INTRO — Red Safelight (unchanged) ══ -->
+<!-- ══ INTRO — Red Safelight Darkroom (kept dark) ══ -->
 <div id="intro">
   <div class="safelight"></div>
   <div class="safelight2"></div>
@@ -20,132 +26,52 @@
   <div class="tray-lines"></div>
   <div class="intro-content">
     <div class="intro-mono">// DARKROOM · DEVELOPING</div>
-    <div class="intro-title">THROUGH<br>MY<br><span style="color:var(--kodak-gold)">EYES.</span></div>
+    <div class="intro-title">THROUGH<br>MY<br><span style="color:#D4792A">EYES.</span></div>
     <div class="intro-rule"></div>
     <div class="intro-sub">"Every picture has a story.<br>I just held the camera still long enough to capture it."</div>
-    <div class="intro-cta">TAP ANYWHERE TO ENTER THE DARKROOM</div>
+    <div class="intro-cta">TAP ANYWHERE TO BRING UP THE LIGHTS</div>
   </div>
   <div class="intro-skip" id="introSkip">SKIP →</div>
 </div>
 
 <!-- ══ PAGE ══ -->
 <div id="page">
+  <div class="page-grain"></div>
+
   <nav class="top-nav" id="topNav">
     <a class="nav-logo" href="nomad.html">AR // LENS</a>
     <a class="nav-back" href="nomad.html">← NOMAD</a>
   </nav>
 
   <!-- ── HERO ── -->
-  <section class="hero">
-    <div class="hero-film-strip top" id="filmStripTop">
-      <div class="perf-row" id="perfTop"></div>
-      <div class="perf-row" id="perfTop2"></div>
-    </div>
-    <div class="hero-kodak-bg">LOADING</div>
-    <div class="hero-eyebrow">// WORLD THROUGH MY EYES</div>
-    <h1 class="hero-title">WHAT<br>PICTURE<br><span class="gold">SAID.</span></h1>
-    <p class="hero-sub">I don't take photographs. I tell the stories — and experiences through my lens.</p>
-    <div class="hero-stats">
-      <div class="h-stat"><div class="h-stat-num" id="statPhotos">—</div><div class="h-stat-label">PHOTOGRAPHS</div></div>
-      <div class="h-stat"><div class="h-stat-num" id="statCountries">—</div><div class="h-stat-label">COUNTRIES</div></div>
-      <div class="h-stat"><div class="h-stat-num">5</div><div class="h-stat-label">ELEMENTS</div></div>
-    </div>
-    <div class="hero-film-strip bot">
-      <div class="perf-row rev" id="perfBot"></div>
-      <div class="perf-row rev" id="perfBot2"></div>
-    </div>
-  </section>
-
-  <!-- ── ELEMENT FILTER TABS ── -->
-  <div class="filter-bar" id="filterBar">
-    <button class="filter-btn active" data-el="all">ALL FRAMES</button>
-    <button class="filter-btn" data-el="ice">❄ ICE</button>
-    <button class="filter-btn" data-el="sky">◉ SKY</button>
-    <button class="filter-btn" data-el="water">〜 WATER</button>
-    <button class="filter-btn" data-el="fire">◈ FIRE</button>
-    <button class="filter-btn" data-el="earth">◆ EARTH</button>
-  </div>
-
-  <!-- ── MAIN VIEWER ── -->
-  <div class="viewer-section">
-    <div class="main-display" id="mainDisplay">
-      <div class="main-display-corners"></div>
-      <img class="main-photo-img" id="mainImg" src="" alt="">
-      <div class="main-grain"></div>
-
-      <!-- Fullscreen button -->
-      <button class="btn-fullscreen" id="btnFullscreen">
-        <svg viewBox="0 0 16 16" fill="none">
-          <path d="M1 6V1h5M10 1h5v5M15 10v5h-5M6 15H1v-5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-        FULLSCREEN
-      </button>
-
-      <!-- Prev / Next -->
-      <button class="main-nav-btn prev" id="mainPrev">‹</button>
-      <button class="main-nav-btn next" id="mainNext">›</button>
-
-      <!-- Info bar -->
-      <div class="main-info-bar">
-        <div class="main-info-left">
-          <div class="main-frame-no" id="mainFrameNo">FRAME 001</div>
-          <div class="main-title" id="mainTitle">—</div>
-          <div class="main-location" id="mainLocation">—</div>
-        </div>
-        <div class="main-info-right">
-          <div class="main-element-tag" id="mainElement">—</div>
-          <div class="main-date" id="mainDate">—</div>
-        </div>
+  <header class="hero">
+    <div class="hero-text">
+      <div class="hero-eyebrow">WORLD THROUGH MY EYES</div>
+      <h1 class="hero-title"><span class="line">WHAT THE</span><span class="line">PICTURE <span class="g">SAID.</span></span></h1>
+      <p class="hero-sub">I don't take photographs. I keep the stories — and hand them back to you, one frame at a time.</p>
+      <div class="hero-stats">
+        <div><div class="h-stat-num" id="statPhotos">—<span class="a">+</span></div><div class="h-stat-label">PHOTOGRAPHS</div></div>
+        <div><div class="h-stat-num" id="statCountries">—</div><div class="h-stat-label">PLACES</div></div>
+        <div><div class="h-stat-num" id="statTags">—</div><div class="h-stat-label">TAGS</div></div>
       </div>
     </div>
-
-    <!-- Story panel -->
-    <div class="story-panel" id="storyPanel">
-      <div class="story-text" id="storyText">Select a frame from the reel below.</div>
-      <div class="story-exif" id="storyExif"></div>
+    <div class="hero-avatar">
+      <img src="images/photographer-cut.png" alt="Anuraag — behind the lens">
+      <div class="ha-cap">ANURAAG · BEHIND THE LENS</div>
     </div>
+  </header>
+
+  <!-- ── CONTROLS: tags + play story ── -->
+  <div class="controls">
+    <div class="tags" id="tags"></div>
+    <button class="play-story" id="playStory">
+      <span class="ps-pulse"></span>
+      PLAY STORY
+    </button>
   </div>
 
-  <!-- ── KODAK GOLD FILM REEL ── -->
-  <div class="reel-section">
-    <div class="reel-label-bar">
-      <div class="reel-label">KODAK GOLD 200 · 35MM</div>
-      <div class="reel-counter" id="reelCounter">0 FRAMES</div>
-    </div>
-
-    <div class="film-strip-wrap" id="filmStripWrap">
-      <div class="film-strip" id="filmStrip">
-        <!-- Top sprocket -->
-        <div class="sprocket-row">
-          <div class="sprocket-inner" id="sprocketTop"></div>
-        </div>
-
-        <!-- Kodak branding badge -->
-        <div class="kodak-badge">
-          <div class="kb-brand">KODAK GOLD</div>
-          <div class="kb-iso">ISO 200 · 35MM</div>
-        </div>
-
-        <!-- The frames -->
-        <div class="frames-row" id="framesRow"></div>
-
-        <!-- Bottom sprocket -->
-        <div class="sprocket-row">
-          <div class="sprocket-inner" id="sprocketBot"></div>
-        </div>
-      </div>
-
-      <!-- Kodak colour stripe -->
-      <div class="kodak-stripe"></div>
-    </div>
-
-    <div class="reel-scroll-hint">
-      <span>SCROLL THE REEL</span>
-      <span class="rsh-arrow">›</span>
-      <span class="rsh-arrow">›</span>
-      <span class="rsh-arrow">›</span>
-    </div>
-  </div>
+  <!-- ── MATTED GALLERY WALL ── -->
+  <main class="wall" id="wall"></main>
 
   <!-- ── CLOSING ── -->
   <div class="closing">
@@ -156,21 +82,64 @@
   <footer class="page-footer">
     <div class="footer-name">ANURAAG RAVULAPARTHI</div>
     <div class="footer-links">
-      <a href="home.html">Home</a>
+      <a href="index.html">Home</a>
       <a href="nomad.html">Nomad</a>
       <a href="Profile.html">Profile</a>
     </div>
   </footer>
 </div>
 
+<!-- ── LIGHTBOX + LOUPE ── -->
+<div class="lb" id="lb">
+  <div class="lb-stage" id="lbStage">
+    <button class="lb-close" id="lbClose">CLOSE ✕</button>
+    <img class="lb-img" id="lbImg" src="" alt="">
+    <div class="lb-loupe" id="lbLoupe"></div>
+    <div class="lb-hint">MOVE OVER THE PRINT TO INSPECT WITH THE LOUPE</div>
+  </div>
+  <div class="lb-panel">
+    <div class="lb-no" id="lbNo"></div>
+    <div class="lb-title" id="lbTitle"></div>
+    <div class="lb-loc" id="lbLoc"></div>
+    <div class="lb-story" id="lbStory"></div>
+    <div class="lb-exif" id="lbExif"></div>
+    <div class="lb-tags" id="lbTags"></div>
+    <div class="lb-actions">
+      <button id="lbPrev">← PREVIOUS</button>
+      <button class="lb-full" id="lbFull">⛶ FULLSCREEN</button>
+      <button id="lbNext">NEXT →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── STORY MODE ── -->
+<div class="story" id="story">
+  <img class="story-img" id="storyImg" src="" alt="">
+  <div class="story-scrim"></div>
+  <div class="story-tap" id="storyTap"></div>
+  <div class="story-progress" id="storyProg"></div>
+  <button class="story-close" id="storyClose">EXIT STORY ✕</button>
+  <div class="story-text">
+    <div class="story-eyebrow" id="storyEyebrow"></div>
+    <div class="story-title" id="storyTitle"></div>
+    <div class="story-body" id="storyBody"></div>
+    <div class="story-date" id="storyDate"></div>
+  </div>
+  <div class="story-ctrl">
+    <button id="storyPrev">‹ PREV</button>
+    <button id="storyPlayBtn">❚❚</button>
+    <button id="storyNext">NEXT ›</button>
+    <span class="story-counter" id="storyCounter"></span>
+  </div>
+</div>
+
 <!-- ── FULLSCREEN VIEWER ── -->
 <div id="fullscreen-viewer">
   <img id="fv-img" src="" alt="" draggable="false">
   <div id="fv-watermark">© ANURAAG RAVULAPARTHI · anuraag.me</div>
-  <div id="fv-close" onclick="closeFullscreen()">ESC / CLOSE ✕</div>
+  <div id="fv-close">ESC / CLOSE ✕</div>
   <div id="fv-caption"></div>
 </div>
-
 
 <script type="module" src="js/photography-module.js"></script>
 </body>
