@@ -152,7 +152,7 @@ function openLB(i) {
   $('lbNo').textContent = `FRAME ${String(i+1).padStart(2,'0')} / ${view.length}`;
   $('lbTitle').textContent = p.title || 'Untitled';
   $('lbLoc').textContent = `${p.location||'—'}${p.date?' · '+p.date:''}`;
-  $('lbStory').textContent = p.story || 'Story coming soon.';
+  $('lbStory').textContent = p.story || p.description || 'Story coming soon.';
   const exif = p.exif || {};
   $('lbExif').innerHTML = [
     ['CAMERA', exif.camera], ['LENS', exif.lens], ['SETTINGS', exif.settings], ['PLACE', placeOf(p)]
@@ -202,7 +202,7 @@ function renderStory() {
   storyImg.classList.add('kb');
   $('storyEyebrow').textContent = `// ${(placeOf(p)||p.location||'').toUpperCase()}`;
   $('storyTitle').textContent = p.title || 'Untitled';
-  $('storyBody').textContent = p.story || '';
+  $('storyBody').textContent = p.story || p.description || '';
   $('storyDate').textContent = p.date || '';
   $('storyCounter').textContent = `${String(stIdx+1).padStart(2,'0')} / ${String(view.length).padStart(2,'0')}`;
   ['storyEyebrow','storyTitle','storyBody','storyDate'].forEach(id => { const el = $(id); el.style.animation='none'; void el.offsetWidth; el.style.animation=''; });

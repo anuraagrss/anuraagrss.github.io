@@ -497,7 +497,7 @@ window.editPerson=function(id){
 
 // ─── PHOTOGRAPHY ─────────────────────────────────────────────────
 let photoQueue=[];
-const DEFAULT_PHOTO_DESCRIPTION_PROMPT="Generate a concise, poetic description of this photography. Focus on mood, lighting, and what story the technical settings tell about the moment captured.";
+const DEFAULT_PHOTO_DESCRIPTION_PROMPT="Write a short, evocative first-person micro-story (2-4 sentences) about the moment this photo was taken — what it felt like to be there, the memory and the mood, not a technical caption. Be intimate and human; let the place and the light set the atmosphere. Avoid clichés.";
 
 async function getClaudeApiKey(){
   try{const snap=await getDoc(doc(db,'config','claude'));if(!snap.exists()||!snap.data().api_key){return null;}return snap.data().api_key;}catch(_){return null;}
@@ -646,7 +646,7 @@ window.uploadPhotosQueue=async function(){
       const storageRef=ref(storage,path);const task=uploadBytesResumable(storageRef,item.file);
       const imageUrl=await new Promise((resolve,reject)=>{task.on('state_changed',snap=>{},reject,async()=>resolve(await getDownloadURL(task.snapshot.ref)));});
       const exif={};if(item.metadata.camera)exif.camera=item.metadata.camera;if(item.metadata.lens)exif.lens=item.metadata.lens;if(item.metadata.settings)exif.settings=item.metadata.settings;
-      const photoDoc={title:item.metadata.title,description:item.description||null,story:item.metadata.story||null,image_url:imageUrl,location:item.metadata.location||null,country_id:item.metadata.country_id||null,date:item.metadata.date||new Date().toISOString().split('T')[0],tags:item.metadata.tags||null,element:_deriveElement(item.metadata.tags),featured:item.metadata.featured===true||item.metadata.featured==='true',trip_id:item.metadata.trip_id||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid};
+      const photoDoc={title:item.metadata.title,description:item.description||null,story:item.metadata.story||item.description||null,image_url:imageUrl,location:item.metadata.location||null,country_id:item.metadata.country_id||null,date:item.metadata.date||new Date().toISOString().split('T')[0],tags:item.metadata.tags||null,element:_deriveElement(item.metadata.tags),featured:item.metadata.featured===true||item.metadata.featured==='true',trip_id:item.metadata.trip_id||null,exif:Object.keys(exif).length?exif:null,addedAt:serverTimestamp(),addedBy:currentUser.uid};
       await addDoc(collection(db,'photos'),photoDoc);
       done++;logMsg.textContent=`✓ ${item.metadata.title}`;logMsg.style.color='var(--green)';
     }catch(e){failed++;logMsg.textContent=`✗ ${item.metadata.title} - ${e.message}`;logMsg.style.color='var(--red)';}
