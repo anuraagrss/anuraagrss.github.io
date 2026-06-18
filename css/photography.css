@@ -143,15 +143,11 @@
     .nav-back:hover { color: var(--teal); }
 
     /* ══════════════════════════════════════════
-       HERO — sticky, frames always visible
+       HERO — scrolls away normally
     ══════════════════════════════════════════ */
     .hero {
-      padding: 62px 48px 16px;
+      padding: 62px 48px 32px;
       display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap;
-      position: sticky; top: 0; z-index: 300;
-      background: rgba(244,239,230,0.97); backdrop-filter: blur(12px);
-      border-bottom: 1px solid rgba(36,26,16,0.09);
-      box-shadow: 0 2px 18px rgba(36,26,16,0.06);
     }
     .hero-text { flex: 1; min-width: 260px; }
     .hero-eyebrow {
@@ -241,32 +237,59 @@
     @keyframes avatarIn { from { opacity: 0; transform: translateY(26px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 
-    /* ── FLOATING WORD CLOUD — between title and avatar ── */
-    .word-cloud {
-      flex: 1; min-width: 0; align-self: center;
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-      gap: 3px 8px; padding: 0 20px;
-      opacity: 0; animation: riseIn 1s ease 0.8s forwards;
+    /* ══════════════════════════════════════════
+       FLOATING TAG CLOUD OVERLAY
+       Fixed over the whole viewport; appears once
+       the hero scrolls away. Words are absolutely
+       positioned with random scatter + 2-D drift.
+    ══════════════════════════════════════════ */
+    #cloudOverlay {
+      position: fixed; inset: 0; z-index: 200;
+      pointer-events: none;
+      opacity: 0; transition: opacity 0.9s ease;
     }
-    .wc-word {
-      font-family: var(--mono); letter-spacing: 0.8px; text-transform: uppercase;
-      cursor: pointer; line-height: 1.4; display: inline-block;
-      color: var(--teal-d); opacity: 0.4; padding: 1px 2px;
-      margin-top: var(--mt, 0px);
-      transform: rotate(var(--rot, 0deg));
-      animation: wcFloat var(--dur, 4s) ease-in-out infinite;
-      animation-delay: var(--delay, 0s);
-      transition: color 0.2s, opacity 0.3s, transform 0.3s;
+    #cloudOverlay.show { opacity: 1; }
+
+    .co-word {
+      position: absolute;
+      left: var(--cx, 50%); top: var(--cy, 50%);
+      font-family: var(--mono); font-size: var(--sz, 10px);
+      letter-spacing: 0.9px; text-transform: uppercase;
+      color: var(--teal-d);
+      opacity: 0.38;
+      padding: 3px 8px; border-radius: 12px;
+      background: rgba(244,239,230,0.14);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      border: 1px solid rgba(46,139,122,0.12);
+      white-space: nowrap;
+      pointer-events: auto; cursor: pointer;
+      text-shadow: 0 1px 6px rgba(255,255,255,0.7);
+      animation: coDrift var(--dur, 6s) ease-in-out infinite var(--delay, 0s);
+      transition: color 0.25s, opacity 0.25s, background 0.25s, border-color 0.25s;
+      user-select: none;
     }
-    /* on hover of the whole cloud, everything brightens */
-    .word-cloud:hover .wc-word { opacity: 0.7; }
-    .wc-word:hover { opacity: 1 !important; color: var(--ember); transform: rotate(0deg) scale(1.2) !important; }
-    .wc-word.active { color: var(--ember); opacity: 0.9 !important; font-weight: 700; }
-    .wc-all { color: var(--ink2); font-weight: 600; }
-    .wc-all.active { color: var(--ember); }
-    @keyframes wcFloat {
-      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
-      50%       { transform: translateY(-6px) rotate(var(--rot, 0deg)); }
+    .co-word:hover {
+      opacity: 0.95 !important;
+      color: var(--ember);
+      background: rgba(244,239,230,0.72);
+      border-color: rgba(212,121,42,0.3);
+      z-index: 5;
+    }
+    .co-word.active {
+      color: var(--ember); opacity: 0.85 !important;
+      font-weight: 700; border-color: rgba(212,121,42,0.25);
+    }
+    .co-all { color: var(--ink2); font-weight: 600; }
+    .co-all.active { color: var(--ember); }
+
+    /* 2-D drift: each word uses custom properties for its travel vectors */
+    @keyframes coDrift {
+      0%   { transform: rotate(var(--rot,0deg)) translate(0,0); }
+      25%  { transform: rotate(calc(var(--rot,0deg) + var(--r1,1.5deg))) translate(var(--dx1,7px),var(--dy1,-9px)); }
+      50%  { transform: rotate(calc(var(--rot,0deg) - var(--r2,1deg))) translate(var(--dx2,-5px),var(--dy2,-15px)); }
+      75%  { transform: rotate(calc(var(--rot,0deg) + var(--r3,2deg))) translate(var(--dx3,10px),var(--dy3,-6px)); }
+      100% { transform: rotate(var(--rot,0deg)) translate(0,0); }
     }
 
     /* ── CAMERA FLASH ── */
@@ -286,9 +309,9 @@
     /* ══════════════════════════════════════════
        MATTED GALLERY WALL
     ══════════════════════════════════════════ */
-    .wall { columns: 3; column-gap: 22px; padding: 34px 48px 90px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
+    .wall { columns: 3; column-gap: 24px; padding: 34px 48px 90px; max-width: 1400px; margin: 0 auto; position: relative; z-index: 2; }
     .print {
-      break-inside: avoid; margin: 0 0 22px; cursor: pointer;
+      break-inside: avoid; margin: 0 0 24px; cursor: pointer;
       opacity: 0; transform: translateY(28px);
     }
     .print.in { animation: printIn 0.7s cubic-bezier(0.2,0.7,0.2,1) forwards; }
@@ -296,9 +319,10 @@
     .print-mat {
       background: var(--card); padding: 13px 13px 0; border: 1px solid rgba(36,26,16,0.1);
       border-radius: 2px; box-shadow: 0 8px 22px rgba(36,26,16,0.10);
+      transform: rotate(var(--tilt, 0deg));
       transition: transform 0.35s cubic-bezier(0.34,1.2,0.64,1), box-shadow 0.35s; position: relative;
     }
-    .print:hover .print-mat { transform: translateY(-6px); box-shadow: 0 18px 38px rgba(36,26,16,0.18); }
+    .print:hover .print-mat { transform: translateY(-6px) rotate(0deg); box-shadow: 0 18px 38px rgba(36,26,16,0.18); }
     .print-imgwrap { position: relative; overflow: hidden; background: #ded5c4; }
     .print-img { width: 100%; height: auto; display: block; transition: transform 0.6s ease; }
     .print:hover .print-img { transform: scale(1.04); }
@@ -415,7 +439,7 @@
       .lb-stage { padding: 24px; }
     }
     @media (max-width: 900px) {
-      .word-cloud { padding: 6px 0; }
+      .co-word { padding: 2px 6px; }
     }
     @media (max-width: 768px) {
       .hero { padding-top: 60px; padding-bottom: 12px; }

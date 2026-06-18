@@ -59,8 +59,6 @@
 
     <!-- ── AVATAR = PLAY STORY BUTTON ── -->
     <div class="hero-avatar" id="avatarPlay" role="button" aria-label="Play story slideshow">
-      <!-- Floating word cloud sits between text and avatar -->
-      <div class="word-cloud" id="wordCloud"></div>
       <div class="avatar-wrap">
         <!-- Thought bubble above avatar head -->
         <div class="avatar-thought">
@@ -74,6 +72,9 @@
       </div>
     </div>
   </header>
+
+  <!-- ── FLOATING TAG CLOUD OVERLAY (fixed, appears on scroll) ── -->
+  <div id="cloudOverlay"></div>
 
   <!-- ── MATTED GALLERY WALL ── -->
   <main class="wall" id="wall"></main>
@@ -199,6 +200,6 @@ initTerminal({
   },
 });
 </script>
-<script type="module" src="js/photography-module.js?v=3"></script>
+<script type="module" src="js/photography-module.js?v=4"></script>
 </body>
 </html>

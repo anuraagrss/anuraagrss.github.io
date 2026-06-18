@@ -59,7 +59,7 @@ async function loadPhotos() {
     console.error('Photos load failed:', e);
   }
   allPhotos.forEach(p => { p._tags = tagsOf(p); });
-  buildWordCloud();
+  buildCloudOverlay();
   filterTag('all');
   updateStats();
 }
@@ -72,69 +72,80 @@ function updateStats() {
   $('statTags').textContent = tags || '—';
 }
 
-// ── FLOATING WORD CLOUD ───────────────────────────────
-const ROTS   = [-2, 1, -1, 2, 0, -3, 1, -1, 2, -2, 0, 3, -1, 1, 0];
-const DURS   = [3.8, 4.5, 3.2, 5.0, 4.1, 3.6, 4.8, 3.4, 4.3, 5.2, 3.9, 4.6, 3.3, 4.9, 4.0];
-const DELAYS = [0, -1.4, -0.7, -2.2, -1.1, -2.8, -0.4, -1.9, -0.9, -2.4, -1.6, -0.3, -2.0, -1.3, -0.6];
-const MTS    = [0, 8, -6, 12, -4, 10, -8, 6, -2, 14, -10, 4, -6, 8, -3];
+// ── FLOATING TAG CLOUD OVERLAY ────────────────────────
+// Deterministic pseudo-random based on tag string → stable positions across re-renders
+function tagSeed(t) {
+  let h = 0;
+  for(let i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) & 0xfffff;
+  return h;
+}
 
-function buildWordCloud() {
-  const cloud = $('wordCloud');
-  if(!cloud) return;
+function buildCloudOverlay() {
+  const overlay = $('cloudOverlay');
+  if(!overlay) return;
   const counts = {};
   allPhotos.forEach(p => p._tags.forEach(t => counts[t] = (counts[t]||0)+1));
   const ordered = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const topTags = ordered.slice(0, 15);         // only top 15 — keep it subtle
+  const topTags = ordered.slice(0, 20);
   const maxC = counts[topTags[0]] || 1;
   const minC = counts[topTags[topTags.length-1]] || 1;
 
-  const allWord = `<span class="wc-word wc-all${activeTag==='all'?' active':''}" data-tag="all"
-    style="font-size:11px;--rot:0deg;--dur:5s;--delay:0s;--mt:0px">ALL</span>`;
-
-  const tagWords = topTags.map((t, i) => {
-    const ratio = maxC === minC ? 0.5 : (counts[t] - minC) / (maxC - minC);
-    const size  = Math.round(8 + ratio * 10);   // 8–18px range (subtle)
-    const rot   = ROTS[i % ROTS.length];
-    const dur   = DURS[i % DURS.length];
-    const delay = DELAYS[i % DELAYS.length];
-    const mt    = MTS[i % MTS.length];
-    return `<span class="wc-word${t===activeTag?' active':''}" data-tag="${t}"
-      style="font-size:${size}px;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s;--mt:${mt}px">${t}</span>`;
+  const words = ['all', ...topTags];
+  overlay.innerHTML = words.map((t) => {
+    const isAll = t === 'all';
+    const s = tagSeed(t);
+    const cnt = isAll ? maxC : (counts[t] || 1);
+    const ratio = maxC === minC ? 0.5 : (cnt - minC) / (maxC - minC);
+    const sz  = isAll ? 11 : Math.round(8 + ratio * 10);  // 8–18px
+    // scatter avoiding very top (nav) and edges
+    const cx  = 4  + (s % 83);           // 4%–87%
+    const cy  = 12 + ((s * 137) % 72);   // 12%–84%
+    const rot = ((s % 11) - 5) * 0.9;    // ≈ -4.5° to +4.5°
+    const dur = 5  + (s % 5);            // 5–9s
+    const delay = -((s % Math.round(dur * 10)) / 10); // random phase offset
+    // 2-D drift vectors — vary per word
+    const dx1 =  4 + (s % 14);  const dy1 = -(3 + (s % 13));
+    const dx2 = -(3 + ((s*7)%12)); const dy2 = -(6 + ((s*3)%12));
+    const dx3 =  3 + ((s*5)%11);  const dy3 = -(2 + ((s*9)%11));
+    const r1 = 0.8 + (s%5)*0.4; const r2 = 0.5+(s%4)*0.4; const r3 = 1+(s%6)*0.3;
+    const cls = `co-word${isAll?' co-all':''}${t===activeTag?' active':''}`;
+    return `<span class="${cls}" data-tag="${t}"
+      style="font-size:${sz}px;--cx:${cx}%;--cy:${cy}%;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s;--dx1:${dx1}px;--dy1:${dy1}px;--dx2:${dx2}px;--dy2:${dy2}px;--dx3:${dx3}px;--dy3:${dy3}px;--r1:${r1}deg;--r2:${r2}deg;--r3:${r3}deg">${t}</span>`;
   }).join('');
-
-  cloud.innerHTML = allWord + tagWords;
 }
 
-$('wordCloud')?.addEventListener('click', e => {
-  const w = e.target.closest('.wc-word');
-  if(w) { e.stopPropagation(); filterTag(w.dataset.tag); }
+$('cloudOverlay')?.addEventListener('click', e => {
+  const w = e.target.closest('.co-word');
+  if(w) filterTag(w.dataset.tag);
 });
 
 function filterTag(t) {
   activeTag = t;
   view = t==='all' ? [...allPhotos] : allPhotos.filter(p => p._tags.includes(t));
-  document.querySelectorAll('.wc-word').forEach(w => w.classList.toggle('active', w.dataset.tag===t));
+  document.querySelectorAll('.co-word').forEach(w => w.classList.toggle('active', w.dataset.tag===t));
   buildWall();
 }
 
 // ── MATTED GALLERY WALL ───────────────────────────────
 const wall = $('wall');
+// subtle tilt pattern — alternating slight angles for an artful scattered feel
+const TILTS = [0.25, 0, -0.3, 0.15, -0.15, 0.3, 0, -0.25, 0.2, -0.1, 0.1, 0];
 function buildWall() {
-  if(!view.length) {
+  // only render photos that have an actual image — skip placeholders
+  const rendered = view.map((p,i) => ({p,i})).filter(({p}) => p.image_url);
+  if(!rendered.length) {
     wall.innerHTML = `<div class="wall-empty">NO FRAMES IN THIS CATEGORY YET</div>`;
     return;
   }
-  wall.innerHTML = view.map((p,i) => {
-    const inner = p.image_url
-      ? `<div class="print-imgwrap"><img class="print-img" src="${p.image_url}" alt="${p.title||''}" loading="lazy"><div class="print-inspect">⌖ INSPECT</div></div>`
-      : `<div class="print-imgwrap empty">NO PHOTO YET</div>`;
+  wall.innerHTML = rendered.map(({p,i}, ri) => {
+    const tilt = TILTS[ri % TILTS.length];
     return `
       <div class="print" data-idx="${i}">
-        <div class="print-mat">
-          ${inner}
+        <div class="print-mat" style="--tilt:${tilt}deg">
+          <div class="print-imgwrap"><img class="print-img" src="${p.image_url}" alt="${p.title||''}" loading="lazy"><div class="print-inspect">⌖ INSPECT</div></div>
           <div class="print-plate">
             <div><div class="pp-title">${p.title||'Untitled'}</div><div class="pp-loc">${p.location||'—'}</div></div>
-            <div class="pp-no">${String(i+1).padStart(2,'0')}</div>
+            <div class="pp-no">${String(ri+1).padStart(2,'0')}</div>
           </div>
         </div>
       </div>`;
@@ -288,8 +299,17 @@ function closeFullscreen() {
 }
 $('fv-close').addEventListener('click', closeFullscreen);
 
-// ── NAV + KEYS ────────────────────────────────────────
-window.addEventListener('scroll', () => $('topNav').classList.toggle('scrolled', window.scrollY > 50), { passive:true });
+// ── NAV + CLOUD OVERLAY + KEYS ────────────────────────
+let heroThreshold = 300;
+function updateOnScroll() {
+  const sy = window.scrollY;
+  $('topNav').classList.toggle('scrolled', sy > 50);
+  // show cloud overlay once hero scrolls past 80% out of view
+  const hero = document.getElementById('hero');
+  if(hero) heroThreshold = hero.offsetHeight * 0.8;
+  $('cloudOverlay')?.classList.toggle('show', sy > heroThreshold);
+}
+window.addEventListener('scroll', updateOnScroll, { passive:true });
 document.addEventListener('keydown', e => {
   if($('fullscreen-viewer').classList.contains('open')) { if(e.key==='Escape') closeFullscreen(); return; }
   if(story.classList.contains('open')) {
