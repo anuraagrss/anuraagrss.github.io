@@ -73,9 +73,10 @@ function updateStats() {
 }
 
 // ── FLOATING WORD CLOUD ───────────────────────────────
-const ROTS    = [-3, -1, 0, 2, -2, 1, 3, 0, -1, 2];
-const DURS    = [3.5, 4.2, 3.8, 4.8, 3.2, 4.5, 4.0, 5.0, 3.6, 4.3];
-const DELAYS  = [0, -1.2, -0.6, -2.1, -1.8, -0.3, -2.5, -0.9, -1.5, -2.8];
+const ROTS   = [-2, 1, -1, 2, 0, -3, 1, -1, 2, -2, 0, 3, -1, 1, 0];
+const DURS   = [3.8, 4.5, 3.2, 5.0, 4.1, 3.6, 4.8, 3.4, 4.3, 5.2, 3.9, 4.6, 3.3, 4.9, 4.0];
+const DELAYS = [0, -1.4, -0.7, -2.2, -1.1, -2.8, -0.4, -1.9, -0.9, -2.4, -1.6, -0.3, -2.0, -1.3, -0.6];
+const MTS    = [0, 8, -6, 12, -4, 10, -8, 6, -2, 14, -10, 4, -6, 8, -3];
 
 function buildWordCloud() {
   const cloud = $('wordCloud');
@@ -83,21 +84,22 @@ function buildWordCloud() {
   const counts = {};
   allPhotos.forEach(p => p._tags.forEach(t => counts[t] = (counts[t]||0)+1));
   const ordered = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const topTags = ordered.slice(0, 42);
+  const topTags = ordered.slice(0, 15);         // only top 15 — keep it subtle
   const maxC = counts[topTags[0]] || 1;
   const minC = counts[topTags[topTags.length-1]] || 1;
 
   const allWord = `<span class="wc-word wc-all${activeTag==='all'?' active':''}" data-tag="all"
-    style="font-size:13px;--rot:0deg;--dur:5s;--delay:0s">ALL</span>`;
+    style="font-size:11px;--rot:0deg;--dur:5s;--delay:0s;--mt:0px">ALL</span>`;
 
   const tagWords = topTags.map((t, i) => {
     const ratio = maxC === minC ? 0.5 : (counts[t] - minC) / (maxC - minC);
-    const size  = Math.round(8 + ratio * 14);
+    const size  = Math.round(8 + ratio * 10);   // 8–18px range (subtle)
     const rot   = ROTS[i % ROTS.length];
     const dur   = DURS[i % DURS.length];
     const delay = DELAYS[i % DELAYS.length];
+    const mt    = MTS[i % MTS.length];
     return `<span class="wc-word${t===activeTag?' active':''}" data-tag="${t}"
-      style="font-size:${size}px;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s">${t}</span>`;
+      style="font-size:${size}px;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s;--mt:${mt}px">${t}</span>`;
   }).join('');
 
   cloud.innerHTML = allWord + tagWords;
@@ -105,7 +107,7 @@ function buildWordCloud() {
 
 $('wordCloud')?.addEventListener('click', e => {
   const w = e.target.closest('.wc-word');
-  if(w) filterTag(w.dataset.tag);
+  if(w) { e.stopPropagation(); filterTag(w.dataset.tag); }
 });
 
 function filterTag(t) {

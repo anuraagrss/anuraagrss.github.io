@@ -172,87 +172,102 @@
     .h-stat-label { font-family: var(--mono); font-size: 7px; letter-spacing: 2px; color: var(--muted); }
     @keyframes riseIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 
-    /* ── FLOATING WORD CLOUD — full width below text+avatar row ── */
-    .word-cloud {
-      flex: 0 0 100%; order: 10;
-      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
-      gap: 4px 10px; padding: 10px 0 2px;
-      opacity: 0; animation: riseIn 1s ease 0.8s forwards;
-    }
-    .wc-word {
-      font-family: var(--mono); letter-spacing: 1px; text-transform: uppercase;
-      cursor: pointer; line-height: 1.3; display: inline-block;
-      color: var(--teal-d); opacity: 0.65; padding: 1px 3px;
-      transform: rotate(var(--rot, 0deg));
-      animation: wcFloat var(--dur, 4s) ease-in-out infinite;
-      animation-delay: var(--delay, 0s);
-      transition: color 0.2s, opacity 0.25s, transform 0.25s, font-weight 0.1s;
-    }
-    .wc-word:hover { opacity: 1; color: var(--ember); transform: rotate(0deg) scale(1.18); }
-    .wc-word.active { color: var(--ember); opacity: 1; font-weight: 700; border-bottom: 1.5px solid rgba(212,121,42,0.6); }
-    .wc-all { color: var(--ink2); font-weight: 600; opacity: 0.8; }
-    .wc-all.active { color: var(--ember); }
-    @keyframes wcFloat {
-      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
-      50%       { transform: translateY(-5px) rotate(var(--rot, 0deg)); }
-    }
-
     /* ── AVATAR AS PLAY BUTTON ── */
     .hero-avatar {
       flex-shrink: 0; align-self: flex-end;
-      display: flex; flex-direction: column; align-items: center; gap: 6px;
+      display: flex; flex-direction: column; align-items: center;
       cursor: pointer; user-select: none;
       opacity: 0; animation: avatarIn 1.1s cubic-bezier(0.2,0.7,0.2,1) 0.4s forwards;
+      position: relative;
     }
-    .avatar-wrap { position: relative; display: inline-block; }
+    .avatar-wrap {
+      position: relative; display: flex; flex-direction: column; align-items: center;
+    }
     .hero-avatar img {
-      height: clamp(140px,20vh,220px); width: auto; display: block;
-      filter: drop-shadow(0 14px 22px rgba(36,26,16,0.16));
-      animation: floaty 6s ease-in-out infinite;
-      transition: filter 0.3s;
+      height: clamp(180px,24vh,270px); width: auto; display: block;
+      filter: drop-shadow(0 12px 28px rgba(36,26,16,0.18)) drop-shadow(0 0 14px rgba(255,255,255,0.45));
+      animation: floaty 6s ease-in-out infinite, avatarGlow 3.5s ease-in-out infinite;
+      transition: filter 0.35s;
       pointer-events: none;
     }
-    .hero-avatar:hover img { filter: drop-shadow(0 14px 22px rgba(36,26,16,0.22)) brightness(0.87); }
-    .hero-avatar:active img { transform: scale(0.96) !important; animation: none; }
+    @keyframes avatarGlow {
+      0%,100% { filter: drop-shadow(0 12px 28px rgba(36,26,16,0.18)) drop-shadow(0 0 10px rgba(255,255,255,0.35)); }
+      50%      { filter: drop-shadow(0 16px 32px rgba(36,26,16,0.22)) drop-shadow(0 0 22px rgba(255,255,255,0.6)); }
+    }
+    .hero-avatar:hover img {
+      filter: drop-shadow(0 16px 32px rgba(36,26,16,0.22)) drop-shadow(0 0 24px rgba(255,255,255,0.7)) brightness(0.9);
+      animation-play-state: paused;
+    }
+    .hero-avatar:active img { transform: scale(0.97); }
 
-    /* pulsing rings hint */
-    .avatar-play-overlay { position: absolute; inset: 0; pointer-events: none; }
-    .av-ring {
-      position: absolute; border-radius: 50%; border-style: solid;
-      animation: avRing var(--ring-dur, 2.6s) ease-in-out infinite;
-      animation-delay: var(--ring-delay, 0s);
+    /* thought bubble */
+    .avatar-thought {
+      position: absolute; top: 4%; left: 50%;
+      transform: translateX(-50%) translateY(-105%);
+      background: rgba(255,255,255,0.94); backdrop-filter: blur(10px);
+      border-radius: 16px; padding: 7px 14px;
+      font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--ink2);
+      white-space: nowrap; box-shadow: 0 4px 18px rgba(36,26,16,0.1);
+      animation: thoughtFloat 3s ease-in-out infinite;
+      pointer-events: none; z-index: 5;
     }
-    .av-ring-1 {
-      inset: -10px; border-width: 2px; border-color: rgba(212,121,42,0.55);
-      --ring-dur: 2.6s; --ring-delay: 0s;
+    .thought-tail {
+      position: absolute; bottom: -18px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
     }
-    .av-ring-2 {
-      inset: -22px; border-width: 1.5px; border-color: rgba(212,121,42,0.22);
-      --ring-dur: 2.6s; --ring-delay: -1.3s;
+    .thought-tail i {
+      display: block; border-radius: 50%; background: rgba(255,255,255,0.88);
     }
-    @keyframes avRing {
-      0%, 100% { opacity: 0.5; transform: scale(1); }
-      50%       { opacity: 1;   transform: scale(1.05); }
+    .thought-tail i:nth-child(1) { width: 9px; height: 9px; }
+    .thought-tail i:nth-child(2) { width: 6px; height: 6px; opacity: 0.75; }
+    .thought-tail i:nth-child(3) { width: 3px; height: 3px; opacity: 0.5; }
+    @keyframes thoughtFloat {
+      0%,100% { transform: translateX(-50%) translateY(-105%); }
+      50%      { transform: translateX(-50%) translateY(-112%); }
     }
 
-    /* play icon — appears on hover */
+    /* play shutter icon — appears on hover */
     .av-shutter {
-      position: absolute; top: 50%; left: 50%;
+      position: absolute; top: 30%; left: 50%;
       transform: translate(-50%, -50%) scale(0.75);
-      width: 54px; height: 54px; border-radius: 50%;
-      background: rgba(212,121,42,0.9); backdrop-filter: blur(4px);
+      width: 50px; height: 50px; border-radius: 50%;
+      background: rgba(36,26,16,0.55); backdrop-filter: blur(6px);
       display: flex; align-items: center; justify-content: center;
-      opacity: 0; transition: opacity 0.28s, transform 0.28s;
+      opacity: 0; transition: opacity 0.25s, transform 0.25s;
+      pointer-events: none;
     }
     .hero-avatar:hover .av-shutter { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
-    .ha-cap {
-      font-family: var(--mono); font-size: 8px; letter-spacing: 1.5px; color: var(--ember);
-      text-align: center; animation: psPulse 2.2s ease-in-out infinite;
-    }
-    @keyframes psPulse { 0%,100% { opacity: 0.55; } 50% { opacity: 1; } }
     @keyframes avatarIn { from { opacity: 0; transform: translateY(26px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
     @keyframes floaty { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+
+    /* ── FLOATING WORD CLOUD — between title and avatar ── */
+    .word-cloud {
+      flex: 1; min-width: 0; align-self: center;
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+      gap: 3px 8px; padding: 0 20px;
+      opacity: 0; animation: riseIn 1s ease 0.8s forwards;
+    }
+    .wc-word {
+      font-family: var(--mono); letter-spacing: 0.8px; text-transform: uppercase;
+      cursor: pointer; line-height: 1.4; display: inline-block;
+      color: var(--teal-d); opacity: 0.4; padding: 1px 2px;
+      margin-top: var(--mt, 0px);
+      transform: rotate(var(--rot, 0deg));
+      animation: wcFloat var(--dur, 4s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      transition: color 0.2s, opacity 0.3s, transform 0.3s;
+    }
+    /* on hover of the whole cloud, everything brightens */
+    .word-cloud:hover .wc-word { opacity: 0.7; }
+    .wc-word:hover { opacity: 1 !important; color: var(--ember); transform: rotate(0deg) scale(1.2) !important; }
+    .wc-word.active { color: var(--ember); opacity: 0.9 !important; font-weight: 700; }
+    .wc-all { color: var(--ink2); font-weight: 600; }
+    .wc-all.active { color: var(--ember); }
+    @keyframes wcFloat {
+      0%, 100% { transform: translateY(0) rotate(var(--rot, 0deg)); }
+      50%       { transform: translateY(-6px) rotate(var(--rot, 0deg)); }
+    }
 
     /* ── CAMERA FLASH ── */
     #cameraFlash {
