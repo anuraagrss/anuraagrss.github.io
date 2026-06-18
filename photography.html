@@ -44,8 +44,8 @@
     <a class="nav-back" href="nomad.html">← NOMAD</a>
   </nav>
 
-  <!-- ── HERO ── -->
-  <header class="hero">
+  <!-- ── HERO (sticky) ── -->
+  <header class="hero" id="hero">
     <div class="hero-text">
       <div class="hero-eyebrow">WORLD THROUGH MY EYES</div>
       <h1 class="hero-title"><span class="line">WHAT THE</span><span class="line">PICTURE <span class="g">SAID.</span></span></h1>
@@ -56,20 +56,25 @@
         <div><div class="h-stat-num" id="statTags">—</div><div class="h-stat-label">TAGS</div></div>
       </div>
     </div>
-    <div class="hero-avatar">
-      <img src="images/photographer-cut.png" alt="Anuraag — behind the lens">
-      <div class="ha-cap">ANURAAG · BEHIND THE LENS</div>
+
+    <!-- ── FLOATING WORD CLOUD ── -->
+    <div class="word-cloud" id="wordCloud"></div>
+
+    <!-- ── AVATAR = PLAY STORY BUTTON ── -->
+    <div class="hero-avatar" id="avatarPlay" role="button" aria-label="Play story slideshow">
+      <div class="avatar-wrap">
+        <img src="images/photographer-cut.png" alt="Anuraag — behind the lens">
+        <div class="avatar-play-overlay">
+          <div class="av-ring av-ring-1"></div>
+          <div class="av-ring av-ring-2"></div>
+          <div class="av-shutter">
+            <svg viewBox="0 0 24 24" fill="white" width="22" height="22"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="ha-cap">◉ CLICK TO PLAY STORY</div>
     </div>
   </header>
-
-  <!-- ── CONTROLS: tags + play story ── -->
-  <div class="controls">
-    <div class="tags" id="tags"></div>
-    <button class="play-story" id="playStory">
-      <span class="ps-pulse"></span>
-      PLAY STORY
-    </button>
-  </div>
 
   <!-- ── MATTED GALLERY WALL ── -->
   <main class="wall" id="wall"></main>
@@ -142,6 +147,9 @@
   <div id="fv-caption"></div>
 </div>
 
+<!-- Camera flash overlay -->
+<div id="cameraFlash"></div>
+
 <!-- Terminal -->
 <button class="term-trigger" id="termTrigger" onclick="openTerm()">
   <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
@@ -188,7 +196,7 @@ initTerminal({
   pageCommands: {
     wall:   function () { closeTerm(); document.getElementById('wall').scrollIntoView({behavior:'smooth'}); },
     frames: function () { closeTerm(); document.getElementById('wall').scrollIntoView({behavior:'smooth'}); },
-    play:   function () { closeTerm(); setTimeout(function(){ document.getElementById('playStory').click(); }, 300); },
+    play:   function () { closeTerm(); setTimeout(function(){ document.getElementById('avatarPlay').click(); }, 300); },
   },
 });
 </script>

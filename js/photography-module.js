@@ -59,7 +59,7 @@ async function loadPhotos() {
     console.error('Photos load failed:', e);
   }
   allPhotos.forEach(p => { p._tags = tagsOf(p); });
-  buildTags();
+  buildWordCloud();
   filterTag('all');
   updateStats();
 }
@@ -72,24 +72,46 @@ function updateStats() {
   $('statTags').textContent = tags || '—';
 }
 
-// ── TAG BAR ───────────────────────────────────────────
-function buildTags() {
+// ── FLOATING WORD CLOUD ───────────────────────────────
+const ROTS    = [-3, -1, 0, 2, -2, 1, 3, 0, -1, 2];
+const DURS    = [3.5, 4.2, 3.8, 4.8, 3.2, 4.5, 4.0, 5.0, 3.6, 4.3];
+const DELAYS  = [0, -1.2, -0.6, -2.1, -1.8, -0.3, -2.5, -0.9, -1.5, -2.8];
+
+function buildWordCloud() {
+  const cloud = $('wordCloud');
+  if(!cloud) return;
   const counts = {};
   allPhotos.forEach(p => p._tags.forEach(t => counts[t] = (counts[t]||0)+1));
   const ordered = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const chips = ['all', ...ordered];
-  $('tags').innerHTML = chips.map(t =>
-    `<button class="tag${t===activeTag?' active':''}" data-tag="${t}">${t==='all'?'ALL FRAMES':t}</button>`
-  ).join('');
+  const topTags = ordered.slice(0, 42);
+  const maxC = counts[topTags[0]] || 1;
+  const minC = counts[topTags[topTags.length-1]] || 1;
+
+  const allWord = `<span class="wc-word wc-all${activeTag==='all'?' active':''}" data-tag="all"
+    style="font-size:13px;--rot:0deg;--dur:5s;--delay:0s">ALL</span>`;
+
+  const tagWords = topTags.map((t, i) => {
+    const ratio = maxC === minC ? 0.5 : (counts[t] - minC) / (maxC - minC);
+    const size  = Math.round(8 + ratio * 14);
+    const rot   = ROTS[i % ROTS.length];
+    const dur   = DURS[i % DURS.length];
+    const delay = DELAYS[i % DELAYS.length];
+    return `<span class="wc-word${t===activeTag?' active':''}" data-tag="${t}"
+      style="font-size:${size}px;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s">${t}</span>`;
+  }).join('');
+
+  cloud.innerHTML = allWord + tagWords;
 }
-$('tags').addEventListener('click', e => {
-  const b = e.target.closest('.tag');
-  if(b) filterTag(b.dataset.tag);
+
+$('wordCloud').addEventListener('click', e => {
+  const w = e.target.closest('.wc-word');
+  if(w) filterTag(w.dataset.tag);
 });
+
 function filterTag(t) {
   activeTag = t;
   view = t==='all' ? [...allPhotos] : allPhotos.filter(p => p._tags.includes(t));
-  document.querySelectorAll('.tag').forEach(b => b.classList.toggle('active', b.dataset.tag===t));
+  document.querySelectorAll('.wc-word').forEach(w => w.classList.toggle('active', w.dataset.tag===t));
   buildWall();
 }
 
@@ -232,7 +254,16 @@ function toggleStoryPlay() {
   if(stPlaying) { updateProg(); schedule(); }
   else clearTimeout(stTimer);
 }
-$('playStory').addEventListener('click', () => openStory(0));
+// ── AVATAR PLAY BUTTON + CAMERA FLASH ────────────────
+function cameraFlashAndPlay() {
+  const flash = $('cameraFlash');
+  if(!flash) { openStory(0); return; }
+  flash.classList.remove('flash');
+  void flash.offsetWidth;              // force reflow to restart animation
+  flash.classList.add('flash');
+  setTimeout(() => openStory(0), 420);
+}
+$('avatarPlay').addEventListener('click', cameraFlashAndPlay);
 $('storyClose').addEventListener('click', closeStory);
 $('storyTap').addEventListener('click', () => storyStep(1));
 $('storyPrev').addEventListener('click', e => { e.stopPropagation(); storyStep(-1); });
