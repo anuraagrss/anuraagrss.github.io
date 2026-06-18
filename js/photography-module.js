@@ -103,7 +103,7 @@ function buildWordCloud() {
   cloud.innerHTML = allWord + tagWords;
 }
 
-$('wordCloud').addEventListener('click', e => {
+$('wordCloud')?.addEventListener('click', e => {
   const w = e.target.closest('.wc-word');
   if(w) filterTag(w.dataset.tag);
 });
@@ -263,7 +263,7 @@ function cameraFlashAndPlay() {
   flash.classList.add('flash');
   setTimeout(() => openStory(0), 420);
 }
-$('avatarPlay').addEventListener('click', cameraFlashAndPlay);
+$('avatarPlay')?.addEventListener('click', cameraFlashAndPlay);
 $('storyClose').addEventListener('click', closeStory);
 $('storyTap').addEventListener('click', () => storyStep(1));
 $('storyPrev').addEventListener('click', e => { e.stopPropagation(); storyStep(-1); });
