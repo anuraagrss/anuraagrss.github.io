@@ -766,8 +766,8 @@ function buildReel(tab) {
   makeSprockets('spr-b-'+pfx, data.length);
   if(!data.length) {
     const ph = document.createElement('div');
-    ph.style.cssText = 'font-family:var(--mono);font-size:10px;letter-spacing:2px;color:rgba(246,241,233,0.2);padding:40px 24px;text-align:center';
-    ph.textContent = 'No '+tab+' yet — add from the dashboard.';
+    ph.style.cssText = 'font-family:var(--mono);font-size:11px;letter-spacing:2px;color:rgba(246,241,233,0.45);padding:40px 24px;text-align:center';
+    ph.textContent = tab.toUpperCase()+' STORIES COMING SOON ✦';
     reel.appendChild(ph);
     return;
   }
