@@ -15,6 +15,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="css/photography.css">
+  <link rel="stylesheet" href="css/terminal.css">
 </head>
 <body>
 
@@ -141,6 +142,56 @@
   <div id="fv-caption"></div>
 </div>
 
+<!-- Terminal -->
+<button class="term-trigger" id="termTrigger" onclick="openTerm()">
+  <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
+  <div class="term-trigger-dot"></div>
+  <span class="term-trigger-label">TERMINAL</span>
+</button>
+<div class="term-backdrop" id="termBackdrop" onclick="closeTerm()"></div>
+<div class="term-drawer" id="termDrawer">
+  <div class="term-bar">
+    <div class="td td-r" onclick="closeTerm()"></div>
+    <div class="td td-y"></div><div class="td td-g"></div>
+    <span class="t-title">anuraag.sh — photography</span>
+    <span class="t-clock" id="tClock"></span>
+  </div>
+  <div class="term-body" id="tBody"></div>
+  <div class="term-foot">
+    <span class="t-ps">anuraag@world:~$</span>
+    <input class="t-in" id="tIn" placeholder="type a command…" autocomplete="off" spellcheck="false">
+    <div class="t-cur"></div>
+  </div>
+</div>
+<script src="js/terminal.js"></script>
+<script>
+initTerminal({
+  bootLines: [
+    [200, 'Initializing photography.sh ...'],
+    [380, 'Loading 86 frames .................. <span class="cok">OK</span>'],
+    [300, 'Mounting stories from 35+ countries . <span class="cok">OK</span>'],
+  ],
+  bootChips: [
+    ['nomad', 'engineer', 'home'],
+    ['help', 'whoami', 'about'],
+  ],
+  pageHelp: {
+    title: 'THIS PAGE',
+    items: [
+      ['wall',  '→ jump to the photo gallery'],
+      ['play',  '→ launch story slideshow'],
+    ],
+  },
+  pageLS: [
+    ['ct', '&nbsp;&nbsp;photography/ &nbsp;<span class="cd">86 frames · 35+ countries · first-person stories</span>'],
+  ],
+  pageCommands: {
+    wall:   function () { closeTerm(); document.getElementById('wall').scrollIntoView({behavior:'smooth'}); },
+    frames: function () { closeTerm(); document.getElementById('wall').scrollIntoView({behavior:'smooth'}); },
+    play:   function () { closeTerm(); setTimeout(function(){ document.getElementById('playStory').click(); }, 300); },
+  },
+});
+</script>
 <script type="module" src="js/photography-module.js"></script>
 </body>
 </html>

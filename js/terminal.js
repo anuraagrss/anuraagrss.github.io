@@ -2,11 +2,12 @@
 // Usage: call initTerminal(config) from each page's JS after DOM is ready.
 (function () {
   const NAV = {
-    engineer: { url: 'Profile.html',      desc: 'Product leader · AI builder · Problem solver' },
-    nomad:    { url: 'nomad.html',         desc: 'Capturing the world one frame at a time' },
-    about:    { url: 'Professional.html',  desc: 'The full story — who I am & what drives me' },
-    contact:  { url: 'Contact.html',       desc: 'Start a conversation worth having' },
-    home:     { url: 'index.html',         desc: 'Back to the split' },
+    engineer:    { url: 'Profile.html',      desc: 'Product leader · AI builder · Problem solver' },
+    nomad:       { url: 'nomad.html',         desc: 'Capturing the world one frame at a time' },
+    photography: { url: 'photography.html',   desc: 'Through my eyes — 86 frames · 35+ countries' },
+    about:       { url: 'Professional.html',  desc: 'The full story — who I am & what drives me' },
+    contact:     { url: 'Contact.html',       desc: 'Start a conversation worth having' },
+    home:        { url: 'index.html',         desc: 'Back to the split' },
   };
 
   window.initTerminal = function (config) {
@@ -102,11 +103,12 @@
     function cmdHelp() {
       gap(); ln('camb', '// NAVIGATE');
       out([
-        ['ct', '&nbsp;&nbsp;engineer &nbsp;<span class="cd">→ product · AI · enterprise builds</span>'],
-        ['ct', '&nbsp;&nbsp;nomad &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ travel · photography · the other side</span>'],
-        ['ct', '&nbsp;&nbsp;about &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ full story · what drives me</span>'],
-        ['ct', '&nbsp;&nbsp;contact &nbsp;&nbsp;<span class="cd">→ bring me a problem worth solving</span>'],
-        ['ct', '&nbsp;&nbsp;home &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ back to the split</span>'],
+        ['ct', '&nbsp;&nbsp;engineer &nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ product · AI · enterprise builds</span>'],
+        ['ct', '&nbsp;&nbsp;nomad &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ travel · the other side</span>'],
+        ['ct', '&nbsp;&nbsp;photography &nbsp;<span class="cd">→ 86 frames · 35+ countries · stories</span>'],
+        ['ct', '&nbsp;&nbsp;about &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ full story · what drives me</span>'],
+        ['ct', '&nbsp;&nbsp;contact &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ bring me a problem worth solving</span>'],
+        ['ct', '&nbsp;&nbsp;home &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">→ back to the split</span>'],
       ]);
       gap(); ln('camb', '// EXPLORE');
       out([
@@ -135,7 +137,8 @@
       gap(); ln('cd', 'drwxr-xr-x &nbsp;anuraag@world:~');
       var entries = [
         ['ct', '&nbsp;&nbsp;engineer/ &nbsp;&nbsp;&nbsp;<span class="cd">product · AI · $300M+ · 2,000 users</span>'],
-        ['ct', '&nbsp;&nbsp;nomad/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">35+ countries · stories · frames</span>'],
+        ['ct', '&nbsp;&nbsp;nomad/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">35+ countries · stories · flights</span>'],
+        ['ct', '&nbsp;&nbsp;photography/ &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="cd">86 frames · first-person stories</span>'],
         ['cm', '&nbsp;&nbsp;about.md &nbsp;&nbsp;&nbsp;<span class="cd">MBA · MS CompSci · BCG · ExxonMobil</span>'],
         ['cm', '&nbsp;&nbsp;contact.sh &nbsp;<span class="cd">executable — start a conversation</span>'],
         ['cd', '&nbsp;&nbsp;.secrets &nbsp;&nbsp;&nbsp;<span class="cerr">permission denied</span>'],
@@ -294,11 +297,14 @@
       resume: cmdResume, hire: cmdHire, work: cmdHire,
       clear: cmdClear,
       hello: cmdHi, hi: cmdHi, hey: cmdHi,
-      engineer: function () { cmdGo('engineer'); },
-      nomad:    function () { cmdGo('nomad'); },
-      about:    function () { cmdGo('about'); },
-      contact:  function () { cmdGo('contact'); },
-      home:     function () { cmdGo('home'); },
+      engineer:    function () { cmdGo('engineer'); },
+      nomad:       function () { cmdGo('nomad'); },
+      photography: function () { cmdGo('photography'); },
+      photos:      function () { cmdGo('photography'); },
+      lens:        function () { cmdGo('photography'); },
+      about:       function () { cmdGo('about'); },
+      contact:     function () { cmdGo('contact'); },
+      home:        function () { cmdGo('home'); },
       profile:  function () { cmdGo('engineer'); },
       chinni:   function () { window.location.href = 'rewards.html'; },
       pseudo:   function () { window.location.href = 'owner.html'; },
