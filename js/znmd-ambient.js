@@ -1,134 +1,112 @@
-// ZNMD Ambient Audio Engine — Web Audio API
-// A-minor tonality, slow wandering arpeggios + drone pads + feedback delay
-// Inspired by the Shankar-Ehsaan-Loy emotional palette of ZNMD
+// ZNMD Ambient — YouTube IFrame Player + Web Speech poem narration
+// BGM: Shankar-Ehsaan-Loy, Zindagi Na Milegi Dobara (2011)
+
+const VIDEO_IDS = [
+  'FCM297g53u8', // ZNMD BGM — Shankar-Ehsaan-Loy full background score
+  '57xlfYZxF-c', // ZNMD background scores compilation (fallback)
+];
 
 export class ZNMDAmbient {
   constructor() {
-    this.ctx = null;
-    this.master = null;
-    this.wet = null;
-    this.running = false;
-    this.melodyTimer = null;
-    this.droneNodes = [];
+    this.player = null;
+    this._ready  = false;
+    this._vol    = 18;
+    this._vidIdx = 0;
   }
 
-  _boot() {
-    if (this.ctx) return;
-    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-
-    this.master = this.ctx.createGain();
-    this.master.gain.value = 0;
-
-    // Tape-style feedback delay for warmth
-    const delay  = this.ctx.createDelay(2.5);
-    const fb     = this.ctx.createGain();
-    const dFilt  = this.ctx.createBiquadFilter();
-    delay.delayTime.value = 0.42;
-    fb.gain.value         = 0.26;
-    dFilt.type            = 'lowpass';
-    dFilt.frequency.value = 1100;
-    delay.connect(dFilt); dFilt.connect(fb); fb.connect(delay);
-    delay.connect(this.ctx.destination);
-
-    // Wet send at lower gain
-    this.wet = this.ctx.createGain();
-    this.wet.gain.value = 0.55;
-    this.master.connect(this.wet);
-    this.wet.connect(delay);
-    this.master.connect(this.ctx.destination);
-  }
-
-  // Soft sine pad — two slightly detuned oscs for warmth
-  _pad(freq, vol) {
-    const ctx = this.ctx;
-    [0, 3].forEach(detune => {
-      const osc  = ctx.createOscillator();
-      const filt = ctx.createBiquadFilter();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.value = freq;
-      osc.detune.value    = detune;
-      filt.type           = 'lowpass';
-      filt.frequency.value = Math.min(freq * 3, 900);
-      gain.gain.value = vol;
-      osc.connect(filt); filt.connect(gain); gain.connect(this.master);
-      osc.start();
-      this.droneNodes.push(osc, gain);
+  _loadAPI() {
+    return new Promise(resolve => {
+      if (window.YT?.Player) { resolve(); return; }
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => { if (prev) prev(); resolve(); };
+      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const s = document.createElement('script');
+        s.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(s);
+      }
     });
   }
 
-  // Plucked triangle — like an acoustic guitar harmonic
-  _pluck(freq, when, vol, dur) {
-    const ctx  = this.ctx;
-    const osc  = ctx.createOscillator();
-    const filt = ctx.createBiquadFilter();
-    const gain = ctx.createGain();
-    osc.type             = 'triangle';
-    osc.frequency.value  = freq;
-    osc.detune.value     = (Math.random() - 0.5) * 5;
-    filt.type            = 'bandpass';
-    filt.frequency.value = freq * 2.2;
-    filt.Q.value         = 1.8;
-    gain.gain.setValueAtTime(0, when);
-    gain.gain.linearRampToValueAtTime(vol, when + 0.018);
-    gain.gain.exponentialRampToValueAtTime(0.0001, when + dur);
-    osc.connect(filt); filt.connect(gain); gain.connect(this.master);
-    osc.start(when);
-    osc.stop(when + dur + 0.05);
-  }
+  async start(vol = 18) {
+    this._vol = vol;
+    await this._loadAPI();
 
-  _drone() {
-    // A-minor tonal center: A1 A2 E3 A3 C4 E4 A4
-    [[55,0.055],[82.41,0.04],[110,0.038],[130.81,0.028],[164.81,0.022],[220,0.016]]
-      .forEach(([f, v]) => this._pad(f, v));
-  }
+    if (this.player && this._ready) {
+      this.player.setVolume(vol);
+      this.player.playVideo();
+      return;
+    }
 
-  _arpeggio() {
-    // A-minor pentatonic melody — wandering, melancholic
-    // A C D E G across two octaves
-    const SEQ = [
-      [220, 0.10, 3.2],[261.63,0.07,2.6],[293.66,0.08,3.0],[329.63,0.09,3.4],
-      [392, 0.07, 2.4],[329.63,0.08,2.8],[261.63,0.07,2.6],[220,  0.09,3.8],
-      [174.61,0.06,2.8],[220,0.07,2.4],[261.63,0.06,2.6],[293.66,0.08,3.0],
-      [329.63,0.09,3.2],[392,0.07,2.6],[440,0.07,2.4],[392,0.08,3.0],
-    ];
-    const GAPS = [4.0,3.2,3.6,4.4,3.0,3.4,4.0,3.2,3.8,4.6,3.2,3.4,4.0,3.2,3.6,4.4];
-    let i = 0;
-    const tick = () => {
-      if (!this.running) return;
-      const [freq, vol, dur] = SEQ[i % SEQ.length];
-      this._pluck(freq, this.ctx.currentTime + 0.05, vol, dur);
-      this.melodyTimer = setTimeout(tick, GAPS[i % GAPS.length] * 1000);
-      i++;
-    };
-    tick();
-  }
-
-  start(vol = 0.38) {
-    this._boot();
-    if (this.ctx.state === 'suspended') this.ctx.resume();
-    this.running = true;
-    this._drone();
-    setTimeout(() => { if (this.running) this._arpeggio(); }, 2200);
-    const now = this.ctx.currentTime;
-    this.master.gain.setValueAtTime(0, now);
-    this.master.gain.linearRampToValueAtTime(vol, now + 4);
+    this.player = new window.YT.Player('ytPlayer', {
+      videoId: VIDEO_IDS[0],
+      width: '1', height: '1',
+      playerVars: {
+        autoplay: 1, controls: 0, disablekb: 1,
+        fs: 0, loop: 1, playlist: VIDEO_IDS[0],
+        modestbranding: 1, rel: 0, iv_load_policy: 3,
+      },
+      events: {
+        onReady: e => {
+          this._ready = true;
+          e.target.setVolume(this._vol);
+          e.target.playVideo();
+        },
+        onStateChange: e => {
+          if (e.data === 0) e.target.playVideo(); // loop on end
+        },
+        onError: e => {
+          // try next video on error
+          this._vidIdx = (this._vidIdx + 1) % VIDEO_IDS.length;
+          if (this.player && this._ready) {
+            this.player.loadVideoById(VIDEO_IDS[this._vidIdx]);
+          }
+        },
+      },
+    });
   }
 
   stop() {
-    this.running = false;
-    clearTimeout(this.melodyTimer);
-    if (!this.ctx) return;
-    const now = this.ctx.currentTime;
-    this.master.gain.linearRampToValueAtTime(0, now + 2.8);
-    setTimeout(() => {
-      this.droneNodes.forEach(n => { try { n.disconnect(); if(n.stop) n.stop(); } catch(e){} });
-      this.droneNodes = [];
-    }, 3200);
+    if (this.player && this._ready) this.player.pauseVideo();
   }
 
   setVol(v) {
-    if (!this.ctx) return;
-    this.master.gain.linearRampToValueAtTime(v, this.ctx.currentTime + 1.8);
+    this._vol = v;
+    if (this.player && this._ready) this.player.setVolume(v);
   }
+}
+
+// ── Poem narration — Web Speech API ─────────────────
+const _voicesReady = new Promise(resolve => {
+  if (!window.speechSynthesis) { resolve(); return; }
+  const v = window.speechSynthesis.getVoices();
+  if (v.length) { resolve(); return; }
+  window.speechSynthesis.addEventListener('voiceschanged', resolve, { once: true });
+});
+
+function _pickVoice() {
+  const voices = window.speechSynthesis?.getVoices() || [];
+  return (
+    voices.find(v => v.name === 'Google UK English Male') ||
+    voices.find(v => /daniel/i.test(v.name) && v.lang === 'en-GB') ||
+    voices.find(v => v.lang === 'en-GB') ||
+    voices.find(v => v.lang.startsWith('en') && !v.localService) ||
+    voices.find(v => v.lang.startsWith('en'))
+  );
+}
+
+export async function speakPoem(text) {
+  if (!window.speechSynthesis) return;
+  await _voicesReady;
+  window.speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text.replace(/\n/g, ', '));
+  u.rate   = 0.64;
+  u.pitch  = 0.80;
+  u.volume = 0.50;
+  const voice = _pickVoice();
+  if (voice) u.voice = voice;
+  window.speechSynthesis.speak(u);
+}
+
+export function stopSpeech() {
+  window.speechSynthesis?.cancel();
 }

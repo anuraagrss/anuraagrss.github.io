@@ -1,6 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { ZNMDAmbient } from './znmd-ambient.js';
+import { ZNMDAmbient, speakPoem, stopSpeech } from './znmd-ambient.js';
 
 // ── FIREBASE ──────────────────────────────────────────
 const app = initializeApp({
@@ -348,19 +348,23 @@ let poemIdx = 0, poemTimer = null;
 function showNextPoem() {
   const el = $('poemText'); if (!el) return;
   el.classList.remove('visible');
+  stopSpeech();
   setTimeout(() => {
-    el.textContent = POEMS[poemIdx % POEMS.length];
+    const text = POEMS[poemIdx % POEMS.length];
     poemIdx++;
+    el.textContent = text;
     el.classList.add('visible');
-  }, 2600);
+    if (musicPlaying) speakPoem(text);
+  }, 2800);
 }
 function startPoems() {
   if (poemTimer) return;
   showNextPoem();
-  poemTimer = setInterval(showNextPoem, 22000);
+  poemTimer = setInterval(showNextPoem, 26000);
 }
 function stopPoems() {
   clearInterval(poemTimer); poemTimer = null;
+  stopSpeech();
   const el = $('poemText'); if (el) el.classList.remove('visible');
 }
 
