@@ -1,5 +1,6 @@
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
 import { getFirestore, collection, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+import { ZNMDAmbient } from './znmd-ambient.js';
 
 // ── FIREBASE ──────────────────────────────────────────
 const app = initializeApp({
@@ -59,7 +60,7 @@ async function loadPhotos() {
     console.error('Photos load failed:', e);
   }
   allPhotos.forEach(p => { p._tags = tagsOf(p); });
-  buildCloudOverlay();
+  buildFilmTicker();
   filterTag('all');
   updateStats();
 }
@@ -72,57 +73,49 @@ function updateStats() {
   $('statTags').textContent = tags || '—';
 }
 
-// ── FLOATING TAG CLOUD OVERLAY ────────────────────────
-// Deterministic pseudo-random based on tag string → stable positions across re-renders
-function tagSeed(t) {
-  let h = 0;
-  for(let i=0;i<t.length;i++) h = (h*31 + t.charCodeAt(i)) & 0xfffff;
-  return h;
-}
-
-function buildCloudOverlay() {
-  const overlay = $('cloudOverlay');
-  if(!overlay) return;
+// ── FILM TICKER — 35mm strip + split-flap ────────────
+function buildFilmTicker() {
+  const track = $('ftTrack');
+  if(!track) return;
   const counts = {};
   allPhotos.forEach(p => p._tags.forEach(t => counts[t] = (counts[t]||0)+1));
-  const ordered = Object.keys(counts).sort((a,b) => counts[b]-counts[a]);
-  const topTags = ordered.slice(0, 20);
-  const maxC = counts[topTags[0]] || 1;
-  const minC = counts[topTags[topTags.length-1]] || 1;
+  const topTags = Object.keys(counts).sort((a,b) => counts[b]-counts[a]).slice(0, 18);
+  const tags = ['all', ...topTags];
 
-  const words = ['all', ...topTags];
-  overlay.innerHTML = words.map((t) => {
-    const isAll = t === 'all';
-    const s = tagSeed(t);
-    const cnt = isAll ? maxC : (counts[t] || 1);
-    const ratio = maxC === minC ? 0.5 : (cnt - minC) / (maxC - minC);
-    const sz  = isAll ? 11 : Math.round(8 + ratio * 10);  // 8–18px
-    // scatter avoiding very top (nav) and edges
-    const cx  = 4  + (s % 83);           // 4%–87%
-    const cy  = 12 + ((s * 137) % 72);   // 12%–84%
-    const rot = ((s % 11) - 5) * 0.9;    // ≈ -4.5° to +4.5°
-    const dur = 5  + (s % 5);            // 5–9s
-    const delay = -((s % Math.round(dur * 10)) / 10); // random phase offset
-    // 2-D drift vectors — vary per word
-    const dx1 =  4 + (s % 14);  const dy1 = -(3 + (s % 13));
-    const dx2 = -(3 + ((s*7)%12)); const dy2 = -(6 + ((s*3)%12));
-    const dx3 =  3 + ((s*5)%11);  const dy3 = -(2 + ((s*9)%11));
-    const r1 = 0.8 + (s%5)*0.4; const r2 = 0.5+(s%4)*0.4; const r3 = 1+(s%6)*0.3;
-    const cls = `co-word${isAll?' co-all':''}${t===activeTag?' active':''}`;
-    return `<span class="${cls}" data-tag="${t}"
-      style="font-size:${sz}px;--cx:${cx}%;--cy:${cy}%;--rot:${rot}deg;--dur:${dur}s;--delay:${delay}s;--dx1:${dx1}px;--dy1:${dy1}px;--dx2:${dx2}px;--dy2:${dy2}px;--dx3:${dx3}px;--dy3:${dy3}px;--r1:${r1}deg;--r2:${r2}deg;--r3:${r3}deg">${t}</span>`;
+  track.innerHTML = tags.map((t, i) => {
+    const label = t === 'all' ? 'ALL' : t;
+    const cnt   = t === 'all' ? allPhotos.length : (counts[t] || 0);
+    const isActive = t === activeTag;
+    return `<div class="ft-frame${isActive?' active':''}" data-tag="${t}">
+      <div class="ft-holes"><div class="ft-hole"></div><div class="ft-hole"></div><div class="ft-hole"></div><div class="ft-hole"></div></div>
+      <div class="ft-content">
+        <div class="ft-half ft-half--top"><span class="ft-tag">${label}</span></div>
+        <div class="ft-divider"></div>
+        <div class="ft-half ft-half--bot"><span class="ft-cnt">${cnt}</span></div>
+        <span class="ft-fno">${String(i+1).padStart(2,'0')}</span>
+      </div>
+      <div class="ft-holes"><div class="ft-hole"></div><div class="ft-hole"></div><div class="ft-hole"></div><div class="ft-hole"></div></div>
+    </div>`;
   }).join('');
-}
 
-$('cloudOverlay')?.addEventListener('click', e => {
-  const w = e.target.closest('.co-word');
-  if(w) filterTag(w.dataset.tag);
-});
+  track.addEventListener('click', e => {
+    const frame = e.target.closest('.ft-frame');
+    if(frame) filterTag(frame.dataset.tag);
+  });
+}
 
 function filterTag(t) {
   activeTag = t;
-  view = t==='all' ? [...allPhotos] : allPhotos.filter(p => p._tags.includes(t));
-  document.querySelectorAll('.co-word').forEach(w => w.classList.toggle('active', w.dataset.tag===t));
+  view = t === 'all' ? [...allPhotos] : allPhotos.filter(p => p._tags.includes(t));
+  document.querySelectorAll('.ft-frame').forEach(frame => {
+    const isActive = frame.dataset.tag === t;
+    if(isActive && !frame.classList.contains('active')) {
+      frame.classList.add('flipping');
+      setTimeout(() => { frame.classList.remove('flipping'); frame.classList.add('active'); }, 370);
+    } else if(!isActive) {
+      frame.classList.remove('active', 'flipping');
+    }
+  });
   buildWall();
 }
 
@@ -228,12 +221,27 @@ function openStory(i) {
   story.classList.add('open');
   $('storyProg').innerHTML = view.map(() => `<div class="sp-seg"><span class="fill"></span></div>`).join('');
   renderStory();
+  // start ambient music on story open; bump volume slightly
+  if (!musicPlaying) {
+    ambient.start(0.45);
+    musicPlaying = true;
+    $('musicBtn')?.classList.add('playing');
+    startPoems();
+  } else {
+    ambient.setVol(0.45);
+  }
 }
-function closeStory() { story.classList.remove('open'); clearTimeout(stTimer); }
+function closeStory() {
+  story.classList.remove('open');
+  clearTimeout(stTimer);
+  // settle back to gallery volume if music was playing
+  if (musicPlaying) ambient.setVol(0.38);
+}
 function renderStory() {
   const p = view[stIdx];
   storyImg.classList.remove('kb'); void storyImg.offsetWidth;
   storyImg.src = p.image_url || '';
+  const sb = $('storyBg'); if(sb) sb.src = p.image_url || '';
   storyImg.classList.add('kb');
   $('storyEyebrow').textContent = `// ${(placeOf(p)||p.location||'').toUpperCase()}`;
   $('storyTitle').textContent = p.title || 'Untitled';
@@ -307,7 +315,7 @@ function updateOnScroll() {
   // show cloud overlay once hero scrolls past 80% out of view
   const hero = document.getElementById('hero');
   if(hero) heroThreshold = hero.offsetHeight * 0.8;
-  $('cloudOverlay')?.classList.toggle('show', sy > heroThreshold);
+  $('filmTicker')?.classList.toggle('show', sy > heroThreshold);
 }
 window.addEventListener('scroll', updateOnScroll, { passive:true });
 document.addEventListener('keydown', e => {
@@ -322,6 +330,56 @@ document.addEventListener('keydown', e => {
     if(e.key==='ArrowRight') lbStep(1);
     if(e.key==='ArrowLeft') lbStep(-1);
     if(e.key==='Escape') closeLB();
+  }
+});
+
+// ── ZNMD POEMS ────────────────────────────────────────
+const POEMS = [
+  "Zindagi mil ke bitaane ke liye hoti hai,\nyaad karke muskaraane ke liye hoti hai.",
+  "Dilon mein tum apni betabiyaan\nleke chal rahe ho — toh zinda ho tum.",
+  "Har lamha badata ja raha hun main,\nzindagi chhoti si lag rahi hai.",
+  "Senorita... yeh jo hai zindagi,\nkuch khwaab hain, kuch armaan hain.",
+  "Ik junoon tha, ik deewaangi thi,\naaj bhi wahi rang hain mere.",
+  "Do dil mil rahe hain,\nmagar chupke chupke.",
+  "Nazar mein khwabon ki bijliyan\nleke chal rahe ho — toh zinda ho tum.",
+  "Har ek pal ka shukrana karo,\nyeh lamha tera hai.",
+];
+let poemIdx = 0, poemTimer = null;
+function showNextPoem() {
+  const el = $('poemText'); if (!el) return;
+  el.classList.remove('visible');
+  setTimeout(() => {
+    el.textContent = POEMS[poemIdx % POEMS.length];
+    poemIdx++;
+    el.classList.add('visible');
+  }, 2600);
+}
+function startPoems() {
+  if (poemTimer) return;
+  showNextPoem();
+  poemTimer = setInterval(showNextPoem, 22000);
+}
+function stopPoems() {
+  clearInterval(poemTimer); poemTimer = null;
+  const el = $('poemText'); if (el) el.classList.remove('visible');
+}
+
+// ── ZNMD AMBIENT ENGINE ───────────────────────────────
+const ambient = new ZNMDAmbient();
+let musicPlaying = false;
+
+$('musicBtn')?.addEventListener('click', () => {
+  const btn = $('musicBtn');
+  if (musicPlaying) {
+    ambient.stop();
+    musicPlaying = false;
+    btn.classList.remove('playing');
+    stopPoems();
+  } else {
+    ambient.start(0.38);
+    musicPlaying = true;
+    btn.classList.add('playing');
+    startPoems();
   }
 });
 

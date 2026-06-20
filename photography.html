@@ -73,8 +73,12 @@
     </div>
   </header>
 
-  <!-- ── FLOATING TAG CLOUD OVERLAY (fixed, appears on scroll) ── -->
-  <div id="cloudOverlay"></div>
+  <!-- ── FILM TICKER (fixed bottom strip, appears on scroll) ── -->
+  <div id="filmTicker">
+    <div class="ft-fade ft-fade--l"></div>
+    <div class="ft-track" id="ftTrack"></div>
+    <div class="ft-fade ft-fade--r"></div>
+  </div>
 
   <!-- ── MATTED GALLERY WALL ── -->
   <main class="wall" id="wall"></main>
@@ -118,8 +122,18 @@
   </div>
 </div>
 
+<!-- ── POEM OVERLAY ── -->
+<div id="poemOverlay"><div class="poem-text" id="poemText"></div></div>
+
+<!-- ── MUSIC BUTTON ── -->
+<button class="music-btn" id="musicBtn" aria-label="Toggle ambient music">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M9 18V5l12-2v13M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm12-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg>
+  <span class="music-btn-label">ZNMD</span>
+</button>
+
 <!-- ── STORY MODE ── -->
 <div class="story" id="story">
+  <img class="story-bg" id="storyBg" src="" alt="" aria-hidden="true">
   <img class="story-img" id="storyImg" src="" alt="">
   <div class="story-scrim"></div>
   <div class="story-tap" id="storyTap"></div>
