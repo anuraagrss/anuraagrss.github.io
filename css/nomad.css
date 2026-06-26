@@ -101,16 +101,18 @@
       position: absolute; top: 60px; right: 56px;
       display: flex; flex-direction: column; align-items: center; z-index: 2;
     }
-    .thumbtack { width: 14px; height: 14px; background: var(--amber); border-radius: 50%; margin-bottom: -4px; position: relative; z-index: 1; box-shadow: 0 2px 8px rgba(200,145,58,0.4); }
-    .thumbtack::after { content: ''; position: absolute; bottom: -8px; left: 50%; transform: translateX(-50%); width: 2px; height: 8px; background: rgba(28,17,9,0.3); border-radius: 1px; }
     .hero-avatar {
       width: clamp(200px, 22vw, 300px); height: clamp(320px, 38vw, 480px);
-      object-fit: cover; object-position: top center;
-      border-radius: 2px; border: 4px solid var(--paper);
-      box-shadow: 6px 10px 36px rgba(28,17,9,0.22), -1px -1px 0 rgba(28,17,9,0.08);
-      transform: rotate(1.5deg); filter: sepia(12%);
+      object-fit: contain; object-position: top center;
+      filter: drop-shadow(0 12px 28px rgba(28,17,9,0.18)) drop-shadow(0 0 18px rgba(255,255,255,0.5));
+      animation: heroAvatarFloat 6s ease-in-out infinite, heroAvatarGlow 3.5s ease-in-out infinite;
     }
-    .avatar-caption { margin-top: 10px; font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--muted); transform: rotate(1.5deg); }
+    @keyframes heroAvatarFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
+    @keyframes heroAvatarGlow {
+      0%,100% { filter: drop-shadow(0 12px 28px rgba(28,17,9,0.18)) drop-shadow(0 0 14px rgba(255,255,255,0.4)); }
+      50%      { filter: drop-shadow(0 16px 32px rgba(28,17,9,0.22)) drop-shadow(0 0 26px rgba(255,255,255,0.7)); }
+    }
+    .avatar-caption { margin-top: 10px; font-family: var(--mono); font-size: 9px; letter-spacing: 1.5px; color: var(--muted); }
 
     /* ═══ GLOBE ═══ */
     .globe-section { padding: 0 0 80px; }
