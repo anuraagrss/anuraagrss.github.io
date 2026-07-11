@@ -1248,6 +1248,8 @@ function renderBookedFlights() {
         ${f.booking_ref?`<span class="bfc-chip accent">REF: ${esc(f.booking_ref)}</span>`:''}
         ${f.email_ref?`<span class="bfc-chip">📧 ${esc(f.email_ref)}</span>`:''}
         ${f.doc?`<span class="bfc-chip">📄 ${esc(f.doc)}</span>`:''}
+        ${f.aircraft_type?`<span class="bfc-chip">✈️ ${esc(f.aircraft_type)}</span>`:''}
+        ${f.tail_number?`<span class="bfc-chip">🔖 ${esc(f.tail_number)}</span>`:''}
       </div>
       <div class="bfc-actions">
         ${f.url?`<a href="${esc(f.url)}" target="_blank" rel="noopener" class="btn btn-ghost" style="font-size:10px;padding:5px 12px;text-decoration:none">MANAGE BOOKING →</a>`:''}

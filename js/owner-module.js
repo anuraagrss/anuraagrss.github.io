@@ -4,7 +4,7 @@ import { getAuth, signInWithPopup, signOut as fbSignOut, onAuthStateChanged, Goo
 import { getFirestore, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc,
          collection, getDocs, serverTimestamp }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-import { getStorage, ref, uploadBytesResumable, getDownloadURL }
+import { getStorage, ref, uploadBytesResumable, getDownloadURL, deleteObject }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js';
 import { getFunctions, httpsCallable }
                            from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-functions.js';
@@ -185,6 +185,7 @@ window.clearForm=function(type){
   (maps[type]||[]).forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   if(type==='photo'){document.getElementById('photoPreview').innerHTML='';selectedPhotoFile=null;}
   if(type==='experience'){document.getElementById('e-img-preview').style.display='none';document.getElementById('e-img-filename').textContent='No file selected';selectedExpFile=null;}
+  if(type==='cafe'){selectedCafeFiles=[];renderCafeImgPreview();}
   // clear country hidden fields
   const cMap={cafe:'c-country',adventure:'adv-country',person:'p-country',photo:'ph-country'};
   if(cMap[type]){const h=document.getElementById(cMap[type]);if(h)h.value='';if(dropdowns[cMap[type]])dropdowns[cMap[type]].setValue('');}
@@ -336,10 +337,51 @@ window.enrichAndUpdate=async function(docId,fn,date){
 };
 
 // ─── CAFES ───────────────────────────────────────────────────────
-let allCafeDocs=[];
+let allCafeDocs=[],selectedCafeFiles=[];
+
+window.previewCafeImgs=function(input){
+  selectedCafeFiles=selectedCafeFiles.concat(Array.from(input.files));
+  input.value='';
+  renderCafeImgPreview();
+};
+window.removeCafePendingImg=function(idx){
+  selectedCafeFiles.splice(idx,1);
+  renderCafeImgPreview();
+};
+function renderCafeImgPreview(){
+  const grid=document.getElementById('c-img-preview-grid');
+  document.getElementById('c-img-filename').textContent=selectedCafeFiles.length?`${selectedCafeFiles.length} photo(s) selected`:'No photos selected';
+  grid.innerHTML=selectedCafeFiles.map((f,i)=>`<div class="cafe-img-thumb"><img src="${URL.createObjectURL(f)}"><button class="rm" onclick="removeCafePendingImg(${i})">✕</button></div>`).join('');
+}
+
+async function uploadCafeImages(files,nameSlug,onProgress){
+  const images=[],image_paths=[];
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    onProgress(i+1,files.length);
+    const ext=file.name.split('.').pop();
+    const path=`cafes/${Date.now()}_${nameSlug}_${i}_${Math.random().toString(36).slice(2,8)}.${ext}`;
+    const storageRef=ref(storage,path);
+    const task=uploadBytesResumable(storageRef,file);
+    const url=await new Promise((resolve,reject)=>{task.on('state_changed',()=>{},reject,async()=>resolve(await getDownloadURL(task.snapshot.ref)));});
+    images.push(url);image_paths.push(path);
+  }
+  return {images,image_paths};
+}
+
 window.addCafe=async function(){
   const name=document.getElementById('c-name').value.trim();if(!name){toast('Name required','err');return;}
-  await addDoc(collection(db,'cafes'),{name,type:document.getElementById('c-type').value.trim()||null,city:document.getElementById('c-city').value.trim()||null,country:dropdowns['c-country'].getValue()||null,ordered:document.getElementById('c-ordered').value.trim()||null,rating:document.getElementById('c-rating').value,vibe:document.getElementById('c-vibe').value.trim()||null,story:document.getElementById('c-story').value.trim()||null,trip_id:document.getElementById('c-trip').value||null,addedAt:serverTimestamp(),addedBy:currentUser.uid});
+  let images=[],image_paths=[];
+  if(selectedCafeFiles.length){
+    const prog=document.getElementById('c-img-progress'),bar=document.getElementById('c-img-bar'),lbl=document.getElementById('c-img-progress-label');
+    prog.style.display='block';
+    try{
+      const slug=name.toLowerCase().replace(/\s+/g,'-').slice(0,40);
+      ({images,image_paths}=await uploadCafeImages(selectedCafeFiles,slug,(done,total)=>{lbl.textContent=`Uploading ${done}/${total}…`;bar.style.width=Math.round(done/total*100)+'%';}));
+    }catch(e){toast('✗ Photo upload failed: '+e.message,'err');prog.style.display='none';return;}
+    prog.style.display='none';
+  }
+  await addDoc(collection(db,'cafes'),{name,type:document.getElementById('c-type').value.trim()||null,city:document.getElementById('c-city').value.trim()||null,country:dropdowns['c-country'].getValue()||null,ordered:document.getElementById('c-ordered').value.trim()||null,rating:document.getElementById('c-rating').value,vibe:document.getElementById('c-vibe').value.trim()||null,story:document.getElementById('c-story').value.trim()||null,images,image_paths,trip_id:document.getElementById('c-trip').value||null,addedAt:serverTimestamp(),addedBy:currentUser.uid});
   toast('✓ Cafe saved');clearForm('cafe');loadCafesTable();loadAllCounts();
 };
 async function loadCafesTable(){
@@ -351,23 +393,62 @@ async function loadCafesTable(){
     el.innerHTML=`<div class="data-table-wrap"><table><thead><tr><th>NAME</th><th>CITY</th><th>COUNTRY</th><th>TYPE</th><th>RATING</th><th></th></tr></thead><tbody>${allCafeDocs.map(c=>`<tr><td>${c.name}</td><td class="muted">${c.city||'—'}</td><td class="muted">${c.country?flag(c.country)+(CODE_TO_NAME[c.country]||c.country):'—'}</td><td class="muted">${c.type||'—'}</td><td>${c.rating||'—'}</td><td><div class="tbl-actions"><button class="tbl-btn edit" onclick="editCafe('${c.id}')">EDIT</button><button class="tbl-btn del" onclick="deleteEntry('cafes','${c.id}',loadCafesTable)">DEL</button></div></td></tr>`).join('')}</tbody></table></div>`;
   }catch(e){el.innerHTML=`<div class="empty-state"><div class="empty-state-text">✗ ${e.message}</div></div>`;}
 }
+let editCafeImages=[],editCafePaths=[],editCafeNewFiles=[];
+function renderEditCafeImgGrid(){
+  const grid=document.getElementById('m-img-grid');if(!grid)return;
+  const existing=editCafeImages.map((url,i)=>`<div class="cafe-img-thumb"><img src="${url}"><button class="rm" onclick="removeEditCafeExistingImg(${i})">✕</button></div>`).join('');
+  const pending=editCafeNewFiles.map((f,i)=>`<div class="cafe-img-thumb"><img src="${URL.createObjectURL(f)}"><button class="rm" onclick="removeEditCafeNewImg(${i})">✕</button></div>`).join('');
+  grid.innerHTML=existing+pending;
+}
+window.previewEditCafeImgs=function(input){
+  editCafeNewFiles=editCafeNewFiles.concat(Array.from(input.files));
+  input.value='';
+  renderEditCafeImgGrid();
+};
+window.removeEditCafeExistingImg=async function(idx){
+  const path=editCafePaths[idx];
+  editCafeImages.splice(idx,1);editCafePaths.splice(idx,1);
+  renderEditCafeImgGrid();
+  if(path){try{await deleteObject(ref(storage,path));}catch(_){/* already gone or blocked, ignore */}}
+};
+window.removeEditCafeNewImg=function(idx){
+  editCafeNewFiles.splice(idx,1);
+  renderEditCafeImgGrid();
+};
+
 window.editCafe=function(id){
   const c=allCafeDocs.find(d=>d.id===id);if(!c)return;
+  editCafeImages=[...(c.images||[])];editCafePaths=[...(c.image_paths||[])];editCafeNewFiles=[];
   const ratingOpts=['★★★★★','★★★★☆','★★★☆☆','★★☆☆☆','★☆☆☆☆'].map(o=>`<option${c.rating===o?' selected':''}>${o}</option>`).join('');
   openModal('EDIT CAFE',`
     <div class="form-grid"><div class="form-group"><label class="form-label">NAME</label><input class="form-input" id="m-name" value="${(c.name||'').replace(/"/g,'&quot;')}"></div><div class="form-group"><label class="form-label">TYPE</label><input class="form-input" id="m-type" value="${c.type||''}"></div></div>
     <div class="form-grid"><div class="form-group"><label class="form-label">CITY</label><input class="form-input" id="m-city" value="${c.city||''}"></div><div class="form-group"><label class="form-label">COUNTRY</label><div class="country-search-wrap" id="m-country-wrap"></div><input type="hidden" id="m-country" value="${c.country||''}"></div></div>
     <div class="form-grid"><div class="form-group"><label class="form-label">ORDERED</label><input class="form-input" id="m-ordered" value="${c.ordered||''}"></div><div class="form-group"><label class="form-label">RATING</label><select class="form-select" id="m-rating">${ratingOpts}</select></div></div>
     <div class="form-grid cols-1"><div class="form-group"><label class="form-label">VIBE</label><textarea class="form-textarea" id="m-vibe">${c.vibe||''}</textarea></div></div>
-    <div class="form-grid cols-1"><div class="form-group"><label class="form-label">STORY</label><textarea class="form-textarea" id="m-story" style="min-height:110px">${c.story||''}</textarea></div></div>`,
+    <div class="form-grid cols-1"><div class="form-group"><label class="form-label">STORY</label><textarea class="form-textarea" id="m-story" style="min-height:110px">${c.story||''}</textarea></div></div>
+    <div class="form-group" style="margin-bottom:16px">
+      <label class="form-label">PHOTOS</label>
+      <div id="m-img-grid" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px"></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost" style="font-size:10px;padding:6px 14px;white-space:nowrap" onclick="document.getElementById('m-img-file').click()">⬆ ADD PHOTOS</button>
+        <input type="file" id="m-img-file" accept="image/*" multiple style="display:none" onchange="previewEditCafeImgs(this)">
+      </div>
+    </div>`,
     async()=>{
-      const dd=makeCountryDropdown('m-country-wrap','m-country');dd.setValue(c.country||'');
-      const updates={name:mval('m-name')||null,type:mval('m-type')||null,city:mval('m-city')||null,country:document.getElementById('m-country').value||null,ordered:mval('m-ordered')||null,rating:mval('m-rating')||null,vibe:mval('m-vibe')||null,story:mval('m-story')||null};
+      let images=editCafeImages,image_paths=editCafePaths;
+      if(editCafeNewFiles.length){
+        const slug=(mval('m-name')||c.name||'cafe').toLowerCase().replace(/\s+/g,'-').slice(0,40);
+        try{
+          const up=await uploadCafeImages(editCafeNewFiles,slug,()=>{});
+          images=images.concat(up.images);image_paths=image_paths.concat(up.image_paths);
+        }catch(e){toast('✗ Photo upload failed: '+e.message,'err');return;}
+      }
+      const updates={name:mval('m-name')||null,type:mval('m-type')||null,city:mval('m-city')||null,country:document.getElementById('m-country').value||null,ordered:mval('m-ordered')||null,rating:mval('m-rating')||null,vibe:mval('m-vibe')||null,story:mval('m-story')||null,images,image_paths};
       await updateDoc(doc(db,'cafes',id),updates);toast('✓ Cafe updated');loadCafesTable();
     }
   );
-  // Init the country dropdown after modal is in DOM
-  setTimeout(()=>{const dd=makeCountryDropdown('m-country-wrap','m-country');dd.setValue(c.country||'');},50);
+  // Init the country dropdown + photo grid after modal is in DOM
+  setTimeout(()=>{const dd=makeCountryDropdown('m-country-wrap','m-country');dd.setValue(c.country||'');renderEditCafeImgGrid();},50);
 };
 
 // ─── EXPERIENCES (with Firebase Storage image upload) ────────────

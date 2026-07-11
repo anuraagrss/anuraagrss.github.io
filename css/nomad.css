@@ -14,6 +14,7 @@
       --serif:   'Lora', Georgia, serif;
       --mono:    'JetBrains Mono', monospace;
       --disp:    'Bebas Neue', sans-serif;
+      --hand:    'Caveat', cursive;
       --dark:    #0C0804;
       --dark2:   #161008;
     }
@@ -246,6 +247,18 @@
     .lb-nav { display:flex; gap:10px; margin-top:24px; padding-top:18px; border-top:1px solid var(--faint); }
     .lb-nav-btn { font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--muted); background:none; border:1px solid var(--faint); padding:7px 16px; border-radius:2px; cursor:pointer; transition:all 0.2s; }
     .lb-nav-btn:hover { color:var(--teal); border-color:var(--teal); }
+
+    /* CAFE LIGHTBOX extras */
+    .cafe-lb-img-nav { position:absolute; bottom:20px; right:20px; display:flex; align-items:center; gap:10px; }
+    .cafe-lb-arrow { font-family:var(--serif); font-size:20px; color:#fff; background:rgba(28,17,9,0.4); border:none; width:28px; height:28px; border-radius:50%; cursor:pointer; transition:background 0.2s; }
+    .cafe-lb-arrow:hover { background:rgba(28,17,9,0.7); }
+    .cafe-lb-dots { display:flex; gap:5px; }
+    .cafe-lb-dot { width:5px; height:5px; border-radius:50%; background:rgba(255,255,255,0.4); transition:background 0.2s; }
+    .cafe-lb-dot.active { background:#fff; }
+    .cafe-lb-caption { font-family:var(--hand); font-weight:600; font-size:20px; color:var(--ink2); line-height:1.3; margin:8px 0 14px; }
+    .cafe-lb-ordered { font-family:var(--mono); font-size:10px; letter-spacing:1.5px; color:var(--muted); margin-bottom:18px; padding-bottom:14px; border-bottom:1px dashed var(--paper3); }
+    .cafe-lb-ordered .amp { color:var(--gold); margin-left:8px; }
+    #cafeLbImgPlaceholder { font-size:44px; }
 
     /* ═══ FLIGHTS ═══ */
     .flights-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
@@ -520,30 +533,35 @@
     .asc-visits { font-family: var(--mono); font-size: 8px; letter-spacing: 1px; color: var(--amber); }
     .asc-inkmark { position: absolute; top: 6px; right: 8px; font-family: var(--mono); font-size: 7px; letter-spacing: 1px; color: rgba(46,139,122,0.4); }
 
-    /* ═══ CAFES ═══ */
+    /* ═══ CAFES — corkboard wall ═══ */
     .cafes-section { max-width:1120px; margin:0 auto 96px; padding:0 56px; }
-    .cafe-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:24px; }
-    .cafe-receipt { background:#FEFEFE; border:1px solid var(--paper3); border-radius:2px; padding:0; box-shadow: 2px 3px 12px rgba(28,17,9,0.07), 0 -2px 6px rgba(28,17,9,0.03); transition:transform 0.25s, box-shadow 0.25s; overflow:hidden; position:relative; }
-    .cafe-receipt:hover { transform:translateY(-3px); box-shadow:4px 8px 24px rgba(28,17,9,0.12); }
-    .cafe-receipt::before { content:''; position:absolute; top:0; left:0; right:0; height:4px; background: linear-gradient(to bottom, rgba(28,17,9,0.04), transparent); }
-    .receipt-perf { border-top:2px dashed var(--paper3); margin:0 8px; }
-    .receipt-header { padding:18px 18px 12px; text-align:center; border-bottom:1px solid var(--paper3); }
-    .receipt-type { font-family:var(--mono); font-size:8px; letter-spacing:2.5px; color:var(--teal); margin-bottom:6px; }
-    .receipt-name { font-family:var(--disp); font-size:28px; color:var(--ink); line-height:1; }
-    .receipt-city { font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:var(--muted); margin-top:3px; }
-    .receipt-body { padding:14px 18px; }
-    .receipt-line { display:flex; justify-content:space-between; align-items:baseline; font-family:var(--mono); font-size:11px; padding:3px 0; border-bottom:1px dotted rgba(28,17,9,0.07); }
-    .receipt-line:last-child { border-bottom:none; }
-    .rl-label { color:var(--muted); font-size:10px; letter-spacing:1px; }
-    .rl-val   { color:var(--ink2); text-align:right; max-width:55%; font-size:11px; }
-    .receipt-vibe { padding:10px 18px; font-style:italic; font-size:12px; color:var(--muted); line-height:1.6; border-top:1px dashed var(--paper3); }
-    .receipt-story-wrap { padding:0 18px; max-height:0; overflow:hidden; transition:max-height 0.4s ease, padding 0.3s ease; }
-    .receipt-story-wrap.open { max-height:300px; padding:12px 18px; }
-    .receipt-story { font-size:12px; line-height:1.75; color:var(--muted); }
-    .receipt-footer { padding:10px 18px 14px; display:flex; align-items:center; justify-content:space-between; border-top:1px solid var(--paper3); }
-    .receipt-rating { color:var(--gold); font-size:14px; letter-spacing:2px; }
-    .receipt-expand { font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:var(--teal); background:none; border:none; cursor:pointer; transition:color 0.2s; padding:0; }
-    .receipt-expand:hover { color:var(--amber); }
+    .cafe-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr)); gap:32px 22px; padding-top:10px; }
+
+    .cafe-pin { background:#FFFEFB; padding:9px 9px 16px; cursor:pointer; box-shadow:2px 4px 14px rgba(28,17,9,0.12); transition:transform 0.3s ease, box-shadow 0.3s ease; position:relative; }
+    .cafe-pin:hover { transform:translateY(-6px) rotate(0deg) !important; box-shadow:4px 10px 26px rgba(28,17,9,0.18); z-index:2; }
+    .cafe-grid .cafe-pin:nth-child(4n+1) { transform:rotate(-2.2deg); margin-top:0; }
+    .cafe-grid .cafe-pin:nth-child(4n+2) { transform:rotate(1.6deg); margin-top:26px; }
+    .cafe-grid .cafe-pin:nth-child(4n+3) { transform:rotate(-1deg); margin-top:8px; }
+    .cafe-grid .cafe-pin:nth-child(4n) { transform:rotate(2deg); margin-top:18px; }
+
+    .cafe-tape { position:absolute; top:-9px; left:50%; width:38px; height:16px; background:rgba(46,139,122,0.32); transform:translateX(-50%) rotate(-5deg); border-radius:1px; box-shadow:0 1px 2px rgba(28,17,9,0.1); }
+    .cafe-grid .cafe-pin:nth-child(2n) .cafe-tape { background:rgba(200,145,58,0.38); transform:translateX(-50%) rotate(6deg); left:60%; }
+
+    .cafe-photo-wrap { position:relative; }
+    .cafe-photo-wrap::before, .cafe-photo-wrap::after { content:''; position:absolute; inset:0; background:#FFFEFB; z-index:-1; }
+    .cafe-photo-wrap.stacked::before { transform:rotate(-4deg) translate(-3px,2px); box-shadow:1px 2px 6px rgba(28,17,9,0.1); }
+    .cafe-photo-wrap.stacked::after  { transform:rotate(3deg) translate(3px,3px); box-shadow:1px 2px 6px rgba(28,17,9,0.1); }
+
+    .cafe-photo { height:132px; position:relative; overflow:hidden; background:var(--paper2); clip-path:polygon(0 0,100% 0,100% 92%,91% 100%,80% 93%,69% 100%,58% 93%,47% 100%,36% 93%,25% 100%,14% 93%,3% 100%,0 92%); }
+    .cafe-photo img { width:100%; height:100%; object-fit:cover; display:block; }
+    .cafe-photo-empty { width:100%; height:100%; display:flex; align-items:center; justify-content:center; font-size:22px; color:rgba(28,17,9,0.14); }
+    .cafe-ring { position:absolute; border-radius:50%; border:6px solid rgba(101,67,33,0.08); pointer-events:none; }
+    .cafe-photo-count { position:absolute; bottom:6px; right:6px; font-family:var(--mono); font-size:8px; letter-spacing:1px; color:#fff; background:rgba(28,17,9,0.55); padding:2px 6px; border-radius:8px; }
+
+    .cafe-cap { font-family:var(--hand); font-weight:600; font-size:17px; color:var(--ink2); line-height:1.25; margin-top:10px; padding:0 3px; }
+    .cafe-meta { font-family:var(--mono); font-size:8px; letter-spacing:1.5px; color:var(--muted); margin-top:8px; padding:0 3px; }
+    .cafe-meta .amp { color:var(--paper3); margin:0 3px; }
+    .cafe-rating { font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--gold); margin-top:4px; padding:0 3px; }
 
     /* ── CAFES SEE MORE CURTAIN ── */
     .cafe-curtain-wrap {

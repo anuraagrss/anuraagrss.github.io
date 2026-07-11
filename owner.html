@@ -191,6 +191,20 @@
           <div class="form-grid"><div class="form-group"><label class="form-label">ORDERED</label><input class="form-input" id="c-ordered" placeholder="Single origin pour-over"></div><div class="form-group"><label class="form-label">RATING</label><select class="form-select" id="c-rating"><option>★★★★★</option><option>★★★★☆</option><option>★★★☆☆</option><option>★★☆☆☆</option><option>★☆☆☆☆</option></select></div></div>
           <div class="form-grid cols-1"><div class="form-group"><label class="form-label">VIBE</label><textarea class="form-textarea" id="c-vibe" placeholder="Minimalist timber, jazz at the right volume…"></textarea></div></div>
           <div class="form-grid cols-1"><div class="form-group"><label class="form-label">STORY</label><textarea class="form-textarea" id="c-story" style="min-height:110px" placeholder="Your story here…"></textarea></div></div>
+          <!-- PHOTOS — one or more -->
+          <div class="form-group" style="margin-bottom:16px">
+            <label class="form-label">PHOTOS (OPTIONAL — PICK ONE OR SEVERAL)</label>
+            <div style="display:flex;gap:8px;align-items:center;margin-bottom:10px">
+              <button class="btn btn-ghost" style="font-size:10px;padding:6px 14px;white-space:nowrap" onclick="document.getElementById('c-img-file').click()">⬆ ADD PHOTOS</button>
+              <input type="file" id="c-img-file" accept="image/*" multiple style="display:none" onchange="previewCafeImgs(this)">
+              <span style="font-size:10px;color:var(--muted)" id="c-img-filename">No photos selected</span>
+            </div>
+            <div id="c-img-preview-grid" style="display:flex;gap:8px;flex-wrap:wrap"></div>
+            <div id="c-img-progress" style="display:none;margin-top:8px">
+              <div class="progress-track"><div class="progress-bar" id="c-img-bar"></div></div>
+              <span style="font-size:9px;color:var(--muted)" id="c-img-progress-label"></span>
+            </div>
+          </div>
           <div class="form-grid"><div class="form-group"><label class="form-label">TRIP (optional)</label><select class="form-select" id="c-trip"><option value="">— no trip —</option></select></div><div class="form-group"></div></div>
           <div class="btn-row"><button class="btn btn-primary" onclick="addCafe()">SAVE CAFE</button><button class="btn btn-ghost" onclick="clearForm('cafe')">CLEAR</button></div>
         </div>

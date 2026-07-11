@@ -12,7 +12,7 @@
   <meta property="og:url" content="https://404-nomad.com/nomad.html">
   <meta property="og:image" content="https://404-nomad.com/images/Avatar.png">
   <meta name="twitter:card" content="summary_large_image">
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <link rel="stylesheet" href="css/terminal.css">
   <link rel="stylesheet" href="css/nomad.css">
@@ -349,6 +349,31 @@
         <button class="lb-nav-btn" onclick="lbStep(-1)">← PREV</button>
         <button class="lb-nav-btn" onclick="lbStep(1)">NEXT →</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Cafe Lightbox -->
+<div class="lightbox" id="cafeLightbox" onclick="closeCafeLB(event)">
+  <div class="lb-panel">
+    <button class="lb-close" onclick="closeCafeLightbox()">ESC / CLOSE ✕</button>
+    <div class="lb-img-col">
+      <img id="cafeLbImg" src="" alt="" style="display:none">
+      <div class="lb-img-placeholder" id="cafeLbImgPlaceholder" style="display:none">☕</div>
+      <div class="lb-img-overlay"></div>
+      <div class="lb-loc-badge" id="cafeLbLoc"></div>
+      <div class="cafe-lb-img-nav" id="cafeLbImgNav" style="display:none">
+        <button class="cafe-lb-arrow" onclick="cafeLbImgStep(-1)">‹</button>
+        <div class="cafe-lb-dots" id="cafeLbDots"></div>
+        <button class="cafe-lb-arrow" onclick="cafeLbImgStep(1)">›</button>
+      </div>
+    </div>
+    <div class="lb-text-col">
+      <div class="lb-tab-label" id="cafeLbType"></div>
+      <div class="lb-title" id="cafeLbTitle"></div>
+      <div class="cafe-lb-caption" id="cafeLbVibe"></div>
+      <div class="cafe-lb-ordered" id="cafeLbOrdered"></div>
+      <div class="lb-story" id="cafeLbStory"></div>
     </div>
   </div>
 </div>

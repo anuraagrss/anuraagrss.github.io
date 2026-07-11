@@ -854,26 +854,63 @@ function buildCafes() {
 
 function buildCafeCard(c) {
   const card = document.createElement('div');
-  card.className = 'cafe-receipt';
+  card.className = 'cafe-pin';
+  card.addEventListener('click', () => openCafeLightbox(c.id));
+  const images = c.images || [];
+  const hasImg = images.length > 0;
+  const stacked = images.length > 1;
+  const caption = c.vibe || (c.story ? c.story.slice(0,90) + (c.story.length>90?'…':'') : 'no notes yet — just the memory');
+  const metaLine = [c.name, c.city].filter(Boolean).map(s=>s.toUpperCase()).join(' <span class="amp">·</span> ');
   card.innerHTML = `
-    <div class="receipt-header">
-      <div class="receipt-type">${c.type||'CAFE'}</div>
-      <div class="receipt-name">${c.name}</div>
-      <div class="receipt-city">${c.city||''}, ${c.country||''}</div>
+    <div class="cafe-tape"></div>
+    <div class="cafe-photo-wrap${stacked?' stacked':''}">
+      <div class="cafe-photo">
+        ${hasImg ? `<img src="${images[0]}" alt="${c.name||''}" loading="lazy">` : `<div class="cafe-photo-empty">☕</div>`}
+        <div class="cafe-ring" style="width:38px;height:38px;top:${hasImg?'-8px':'8px'};right:${hasImg?'-8px':'8px'}"></div>
+        ${stacked ? `<div class="cafe-photo-count">+${images.length-1}</div>` : ''}
+      </div>
     </div>
-    <div class="receipt-body">
-      <div class="receipt-line"><span class="rl-label">ORDERED</span><span class="rl-val">${c.ordered||'—'}</span></div>
-      <div class="receipt-line"><span class="rl-label">RATING</span><span class="rl-val">${c.rating||'—'}</span></div>
-    </div>
-    <div class="receipt-vibe">${c.vibe||''}</div>
-    <div class="receipt-perf"></div>
-    <div class="receipt-story-wrap"><div class="receipt-story">${c.story||''}</div></div>
-    <div class="receipt-footer">
-      <div class="receipt-rating">${c.rating||''}</div>
-      <button class="receipt-expand" onclick="const w=this.closest('.cafe-receipt').querySelector('.receipt-story-wrap');w.classList.toggle('open');this.textContent=w.classList.contains('open')?'READ LESS ↑':'THE STORY ↓';">THE STORY ↓</button>
-    </div>`;
+    <div class="cafe-cap">${caption}</div>
+    <div class="cafe-meta">${metaLine}</div>
+    <div class="cafe-rating">${c.rating||''}</div>`;
   return card;
 }
+
+// ── CAFE LIGHTBOX ──
+let cafeLbId=null, cafeLbImgIdx=0;
+function getCafeById(id) { return cafesData.find(c => c.id===id); }
+window.openCafeLightbox = function(id) {
+  cafeLbId=id; cafeLbImgIdx=0;
+  renderCafeLB();
+  document.getElementById('cafeLightbox').classList.add('open');
+  document.body.style.overflow='hidden';
+};
+function renderCafeLB() {
+  const c=getCafeById(cafeLbId); if(!c) return;
+  const images=c.images||[];
+  const img=document.getElementById('cafeLbImg'), ph=document.getElementById('cafeLbImgPlaceholder');
+  if(images.length) { img.src=images[cafeLbImgIdx]; img.style.display='block'; ph.style.display='none'; }
+  else { img.style.display='none'; ph.style.display='flex'; }
+  document.getElementById('cafeLbLoc').textContent = [c.city,c.country].filter(Boolean).join(', ');
+  document.getElementById('cafeLbType').textContent = c.type || 'CAFE';
+  document.getElementById('cafeLbTitle').textContent = c.name || '';
+  document.getElementById('cafeLbVibe').textContent = c.vibe || '';
+  document.getElementById('cafeLbOrdered').innerHTML = c.ordered ? `${c.ordered}${c.rating?`<span class="amp">${c.rating}</span>`:''}` : (c.rating||'');
+  document.getElementById('cafeLbStory').textContent = c.story || 'No story written yet.';
+  const nav=document.getElementById('cafeLbImgNav'), dots=document.getElementById('cafeLbDots');
+  if(images.length>1) {
+    nav.style.display='flex';
+    dots.innerHTML = images.map((_,i) => `<div class="cafe-lb-dot${i===cafeLbImgIdx?' active':''}"></div>`).join('');
+  } else nav.style.display='none';
+}
+window.cafeLbImgStep = function(dir) {
+  const c=getCafeById(cafeLbId); if(!c) return;
+  const n=(c.images||[]).length; if(!n) return;
+  cafeLbImgIdx=(cafeLbImgIdx+dir+n)%n;
+  renderCafeLB();
+};
+window.closeCafeLightbox = function() { document.getElementById('cafeLightbox').classList.remove('open'); document.body.style.overflow=''; };
+window.closeCafeLB = function(e) { if(e.target===document.getElementById('cafeLightbox')) closeCafeLightbox(); };
 
 let cafeCurtainOpen = false;
 window.toggleCafeCurtain = function() {
