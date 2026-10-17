@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * upload-photos.js — Bulk upload 86 photos to Firebase Storage + Firestore
+ * upload-photos.js — Bulk upload a batch of photos to Firebase Storage + Firestore
  *
  * ONE-TIME SETUP:
  *   1. Firebase Console → Project Settings → Service Accounts tab
@@ -21,7 +21,9 @@ const os     = require('os');
 const { execSync } = require('child_process');
 
 // ── CONFIG ────────────────────────────────────────────────────────────────────
-const PHOTOS_DIR    = path.join(os.homedir(), 'Downloads', 'iCloud Photos from Swami sai anuraag Ravulaparthi');
+// Pass a batch folder as the first arg (it must contain photo_data.json):
+//   node upload-photos.js "/path/to/batch folder"
+const PHOTOS_DIR    = process.argv[2] || path.join(os.homedir(), 'Downloads', 'iCloud Photos from Swami sai anuraag Ravulaparthi');
 const JSON_FILE     = path.join(PHOTOS_DIR, 'photo_data.json');
 const SA_PATH       = path.join(__dirname, 'service-account.json');
 const BUCKET        = 'nomad-404.firebasestorage.app';
@@ -109,7 +111,14 @@ function buildDoc(data, imageUrl) {
 
 // ── MAIN ──────────────────────────────────────────────────────────────────────
 async function main() {
-  const { photos } = JSON.parse(fs.readFileSync(JSON_FILE));
+  const { photos, update } = JSON.parse(fs.readFileSync(JSON_FILE));
+
+  // Optional: fill in story/metadata on an existing doc (e.g. a test upload of the same image)
+  if (update && update.doc_id) {
+    await db.collection(COLLECTION).doc(update.doc_id).update(update.fields);
+    console.log(`  ✎  Updated existing doc ${update.doc_id}`);
+  }
+
   const keys = Object.keys(photos);
   console.log(`\n📸  Starting bulk upload — ${keys.length} photos → ${BUCKET}\n`);
 
