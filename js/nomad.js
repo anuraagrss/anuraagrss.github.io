@@ -503,8 +503,12 @@ window.toggleFlightLog = function() {
 // Maps normalised model key → Firebase Storage filename in /flights/ folder
 // Filenames match the uploaded blueprints exactly
 // ── FLEET BLUEPRINTS ──
-// Naming convention: spaces → underscores, hyphens kept → Boeing_737-800
-// Files live in Firebase Storage /flights/ folder
+// Naming convention: EVERY space → underscore, hyphens kept → Boeing_737-800
+// (matches the aircraft_type string FR24's enrichFlight returns, verbatim,
+// with .replace(/\s+/g,'_') applied — see getBlueprintUrl below).
+// "Boeing 737 MAX 8" → Boeing_737_MAX_8.png, NOT "Boeing_737 MAX 8.png".
+// Files live in Firebase Storage /flights/ folder — when uploading a new
+// blueprint, run the model name through the same replace before naming the file.
 const STORAGE_BASE   = 'https://firebasestorage.googleapis.com/v0/b/nomad-404.firebasestorage.app/o/flights%2F';
 const STORAGE_SUFFIX = '?alt=media';
 
@@ -515,7 +519,8 @@ function getBlueprintUrl(modelName) {
   return STORAGE_BASE + encodeURIComponent(filename) + STORAGE_SUFFIX;
 }
 
-// CDN fallbacks for Airbus / unknown aircraft (no blueprints uploaded)
+// CDN fallbacks — used only when a model has no blueprint uploaded yet
+// (checked via the <img onerror> handler in renderFleetCard)
 const CDN_FALLBACKS = {
   '777':     'https://images.unsplash.com/photo-1587019158091-1a103c5dd17f?w=900&q=80&fit=crop',
   '787':     'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=900&q=80&fit=crop',
@@ -529,18 +534,11 @@ const CDN_FALLBACKS = {
   'default': 'https://images.unsplash.com/photo-1436491865332-7a61a109cc05?w=900&q=80&fit=crop',
 };
 
-// Try storage URL, fallback to CDN on image load error
+// Always try the storage blueprint first, for every manufacturer —
+// the <img onerror> handler in renderFleetCard falls back to CDN_FALLBACKS
+// if that specific model has no blueprint uploaded yet.
 function getFleetImageSrc(modelName) {
-  // Only Boeing models have blueprints uploaded — return storage URL for them
-  if(/^boeing/i.test(modelName.trim())) {
-    return getBlueprintUrl(modelName);
-  }
-  // For Airbus/ATR/others, use CDN fallback immediately
-  const lower = modelName.toLowerCase();
-  for(const [key, url] of Object.entries(CDN_FALLBACKS)) {
-    if(lower.includes(key)) return url;
-  }
-  return CDN_FALLBACKS.default;
+  return getBlueprintUrl(modelName);
 }
 
 // Per-model nicknames and stories
@@ -563,17 +561,56 @@ const AIRCRAFT_META = {
   'Airbus A380':      {nickname:'The Superjumbo',   story:`Double-deck, four engines. You don't board it — you enter it.`},
   'Airbus A350':      {nickname:'Xtra Wide Body',   story:`53% composite materials. You land after 14 hours feeling genuinely rested.`},
   'Airbus A350-900':  {nickname:'Xtra Wide Body',   story:`Carbon-fibre from nose to tail. The base variant of Airbus's masterpiece.`},
+  'Airbus A350-1000': {nickname:'Xtra Wide Body XL',story:`The stretched, longer-range sibling of the A350-900.`},
   'Airbus A330':      {nickname:'Medium Hauler',    story:`An analogue warmth the newer jets lack. Two engines, wide body, 13,000 km range.`},
+  'Airbus A330-200':  {nickname:'Medium Hauler',    story:`The shorter-body A330, tuned for range over capacity.`},
+  'Airbus A330-300':  {nickname:'Medium Hauler',    story:`The original A330 — a widebody workhorse on medium-haul routes.`},
+  'Airbus A330neo':   {nickname:'Medium Hauler NEO',story:`New engines, new wingtips, same trusted A330 airframe.`},
+  'Airbus A340-300':  {nickname:'Four-Holer',       story:`Four engines, long range — built for routes where diversion airports are scarce.`},
+  'Airbus A340-400':  {nickname:'Four-Holer',       story:`Stretched A340 variant. Rare now — most of the fleet has been retired.`},
+  'Airbus A340-600':  {nickname:'Four-Holer XL',    story:`The longest airliner of its era. Four engines, unmistakable silhouette.`},
   'Airbus A320':      {nickname:'The Narrowbody',   story:`Introduced fly-by-wire sidestick controls to commercial aviation.`},
   'Airbus A320neo':   {nickname:'New Engine Option',story:`20% better fuel burn. Sharklet wingtips. Flying IndiGo, this is your aircraft.`},
+  'Airbus A321':      {nickname:'The Stretch',      story:`The longest of the A320 family, more seats on the same narrowbody DNA.`},
+  'Airbus A321neo':   {nickname:'The Stretch NEO',  story:`New-engine A321 — the backbone of modern narrowbody long-haul.`},
+  'Airbus A319':      {nickname:'The Shortbody',    story:`The compact sibling in the A320 family, built for shorter routes.`},
+  'Airbus A318':      {nickname:'The Baby Bus',     story:`The smallest of the A320 family — rare, and increasingly hard to find.`},
+  'Airbus A220-100':  {nickname:'C Series',         story:`Started life as the Bombardier CSeries. A clean-sheet narrowbody, all curves.`},
+  'Airbus A220-300':  {nickname:'C Series',         story:`The stretched A220, quietly replacing older regional jets worldwide.`},
   'Boeing 737':       {nickname:'The Bus',          story:`First flew 1967. Most produced commercial aircraft in history. It goes everywhere.`},
+  'Boeing 767-200ER': {nickname:'The Warhorse',     story:`The original 767 — shorter body, still flying transoceanic routes decades on.`},
+  'Boeing 767-400ER': {nickname:'The Warhorse XL',  story:`The stretched, longest-range member of the 767 family.`},
+  'Boeing 777-8':     {nickname:'Eight',            story:`The smaller sibling of the 777X family — folding wingtips, ultra-long range.`},
   'ATR 72':           {nickname:'The Turboprop',    story:`Two turboprop engines. Goes to airports jets cannot. The most honest flying there is.`},
+  'ATR 42':           {nickname:'The Small Turboprop', story:`The compact ATR — regional flying at its most honest.`},
+  'Embraer 170':      {nickname:'The Regional',     story:`The original E-Jet — brought jet comfort to routes turboprops used to own.`},
+  'Embraer 175':      {nickname:'The Regional',     story:`The most common E-Jet in the sky — a regional-jet mainstay for airlines worldwide.`},
+  'Embraer 190':      {nickname:'The Bigger Regional', story:`Stretched E-Jet, blurring the line between regional and mainline.`},
+  'Embraer 195':      {nickname:'The Bigger Regional', story:`The largest of the original E-Jet family.`},
+  'Embraer E175-E2':  {nickname:'E-Jet E2',         story:`New engines, new wing — the second-generation E-Jet.`},
+  'Embraer E190-E2':  {nickname:'E-Jet E2',         story:`Quieter, more efficient successor to the E190.`},
+  'Embraer E195-E2':  {nickname:'E-Jet E2',         story:`The largest E-Jet E2 — encroaching on narrowbody mainline territory.`},
+  'Bombardier CRJ700': {nickname:'The Regional Jet', story:`Compact, twin-engine, built for thinner regional routes.`},
+  'Bombardier CRJ900': {nickname:'The Regional Jet', story:`The stretched CRJ — a regional-jet staple across North America.`},
+  'Bombardier CRJ1000':{nickname:'The Regional Jet', story:`The largest CRJ — pushing regional-jet capacity to its limit.`},
+  'Bombardier Dash 8 Q200': {nickname:'The Dash',    story:`Compact turboprop, built for short regional hops.`},
+  'Bombardier Dash 8 Q300': {nickname:'The Dash',    story:`Stretched Dash 8 — more seats, same twin-turboprop reliability.`},
+  'Bombardier Dash 8 Q400': {nickname:'The Dash',    story:`The largest Dash 8 — fast for a turboprop, built for short-runway airports.`},
+};
+
+// Known Firestore data-entry variants that don't fuzzy-match their canonical
+// AIRCRAFT_META key on their own (typos, alternate naming) — map them here
+// instead of touching historical flight records.
+const AIRCRAFT_ALIASES = {
+  'Embraer ERJ-175': 'Embraer 175',
+  'Airbus 350-900':  'Airbus A350-900',
 };
 
 // Normalise aircraft_type from Firestore to a known model key
 function normaliseAircraft(type) {
   if(!type) return null;
   const t = type.trim();
+  if(AIRCRAFT_ALIASES[t]) return AIRCRAFT_ALIASES[t];
   if(AIRCRAFT_META[t]) return t;
   for(const key of Object.keys(AIRCRAFT_META)) {
     if(t.startsWith(key) || key.startsWith(t)) return key;
@@ -598,8 +635,12 @@ function buildFleet() {
   // Count aircraft types from Firestore flightsData
   const counts = {};
   flightsData.forEach(f => {
-    if(!f.aircraft_type) return;
-    const key = normaliseAircraft(f.aircraft_type);
+    // Prefer the full descriptive name (e.g. "Boeing 737-800") over aircraft_type,
+    // which for AeroDataBox-enriched flights is often a short IATA/ICAO code (e.g. "738")
+    // that the schema matcher below can't resolve to a blueprint.
+    const raw = f.aircraft_name || f.aircraft_type;
+    if(!raw) return;
+    const key = normaliseAircraft(raw);
     if(key) counts[key] = (counts[key]||0)+1;
   });
 

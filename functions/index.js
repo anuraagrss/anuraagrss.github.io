@@ -1,8 +1,30 @@
 const { onCall, HttpsError } = require('firebase-functions/v2/https');
 const { initializeApp } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
 initializeApp();
+
+/**
+ * Simple fixed-window rate limiter backed by Firestore, keyed by an
+ * arbitrary string (typically caller IP). Throws 'resource-exhausted'
+ * once `limit` calls have been made within `windowMs`.
+ */
+async function checkRateLimit(db, key, limit, windowMs) {
+  const ref = db.doc(`rate_limits/${key}`);
+  const now = Date.now();
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const data = snap.exists ? snap.data() : null;
+    if (!data || now - data.windowStart > windowMs) {
+      tx.set(ref, { windowStart: now, count: 1 });
+      return;
+    }
+    if (data.count >= limit) {
+      throw new HttpsError('resource-exhausted', 'Too many requests — please slow down and try again shortly.');
+    }
+    tx.update(ref, { count: FieldValue.increment(1) });
+  });
+}
 
 /**
  * Verifies the caller is signed in and listed in the admins collection.
@@ -91,11 +113,33 @@ exports.generatePhotoDescription = onCall({ region: 'us-central1' }, async (requ
 });
 
 /**
+ * Known-good system prompt preambles for chatWithClaude, one per public
+ * caller (Profile.html, nomad.html). nomad.html's prompt is templated with
+ * live Firestore data (country count, travel context) so we only pin the
+ * static preamble, not the whole string. This stops the endpoint being
+ * used as a general-purpose, unauthenticated LLM proxy with an arbitrary
+ * persona/topic — the one thing an open `system` field would otherwise allow.
+ */
+const ALLOWED_SYSTEM_PREFIXES = [
+  "You are Anuraag Ravulaparthi's professional AI assistant, embedded in his executive portfolio website.",
+  'You are Anuraag Ravulaparthi — a nomad, engineer and storyteller who has visited ',
+];
+const MAX_SYSTEM_LEN = 8000;
+const MAX_MESSAGE_LEN = 4000;
+const MAX_MESSAGES = 20;
+
+/**
  * Proxy for Anthropic Claude API — public AI chat used by Profile.html and nomad.html.
  * API key is read server-side from Firestore config/claude.api_key.
+ * Unauthenticated by design (public chat widgets), so it's locked down by
+ * system-prompt allow-listing, payload size caps, and per-IP rate limiting
+ * instead of an auth check.
  */
 exports.chatWithClaude = onCall({ region: 'us-central1' }, async (request) => {
   const db = getFirestore();
+
+  const ip = request.rawRequest?.ip || request.rawRequest?.headers?.['x-forwarded-for'] || 'unknown';
+  await checkRateLimit(db, `chatWithClaude_${ip}`, 20, 10 * 60 * 1000); // 20 calls / 10 min / IP
 
   const configDoc = await db.doc('config/claude').get();
   if (!configDoc.exists || !configDoc.data().api_key) {
@@ -104,8 +148,19 @@ exports.chatWithClaude = onCall({ region: 'us-central1' }, async (request) => {
   const apiKey = configDoc.data().api_key;
 
   const { system, messages, max_tokens } = request.data;
-  if (!system || !Array.isArray(messages) || messages.length === 0) {
-    throw new HttpsError('invalid-argument', 'system and messages are required');
+  if (!system || typeof system !== 'string' || system.length > MAX_SYSTEM_LEN) {
+    throw new HttpsError('invalid-argument', 'system is required and must be a reasonably sized string');
+  }
+  if (!ALLOWED_SYSTEM_PREFIXES.some((p) => system.startsWith(p))) {
+    throw new HttpsError('permission-denied', 'system prompt not recognized');
+  }
+  if (!Array.isArray(messages) || messages.length === 0 || messages.length > MAX_MESSAGES) {
+    throw new HttpsError('invalid-argument', `messages must be a non-empty array of at most ${MAX_MESSAGES} items`);
+  }
+  for (const m of messages) {
+    if (!m || (m.role !== 'user' && m.role !== 'assistant') || typeof m.content !== 'string' || m.content.length > MAX_MESSAGE_LEN) {
+      throw new HttpsError('invalid-argument', 'each message needs a role of user/assistant and a bounded string content');
+    }
   }
 
   const res = await fetch('https://api.anthropic.com/v1/messages', {

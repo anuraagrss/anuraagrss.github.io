@@ -2,6 +2,11 @@ rules_version = '2';
 service firebase.storage {
   match /b/{bucket}/o {
 
+    function isAdmin() {
+      return request.auth != null
+        && firestore.exists(/databases/(default)/documents/admins/$(request.auth.uid));
+    }
+
     // Chinni's reward images — rewards role only
     match /sarah_achievements/{allPaths=**} {
       allow read, write: if request.auth != null
@@ -9,10 +14,10 @@ service firebase.storage {
          || firestore.get(/databases/(default)/documents/admins/$(request.auth.uid)).data.role == 'super-admin');
     }
 
-    // Photos — public read
+    // Photos — public read, admin upload (owner.html photo queue writes here)
     match /photos/{allPaths=**} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isAdmin();
     }
 
     // Aircraft blueprint images — public read
@@ -24,12 +29,25 @@ service firebase.storage {
     // Cafe photos — public read, admin upload
     match /cafes/{allPaths=**} {
       allow read: if true;
-      allow write: if request.auth != null;
+      allow write: if isAdmin();
     }
 
-    // Everything else — any authenticated user
+    // People photos — public read, admin upload (experiences tab:'people')
+    match /people/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Experiences photos — public read, admin upload (adventures/people/moments tabs)
+    match /experiences/{allPaths=**} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Everything else — admin only (was: any authenticated user, which let
+    // anyone who signs in with a Google account write anywhere in the bucket)
     match /{allPaths=**} {
-      allow read, write: if request.auth != null;
+      allow read, write: if isAdmin();
     }
   }
 }

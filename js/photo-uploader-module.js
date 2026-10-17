@@ -1,25 +1,30 @@
 
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
   import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-firestore.js";
   import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-storage.js";
 
-  // ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────────────────────
   const firebaseConfig = {
-    apiKey:            "YOUR_API_KEY",
-    authDomain:        "YOUR_AUTH_DOMAIN",
+    apiKey:            "AIzaSyCESqunM9b_Yc-5Dj0qJJFxGALmEGm0Rd0",
+    authDomain:        "nomad-404.firebaseapp.com",
     projectId:         "nomad-404",
     storageBucket:     "nomad-404.firebasestorage.app",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId:             "YOUR_APP_ID",
+    messagingSenderId: "638331724572",
+    appId:             "1:638331724572:web:baa0d70108e920099150d9",
   };
-  // ─────────────────────────────────────────────────────────────────────────
 
   const app  = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
   const db   = getFirestore(app);
   const stor = getStorage(app);
 
-  // Hardcode your user ID (same as addedBy in Firestore)
-  const USER_ID = "9aHUiUedgBUn09RH5NnW9lqhX9G2";
+  // Firestore rules require the caller to be a signed-in admin — this tool
+  // relies on the shared auth session from owner.html (sign in there first).
+  onAuthStateChanged(auth, user => {
+    if (!user) {
+      console.warn('Not signed in — open owner.html in another tab first to authenticate, then reload this page.');
+    }
+  });
 
   // ── EXIF reader (pure JS, no deps) ──────────────────────────────────────
   function readExif(file) {
@@ -110,6 +115,9 @@
 
   // ── Upload one photo ─────────────────────────────────────────────────────
   async function uploadPhoto(file, meta, onProgress) {
+    if (!auth.currentUser) {
+      throw new Error('Not signed in — open owner.html first to authenticate, then retry.');
+    }
     const ts   = Date.now();
     const path = `photos/${ts}_${file.name}`;
     const sRef = ref(stor, path);
@@ -134,7 +142,7 @@
 
     const doc = {
       addedAt:   serverTimestamp(),
-      addedBy:   USER_ID,
+      addedBy:   auth.currentUser.uid,
       country_id: meta.country_id || 'US',
       date,
       element:   meta.element || 'fire',

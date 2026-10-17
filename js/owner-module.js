@@ -620,16 +620,16 @@ function renderPhotoQueue(){
     <div class="photo-queue-card" id="card-${item.id}">
       <div class="queue-preview"><img src="${item.preview}" alt=""></div>
       <div class="queue-details">
-        <input type="text" class="queue-title-input" placeholder="Title *" value="${item.metadata.title}" oninput="updatePhotoMetadata('${item.id}','title',this.value)">
+        <input type="text" class="queue-title-input" placeholder="Title *" value="${(item.metadata.title||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','title',this.value)">
         <div class="queue-meta-row">
-          <input type="text" class="queue-meta-input" placeholder="Camera" value="${item.metadata.camera}" oninput="updatePhotoMetadata('${item.id}','camera',this.value)">
-          <input type="text" class="queue-meta-input" placeholder="Lens" value="${item.metadata.lens}" oninput="updatePhotoMetadata('${item.id}','lens',this.value)">
+          <input type="text" class="queue-meta-input" placeholder="Camera" value="${(item.metadata.camera||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','camera',this.value)">
+          <input type="text" class="queue-meta-input" placeholder="Lens" value="${(item.metadata.lens||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','lens',this.value)">
         </div>
-        <input type="text" class="queue-meta-input" placeholder="Settings  f/8 · 1/250s · ISO 400" value="${item.metadata.settings}" oninput="updatePhotoMetadata('${item.id}','settings',this.value)">
-        <input type="text" class="queue-meta-input" placeholder="Location" value="${item.metadata.location}" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
-        <textarea class="queue-meta-input" placeholder="Description — auto-generated or manual" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${item.description}</textarea>
+        <input type="text" class="queue-meta-input" placeholder="Settings  f/8 · 1/250s · ISO 400" value="${(item.metadata.settings||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','settings',this.value)">
+        <input type="text" class="queue-meta-input" placeholder="Location" value="${(item.metadata.location||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','location',this.value)">
+        <textarea class="queue-meta-input" placeholder="Description — auto-generated or manual" oninput="updatePhotoMetadata('${item.id}','description',this.value)">${(item.description||'').replace(/</g,'&lt;')}</textarea>
         <div class="queue-card-footer">
-          <input type="text" class="queue-meta-input tags-input" placeholder="Tags — Claude-generated or manual" value="${item.metadata.tags||''}" oninput="updatePhotoMetadata('${item.id}','tags',this.value)">
+          <input type="text" class="queue-meta-input tags-input" placeholder="Tags — Claude-generated or manual" value="${(item.metadata.tags||'').replace(/"/g,'&quot;')}" oninput="updatePhotoMetadata('${item.id}','tags',this.value)">
           <button class="gen-btn" onclick="generateDescriptionForCard('${item.id}')">✦ GEN</button>
           <button class="rem-btn" onclick="removeFromQueue('${item.id}')">×</button>
         </div>
@@ -952,7 +952,21 @@ async function loadUsers(){
 }
 
 // ─── DELETE ──────────────────────────────────────────────────────
-window.deleteEntry=async function(col,docId,reloadFn){if(!confirm('Delete? Cannot be undone.'))return;try{await deleteDoc(doc(db,col,docId));toast('✓ Deleted');if(typeof reloadFn==='function')reloadFn();}catch(e){toast('✗ '+e.message,'err');}};
+function _storagePathFromUrl(url){const m=typeof url==='string'&&url.match(/\/o\/([^?]+)/);return m?decodeURIComponent(m[1]):null;}
+async function _cleanupStorageForEntry(col,docId){
+  if(col!=='cafes'&&col!=='experiences'&&col!=='photos')return;
+  try{
+    const snap=await getDoc(doc(db,col,docId));
+    if(!snap.exists())return;
+    const d=snap.data();
+    const paths=[];
+    if(col==='cafes'&&Array.isArray(d.image_paths))paths.push(...d.image_paths);
+    if(col==='experiences'&&d.img_storage_path)paths.push(d.img_storage_path);
+    if(col==='photos'){const p=_storagePathFromUrl(d.image_url);if(p)paths.push(p);}
+    await Promise.all(paths.map(p=>deleteObject(ref(storage,p)).catch(()=>{})));
+  }catch(_){ /* best-effort — never block the doc delete on storage cleanup failing */ }
+}
+window.deleteEntry=async function(col,docId,reloadFn){if(!confirm('Delete? Cannot be undone.'))return;try{await _cleanupStorageForEntry(col,docId);await deleteDoc(doc(db,col,docId));toast('✓ Deleted');if(typeof reloadFn==='function')reloadFn();}catch(e){toast('✗ '+e.message,'err');}};
 
 // ─── CONFIG ──────────────────────────────────────────────────────
 const SERVICE_LABELS={fr24:'FR24 — FlightRadar24',seats_aero:'Seats.aero',planespotters:'Planespotters',unsplash:'Unsplash',google_maps:'Google Maps',claude:'Claude — Anthropic',openai:'OpenAI'};

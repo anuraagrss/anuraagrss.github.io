@@ -40,13 +40,17 @@ function updateProgress(processed, total, label) {
 }
 
 // ── AeroDataBox ───────────────────────────────────────────────────
-async function fetchAeroDataBox(flightNumber, date, apiKey) {
+async function fetchAeroDataBox(flightNumber, date, apiKey, retriesLeft = 5) {
   const fn      = flightNumber.replace(/\s+/g,'').toUpperCase();
   const dateStr = date.split('T')[0];
   const url     = `https://aerodatabox.p.api.market/flights/number/${encodeURIComponent(fn)}/${dateStr}`;
   const res     = await fetch(url, { headers:{ 'x-magicapi-key': apiKey, 'Accept':'application/json' } });
   if (res.status === 404) return null;
-  if (res.status === 429) { await sleep(3000); return fetchAeroDataBox(flightNumber, date, apiKey); }
+  if (res.status === 429) {
+    if (retriesLeft <= 0) throw new Error('ADB 429: rate limited, retries exhausted');
+    await sleep(3000);
+    return fetchAeroDataBox(flightNumber, date, apiKey, retriesLeft - 1);
+  }
   if (!res.ok) throw new Error(`ADB ${res.status}: ${(await res.text()).slice(0,100)}`);
   const data = await res.json();
   return Array.isArray(data) ? data[0] : data;

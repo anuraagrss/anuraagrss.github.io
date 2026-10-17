@@ -1396,7 +1396,7 @@ async function loadLinkedFlights() {
     const snap = await getDocs(collection(db, 'flights'));
     const flights = snap.docs
       .map(d => ({ id: d.id, ...d.data() }))
-      .filter(f => f.trip === currentTripId);
+      .filter(f => f.trip_id === currentTripId);
     linkedFlightsCache = flights;
     document.getElementById('heroFlights').textContent = flights.length || '—';
     if (!flights.length) {
