@@ -11,10 +11,19 @@ const PENCIL = '<svg class="pencil" viewBox="0 0 24 24" aria-hidden="true"><path
 export function pencil(root, { speed = 1, follow = null, wait = 0 } = {}) {
   let cancelled = false, userMoved = false;
   const items = [...root.querySelectorAll('[data-pen]')];
-  // things marked .pen-after (a photo, a note) wait until the words beside them have been written
-  const showAfter = scope => scope.querySelectorAll('.pen-after').forEach(a => a.classList.add('shown'));
+  // Everything on the page that isn't written waits its turn:
+  //  .pen-after — appears when the pencil reaches it, in reading order (after whatever is written before it)
+  //  .pen-with  — appears once the words in its own block are written (a place's photo after its name)
+  const showAfter = scope => scope.querySelectorAll('.pen-after, .pen-with').forEach(a => a.classList.add('shown'));
+  const revealBefore = next => root.querySelectorAll('.pen-after:not(.shown)').forEach(a => {
+    if (!next || (a.compareDocumentPosition(next) & Node.DOCUMENT_POSITION_FOLLOWING)) a.classList.add('shown');
+  });
   const finishAll = () => { cancelled = true; root.querySelectorAll('.pen-u').forEach(s => s.classList.add('in')); root.querySelectorAll('.pen-tip').forEach(p => p.remove()); showAfter(root); };
-  if (reduced || !items.length) { showAfter(root); return { cancel: () => { cancelled = true; }, finish: finishAll }; }
+  if (reduced) { showAfter(root); return { cancel: () => { cancelled = true; }, finish: finishAll }; }
+  if (!items.length) {
+    const t = setTimeout(() => { if (!cancelled) showAfter(root); }, wait);
+    return { cancel: () => { cancelled = true; clearTimeout(t); }, finish: () => { clearTimeout(t); finishAll(); } };
+  }
 
   // wrap every letter/word in a hidden span, keeping any markup inside
   items.forEach(el => {
@@ -53,7 +62,8 @@ export function pencil(root, { speed = 1, follow = null, wait = 0 } = {}) {
     if (wait) await new Promise(r => setTimeout(r, wait));   // let the page settle before the pencil touches it
     if (cancelled) return;
     const tip = document.createElement('span'); tip.className = 'pen-tip'; tip.innerHTML = PENCIL;
-    for (const el of items) {
+    revealBefore(items[0]);                                   // what comes before the first written line
+    for (const [k, el] of items.entries()) {
       const units = [...el.querySelectorAll('.pen-u')], mode = el.dataset.pen;
       for (const u of units) {
         if (cancelled) return;
@@ -65,7 +75,8 @@ export function pencil(root, { speed = 1, follow = null, wait = 0 } = {}) {
         await new Promise(r => setTimeout(r, pause(u.textContent, mode)));
       }
       if (cancelled) return;
-      if (el.parentElement) el.parentElement.querySelectorAll(':scope > .pen-after').forEach(a => a.classList.add('shown'));
+      if (el.parentElement) el.parentElement.querySelectorAll(':scope > .pen-with').forEach(a => a.classList.add('shown'));
+      revealBefore(items[k + 1]);                               // what sits between this line and the next
       await new Promise(r => setTimeout(r, (mode === 'c' ? 240 : 650) / speed));   // a breath between lines
     }
     tip.remove();

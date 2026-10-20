@@ -50,13 +50,14 @@ function renderCover() {
 // Pick one up: it opens, the letter unfolds, and the pencil writes it in. Fold it back to put it away.
 let letters = [], openLt = null, letterPen = null;
 function pocketPage() {
-  return `<p class="lt-eyebrow">— // letters across time</p><div class="letter-desk" id="letterDesk"></div>`;
+  return `<p class="lt-eyebrow pen-after">— // letters across time</p><div class="letter-desk" id="letterDesk"></div>`;
 }
-function renderLetter(root = document) {
+// live: called by a click (show at once) rather than while the page is first being written
+function renderLetter(root = document, live = false) {
   const desk = root.querySelector('#letterDesk'); if (!desk) return;
   letterPen && letterPen.finish();
   if (openLt === null) {
-    desk.innerHTML = `<div class="bundle">${letters.map((l, i) => `
+    desk.innerHTML = `<div class="bundle pen-after${live ? ' shown' : ''}">${letters.map((l, i) => `
         <button type="button" class="env" data-env="${i}" style="--i:${i};--r:${((i * 37) % 7) - 3}deg" aria-label="open the letter ${esc(l.to)}">
           <span class="env-stamp"><b>${esc(l.stampIcon || '✈')}</b><small>${esc(l.stampLabel || '')}</small></span>
           <span class="env-pm">${esc((l.postmark || '').replace('\n', ' · '))}</span>
@@ -64,7 +65,7 @@ function renderLetter(root = document) {
           ${l.fromSub ? `<span class="env-from">${esc(l.fromSub)}</span>` : ''}
         </button>`).join('')}
         <span class="twine" aria-hidden="true"></span></div>
-      <p class="lt-hint">pick one up</p>`;
+      <p class="lt-hint pen-after${live ? ' shown' : ''}">pick one up</p>`;
     return;
   }
   const l = letters[openLt];
@@ -93,14 +94,14 @@ function waysPage() {
       <div class="fc-back"><b>${count(w.k)}</b><small>${esc(w.what)}</small>${back}</div></div></div>`;
   }).join('');
   // a first page, said the way I'd say it — draft lines, mine to change
-  return `<p class="bg-k">if you found this journal,</p>
+  return `<p class="bg-k pen-after">if you found this journal,</p>
     <p class="bg-poem" data-pen="w">it holds the roads I walked,<br>the strangers who stayed,<br>and the mornings the light came late.</p>
     <p class="bg-poem small" data-pen="w">read it slowly. I lived it that way.</p>
     <p class="bg-name" data-pen="c">— <span class="arey">Arey<span class="arey-dots">...<i></i></span></span></p>
     <p class="wi-h" data-pen="c">Dil kya dhoondh raha hai aaj?</p>
-    <p class="wi-sub">what is your heart looking for today? open any page, I'll walk you there.</p>
-    <div class="fcards">${cards}</div>
-    <p class="wi-alt"><button type="button" data-act="contents">the contents</button><span>·</span><button type="button" data-act="fall">let it fall open</button><span>·</span>or turn the page →</p>`;
+    <p class="wi-sub pen-after">what is your heart looking for today? open any page, I'll walk you there.</p>
+    <div class="fcards pen-after">${cards}</div>
+    <p class="wi-alt pen-after"><button type="button" data-act="contents">the contents</button><span>·</span><button type="button" data-act="fall">let it fall open</button><span>·</span>or turn the page →</p>`;
 }
 
 // ── THE CLOSING PAGE: this journal, so far — then the back cover ──
@@ -137,10 +138,10 @@ function placeBlock(j, pos) {
   const snap = (j.photos[0] && j.photos[0].image_url) || (j.stories.find(x => x.img) || {}).img || '';
   const note = j.country && j.country.notes ? j.country.notes : j.stories[0].title;
   return `<button class="place p${pos}" type="button" data-j="${i}">
-    ${snap ? `<img class="pl-snap pen-after" src="${esc(snap)}" alt="" loading="lazy">` : ''}
+    ${snap ? `<img class="pl-snap pen-with" src="${esc(snap)}" alt="" loading="lazy">` : ''}
     <span class="pl-name" data-pen="c">${esc(j.name.toLowerCase())}</span>
-    <span class="pl-meta pen-after">${esc(countLine(j))}</span>
-    <span class="pl-note pen-after">${esc(note)}</span>
+    <span class="pl-meta pen-with">${esc(countLine(j))}</span>
+    <span class="pl-note pen-with">${esc(note)}</span>
   </button>`;
 }
 
@@ -302,8 +303,8 @@ $('book').addEventListener('click', e => {
   else if (j) openJournal(+j.dataset.j);
   else if (act && act.dataset.act === 'contents') show('contents');
   else if (act && act.dataset.act === 'close') closeBook();
-  else if (e.target.closest('[data-env]')) { openLt = +e.target.closest('[data-env]').dataset.env; renderLetter(); }
-  else if (e.target.closest('[data-lt]')) { const d = e.target.closest('[data-lt]').dataset.lt; openLt = d === 'next' ? openLt + 1 : null; renderLetter(); }
+  else if (e.target.closest('[data-env]')) { openLt = +e.target.closest('[data-env]').dataset.env; renderLetter(document, true); }
+  else if (e.target.closest('[data-lt]')) { const d = e.target.closest('[data-lt]').dataset.lt; openLt = d === 'next' ? openLt + 1 : null; renderLetter(document, true); }
   else if (act && act.dataset.act === 'fall' && S.all.length) openRead(S.all, Math.floor(Math.random() * S.all.length), { kind: 'all', label: 'the whole book' });
 });
 

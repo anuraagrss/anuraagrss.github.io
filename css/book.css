@@ -130,6 +130,6 @@
 /* a photo or a note that waits for the words beside it.
    Hidden with !important so a page's own opacity (a faint note at .55) can't show it early;
    once shown, the element falls back to its own opacity, fading in slowly. */
-.pen-after { transition: opacity 1.6s ease, translate 1.6s ease; }
-.pen-after:not(.shown) { opacity: 0 !important; translate: 0 8px; }
-.pen-after.shown { translate: 0 0; }
+.pen-after, .pen-with { transition: opacity 1.6s ease, translate 1.6s ease; }
+.pen-after:not(.shown), .pen-with:not(.shown) { opacity: 0 !important; translate: 0 8px; }
+.pen-after.shown, .pen-with.shown { translate: 0 0; }
