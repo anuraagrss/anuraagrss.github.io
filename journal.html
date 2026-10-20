@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/Logo.ico" type="image/x-icon">
+  <title>The journal — Arey...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@400&family=Lora:ital,wght@0,400;1,400;1,600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="css/late-sun.css" rel="stylesheet">
+  <link href="css/book.css" rel="stylesheet">
+  <link href="css/journal.css" rel="stylesheet">
+</head>
+<body class="journal-page">
+  <!-- ── THE JOURNAL: turned page by page ── -->
+  <section class="desk" id="desk" aria-label="the journal">
+    <div class="book closed" id="book">
+      <div class="spread">
+        <div class="pg pg-l paper"></div>
+        <div class="pg pg-r paper"></div>
+        <!-- turn a page by its corner -->
+        <button type="button" class="corner next" data-turn="next" aria-label="turn to the next page"><i></i></button>
+        <button type="button" class="corner prev" data-turn="prev" aria-label="turn back a page"><i></i></button>
+
+        <!-- the cover: leather, the headline pressed in, ALIVE in gold, the strap with the numbers -->
+        <div class="cover" id="cover" tabindex="0" role="button" aria-label="open my journal">
+          <div class="cv-front">
+            <p class="cv-eyebrow">— // nomad chronicles</p>
+            <h1 class="cv-title"><span>THE WORLD</span><span>IS PROOF</span><span>I AM <em>ALIVE.</em></span></h1>
+            <p class="cv-label" id="cvLabel"></p>
+            <figure class="cv-me"><img src="images/photographer-cut.png" alt="Arey, with a camera and a backpack"><figcaption id="cvTag"></figcaption></figure>
+            <div class="cv-strap" id="cvStrap"></div>
+            <p class="cv-hint">unhook the strap to open</p>
+          </div>
+          <div class="cv-back" aria-hidden="true"></div>
+        </div>
+      </div>
+      <nav class="turnbar" aria-label="turn the page">
+        <div class="ribbons" data-turn="tabs"></div>
+        <span class="turn-pos" data-turn="pos"></span>
+      </nav>
+    </div>
+  </section>
+  <script type="module" src="js/journal.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

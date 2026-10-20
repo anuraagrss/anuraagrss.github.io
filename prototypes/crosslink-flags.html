@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype — Country → Photos crosslink</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=JetBrains+Mono:wght@400;500&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E9; --paper2:#EDE7DC; --paper3:#E3DBCD;
+    --ink:#1C1109; --ink2:#3D2B1A; --muted:#7A6A54; --faint:rgba(28,17,9,0.09);
+    --teal:#2E8B7A; --teal2:rgba(46,139,122,0.1);
+    --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace;
+    --disp:'Bebas Neue',sans-serif; --hand:'Caveat',cursive;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);margin:0;padding:0 0 120px;}
+
+  .proto-banner{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-align:center;padding:8px;}
+  .proto-banner b{color:#E8B84B}
+
+  .top-nav{position:sticky;top:0;z-index:50;padding:13px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(246,241,233,0.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--faint);}
+  .nav-logo{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--teal);text-decoration:none;}
+  .nav-forward{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);text-decoration:none;display:flex;align-items:center;gap:6px;transition:color .2s;}
+  .nav-forward:hover{color:var(--teal)}
+
+  .wrap{max-width:900px;margin:0 auto;padding:56px 48px 0;}
+  .section-title{font-family:var(--disp);font-size:clamp(36px,5vw,56px);line-height:.95;margin:0 0 6px;}
+  .section-sub{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:36px;}
+
+  .flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+  .flag-card{background:#FEFCF8;border:1px solid var(--paper3);border-radius:3px;padding:10px 8px 8px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:1px 2px 8px rgba(28,17,9,.07);}
+  .flag-card::before{content:'';position:absolute;inset:4px;border:1px dashed rgba(28,17,9,.1);pointer-events:none;}
+  .flag-card:hover{transform:scale(1.06);box-shadow:3px 4px 16px rgba(28,17,9,.14);z-index:2;}
+  .flag-card.has-photos{cursor:pointer;}
+  .flag-card.no-photos{cursor:default;opacity:.55;}
+  .flag-card.active{outline:2px solid var(--teal);outline-offset:-2px;}
+  .flag-emoji{font-size:26px;line-height:1;margin-bottom:6px;}
+  .flag-name{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--ink2);}
+  .flag-badge{position:absolute;top:4px;right:4px;background:var(--teal);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.5px;padding:1px 5px;border-radius:8px;}
+
+  /* inline preview strip */
+  .strip-wrap{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+  .strip-wrap.open{max-height:260px;}
+  .strip-inner{margin-top:24px;padding:20px 22px;background:var(--paper2);border:1px solid var(--faint);border-radius:4px;}
+  .strip-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .strip-title{font-family:var(--hand);font-weight:600;font-size:22px;color:var(--ink2);}
+  .strip-link{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--teal);text-decoration:none;white-space:nowrap;}
+  .strip-link:hover{text-decoration:underline;}
+  .strip-track{display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;}
+  .strip-photo{flex:0 0 auto;width:130px;height:150px;border-radius:3px;position:relative;box-shadow:2px 4px 14px rgba(28,17,9,.15);transform:rotate(var(--r));transition:transform .2s;}
+  .strip-photo:hover{transform:rotate(0deg) scale(1.04);z-index:3;}
+  .strip-photo img{width:100%;height:100%;object-fit:cover;border-radius:2px;border:5px solid #fff;box-sizing:border-box;display:block;}
+  .strip-photo .cap{position:absolute;bottom:-2px;left:8px;right:8px;font-family:var(--mono);font-size:8px;letter-spacing:.5px;color:var(--muted);text-align:center;}
+
+  .hint{margin-top:40px;padding:16px 20px;background:var(--teal2);border-left:3px solid var(--teal);font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink2);}
+  .hint code{background:rgba(28,17,9,.06);padding:1px 5px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="proto-banner">PROTOTYPE — not wired to Firestore. Mock data only. See <b>#1 country→photos crosslink</b> + <b>#2 nav link</b>.</div>
+
+<nav class="top-nav">
+  <a class="nav-logo" href="#">AREY // DREAMER</a>
+  <a class="nav-forward" href="#" id="lensLink">LENS →</a>
+</nav>
+
+<div class="wrap">
+  <h2 class="section-title">Countries</h2>
+  <div class="section-sub">CLICK A STAMPED COUNTRY TO PREVIEW ITS PHOTOS</div>
+
+  <div class="flags-grid" id="flagsGrid"></div>
+
+  <div class="strip-wrap" id="stripWrap">
+    <div class="strip-inner">
+      <div class="strip-head">
+        <div class="strip-title" id="stripTitle">Photos from —</div>
+        <a class="strip-link" id="stripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a>
+      </div>
+      <div class="strip-track" id="stripTrack"></div>
+    </div>
+  </div>
+
+  <div class="hint">
+    behavior: <code>.flag-card</code> now has a real click handler (currently <code>cursor:default</code>, no-op in prod).
+    Cards with matching <code>photos</code> docs get <code>.has-photos</code> + a count badge; clicking one lazily
+    queries <code>photos where country_id == X</code> (mocked here) and expands an inline strip reusing the
+    cafe-photo stacked-card look. The CTA link is <code>photography.html?country=X</code> — open
+    <code>photography-deeplink.html</code> in this same folder to see the receiving side.
+  </div>
+</div>
+
+<script>
+const COUNTRIES = [
+  {id:'in', name:'INDIA', emoji:'🇮🇳'},
+  {id:'jp', name:'JAPAN', emoji:'🇯🇵'},
+  {id:'pt', name:'PORTUGAL', emoji:'🇵🇹'},
+  {id:'th', name:'THAILAND', emoji:'🇹🇭'},
+  {id:'is', name:'ICELAND', emoji:'🇮🇸'},
+  {id:'ma', name:'MOROCCO', emoji:'🇲🇦'},
+  {id:'nz', name:'NEW ZEALAND', emoji:'🇳🇿'},
+  {id:'gr', name:'GREECE', emoji:'🇬🇷'},
+];
+
+// Mock of what a `photos` Firestore query filtered by country_id would return
+const MOCK_PHOTOS = {
+  in: [
+    {url:'https://picsum.photos/seed/in1/200/240', cap:'Hampi, sunrise'},
+    {url:'https://picsum.photos/seed/in2/200/240', cap:'Old Delhi lanes'},
+    {url:'https://picsum.photos/seed/in3/200/240', cap:'Kerala backwaters'},
+  ],
+  jp: [
+    {url:'https://picsum.photos/seed/jp1/200/240', cap:'Shibuya crossing'},
+    {url:'https://picsum.photos/seed/jp2/200/240', cap:'Kyoto bamboo'},
+    {url:'https://picsum.photos/seed/jp3/200/240', cap:'Fuji, dusk'},
+    {url:'https://picsum.photos/seed/jp4/200/240', cap:'Osaka street food'},
+  ],
+  pt: [
+    {url:'https://picsum.photos/seed/pt1/200/240', cap:'Lisbon trams'},
+    {url:'https://picsum.photos/seed/pt2/200/240', cap:'Porto rooftops'},
+  ],
+  is: [
+    {url:'https://picsum.photos/seed/is1/200/240', cap:'Ring road, storm'},
+  ],
+};
+
+const grid = document.getElementById('flagsGrid');
+const stripWrap = document.getElementById('stripWrap');
+const stripTitle = document.getElementById('stripTitle');
+const stripTrack = document.getElementById('stripTrack');
+const stripCta = document.getElementById('stripCta');
+let activeCard = null;
+
+function buildFlags(){
+  COUNTRIES.forEach(c=>{
+    const photos = MOCK_PHOTOS[c.id] || [];
+    const card = document.createElement('div');
+    card.className = 'flag-card ' + (photos.length ? 'has-photos' : 'no-photos');
+    card.innerHTML = `
+      <div class="flag-emoji">${c.emoji}</div>
+      <div class="flag-name">${c.name}</div>
+      ${photos.length ? `<div class="flag-badge">${photos.length}</div>` : ''}
+    `;
+    if (photos.length) {
+      card.addEventListener('click', () => onCountryClick(c, photos, card));
+    }
+    grid.appendChild(card);
+  });
+}
+
+// Simulates the lazy, on-demand Firestore query nomad.js would make on click
+// e.g. getDocs(query(collection(db,'photos'), where('country_id','==', c.id)))
+function fetchPhotosForCountry(countryId){
+  return new Promise(res => setTimeout(() => res(MOCK_PHOTOS[countryId] || []), 250));
+}
+
+async function onCountryClick(country, cachedPhotos, cardEl){
+  const reopening = activeCard === cardEl && stripWrap.classList.contains('open');
+  if (activeCard) activeCard.classList.remove('active');
+
+  if (reopening) {
+    stripWrap.classList.remove('open');
+    activeCard = null;
+    return;
+  }
+
+  cardEl.classList.add('active');
+  activeCard = cardEl;
+
+  const photos = await fetchPhotosForCountry(country.id);
+  stripTitle.textContent = `Photos from ${country.name.charAt(0)}${country.name.slice(1).toLowerCase()}`;
+  stripCta.href = `photography-deeplink.html?country=${country.id}`;
+  stripTrack.innerHTML = photos.map((p,i)=>`
+    <div class="strip-photo" style="--r:${(i%2?1:-1)*(2+i)}deg">
+      <img src="${p.url}" alt="${p.cap}">
+      <div class="cap">${p.cap}</div>
+    </div>
+  `).join('');
+  stripWrap.classList.add('open');
+  stripWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('lensLink').addEventListener('click', (e)=>{
+  e.preventDefault();
+  window.open('photography-deeplink.html', '_blank');
+});
+
+buildFlags();
+</script>
+</body>
+</html>

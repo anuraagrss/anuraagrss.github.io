@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prototype — The Loupe</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{ --gold:#F5A800; --gold2:#C8861A; --dark:#0D0800; --paper:#F6F1E9;
+         --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace; --disp:'Bebas Neue',sans-serif; }
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#0A0604; color:var(--paper); font-family:var(--serif);
+        overflow-x:hidden; cursor:none; min-height:100vh; }
+  a{ color:inherit; }
+
+  .proto-nav{ position:fixed; top:0; left:0; right:0; z-index:200; padding:14px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(to bottom,rgba(10,6,4,0.9),transparent); cursor:default; }
+  .pn-title{ font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold); }
+  .pn-back{ font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(246,241,233,.4); text-decoration:none; cursor:pointer; }
+  .pn-back:hover{ color:var(--gold); }
+
+  .lead{ text-align:center; padding:96px 24px 8px; cursor:none; }
+  .lead-eyebrow{ font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(245,168,0,.55); margin-bottom:14px; }
+  .lead-title{ font-family:var(--disp); font-size:clamp(40px,7vw,84px); letter-spacing:2px; line-height:.9; }
+  .lead-title .g{ color:var(--gold); }
+  .lead-sub{ font-style:italic; font-size:15px; color:rgba(246,241,233,.4); margin-top:14px; }
+
+  .hint{ display:flex; align-items:center; justify-content:center; gap:10px; margin:18px 0 30px;
+    font-family:var(--mono); font-size:9px; letter-spacing:2px; color:rgba(246,241,233,.3); }
+  .hint span{ display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--gold); animation:pulse 1.6s infinite; }
+  @keyframes pulse{ 0%,100%{opacity:.3} 50%{opacity:1} }
+
+  /* Contact sheet of negative frames */
+  .sheet{ display:grid; grid-template-columns:repeat(auto-fill,minmax(190px,1fr));
+    gap:10px; padding:0 28px 120px; max-width:1500px; margin:0 auto; }
+  .neg{ position:relative; aspect-ratio:16/10; overflow:hidden; background:#000;
+    border:1px solid rgba(245,168,0,.1); }
+  .neg img{ width:100%; height:100%; object-fit:cover; display:block;
+    /* negative / undeveloped look */
+    filter:invert(1) sepia(.5) hue-rotate(150deg) saturate(.5) brightness(.7) contrast(1.1);
+    transition:filter .45s ease, transform .5s ease; -webkit-user-drag:none; }
+  .neg::after{ content:''; position:absolute; inset:0; pointer-events:none;
+    background:repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(0,0,0,.25) 18px,rgba(0,0,0,.25) 20px);
+    opacity:.4; mix-blend-mode:multiply; }
+  .neg-no{ position:absolute; top:5px; left:6px; z-index:3; font-family:var(--mono);
+    font-size:8px; letter-spacing:1px; color:rgba(245,168,0,.35); }
+
+  /* Frame currently under the loupe = developed positive */
+  .neg.bloom{ z-index:5; border-color:var(--gold); }
+  .neg.bloom img{ filter:none; transform:scale(1.04); }
+  .neg.bloom::after{ opacity:0; }
+
+  /* The loupe cursor */
+  .loupe{ position:fixed; top:0; left:0; width:120px; height:120px; z-index:300;
+    border-radius:50%; pointer-events:none; transform:translate(-50%,-50%);
+    border:2px solid var(--gold);
+    box-shadow:0 0 0 6px rgba(10,6,4,.55), 0 0 30px rgba(245,168,0,.25), inset 0 0 24px rgba(0,0,0,.5);
+    background:radial-gradient(circle,transparent 60%,rgba(245,168,0,.06) 100%);
+    transition:width .2s ease,height .2s ease,opacity .3s; }
+  .loupe::before{ content:''; position:absolute; top:50%; left:50%; width:1px; height:14px;
+    background:rgba(245,168,0,.4); transform:translate(-50%,-50%); }
+  .loupe::after{ content:''; position:absolute; top:50%; left:50%; width:14px; height:1px;
+    background:rgba(245,168,0,.4); transform:translate(-50%,-50%); }
+  body.over .loupe{ width:150px; height:150px; }
+
+  /* Floating caption for bloomed frame */
+  .caption{ position:fixed; z-index:280; max-width:260px; padding:12px 14px;
+    background:rgba(10,6,4,.92); border:1px solid rgba(245,168,0,.3); border-radius:3px;
+    backdrop-filter:blur(8px); pointer-events:none; opacity:0; transition:opacity .25s;
+    transform:translateY(6px); }
+  .caption.show{ opacity:1; transform:translateY(0); }
+  .cap-title{ font-family:var(--disp); font-size:24px; letter-spacing:1px; line-height:1; }
+  .cap-loc{ font-family:var(--mono); font-size:9px; letter-spacing:1.5px; color:rgba(245,168,0,.6); margin:5px 0 8px; }
+  .cap-story{ font-style:italic; font-size:12.5px; line-height:1.6; color:rgba(246,241,233,.7); }
+  .cap-exif{ display:flex; gap:10px; flex-wrap:wrap; margin-top:9px; font-family:var(--mono);
+    font-size:8px; letter-spacing:1px; color:rgba(246,241,233,.35); }
+  .cap-tags{ display:flex; gap:5px; margin-top:9px; }
+  .cap-tags span{ font-family:var(--mono); font-size:8px; letter-spacing:1px; padding:2px 7px;
+    border-radius:20px; background:rgba(245,168,0,.12); color:var(--gold); }
+
+  @media(hover:none){ body{cursor:default;} .loupe{display:none;} .neg img{filter:none;} .neg::after{opacity:0;} }
+</style>
+</head>
+<body>
+  <div class="proto-nav">
+    <div class="pn-title">// THE LOUPE</div>
+    <a class="pn-back" href="index.html">← ALL PROTOTYPES</a>
+  </div>
+
+  <div class="lead">
+    <div class="lead-eyebrow">CONCEPT 01 · INSPECT THE ROLL</div>
+    <div class="lead-title">DRAG THE <span class="g">LOUPE</span>.</div>
+    <div class="lead-sub">The sheet is negatives. Whatever you magnify, develops.</div>
+  </div>
+  <div class="hint"><span></span> MOVE YOUR CURSOR ACROSS THE FRAMES</div>
+
+  <div class="sheet" id="sheet"></div>
+
+  <div class="loupe" id="loupe"></div>
+  <div class="caption" id="caption"></div>
+
+<script src="sample-photos.js"></script>
+<script>
+  const sheet = document.getElementById('sheet');
+  const loupe = document.getElementById('loupe');
+  const caption = document.getElementById('caption');
+
+  SAMPLE_PHOTOS.forEach((p,i)=>{
+    const d = document.createElement('div');
+    d.className = 'neg';
+    d.dataset.idx = i;
+    d.innerHTML = `<div class="neg-no">${String(i+1).padStart(3,'0')}</div>
+      <img src="${p.image_url}" alt="${p.title}" loading="lazy">`;
+    sheet.appendChild(d);
+  });
+
+  let current = null;
+  function bloom(el){
+    if(el === current) return;
+    if(current) current.classList.remove('bloom');
+    current = el;
+    if(!el){ document.body.classList.remove('over'); caption.classList.remove('show'); return; }
+    el.classList.add('bloom');
+    document.body.classList.add('over');
+    const p = SAMPLE_PHOTOS[+el.dataset.idx];
+    caption.innerHTML = `
+      <div class="cap-title">${p.title}</div>
+      <div class="cap-loc">${p.location} · ${p.date}</div>
+      <div class="cap-story">${p.story}</div>
+      <div class="cap-exif"><span>${p.exif.camera}</span><span>${p.exif.lens}</span><span>${p.exif.settings}</span></div>
+      <div class="cap-tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>`;
+    caption.classList.add('show');
+  }
+
+  window.addEventListener('mousemove', e=>{
+    loupe.style.left = e.clientX+'px';
+    loupe.style.top  = e.clientY+'px';
+    // caption near the loupe, flipped if near right/bottom edge
+    const cx = e.clientX > window.innerWidth-300 ? e.clientX-280 : e.clientX+95;
+    const cy = Math.min(e.clientY+10, window.innerHeight-220);
+    caption.style.left = cx+'px';
+    caption.style.top  = cy+'px';
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    bloom(el ? el.closest('.neg') : null);
+  });
+  window.addEventListener('mouseleave', ()=>{ loupe.style.opacity=0; bloom(null); });
+  window.addEventListener('mouseenter', ()=>{ loupe.style.opacity=1; });
+</script>
+</body>
+</html>

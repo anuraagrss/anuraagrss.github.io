@@ -12,7 +12,11 @@
 | Page | What it is |
 |---|---|
 | `index.html` | Entry point — split hero with terminal navigation |
-| `nomad.html` | Travel page — globe, flights, experiences, cafes, countries |
+| `nomad.html` | The journey — the walk-in on the shore, then trips on a footprint path, ending at the bench |
+| `journal.html` | The journal — a leather-bound book turned page by page (letters, the road, how far I've come) |
+| `logbook.html` | Flights as a book, with a classic view (`logbook-classic.html`) |
+| `darkroom.html` | Photographs on a drying line under the safelight |
+| `nomad-classic.html` | The previous travel page — globe, flights, experiences, cafes, countries |
 | `Profile.html` | Professional portfolio — career, projects, AI chat |
 | `Professional.html` | About page — story, skills |
 | `photography.html` | Photography gallery — darkroom-style, element chapters |
@@ -48,7 +52,8 @@
 CC/
 │
 ├── index.html                  ← Entry point
-├── nomad.html                  ← Travel page
+├── nomad.html                  ← The journey (new nomad page)
+├── nomad-classic.html          ← Previous travel page
 ├── Profile.html                ← Professional portfolio
 ├── Professional.html           ← About page
 ├── photography.html            ← Photography gallery

@@ -1,0 +1,128 @@
+/* ═══ THE JOURNAL — a book that fits the screen ═══ */
+.desk { position: relative; height: 100vh; height: 100svh; min-height: 560px; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        padding: 18px 16px 14px; background: radial-gradient(ellipse at 50% 40%, #232a31 0%, #12161a 60%, #0b0d0f 100%); overflow: hidden; }
+.book { position: relative; width: min(100%, 1120px); flex: 1; max-height: 820px; display: flex; flex-direction: column; min-height: 0; }
+.spread { position: relative; flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr 1fr; border-radius: 4px; perspective: 2000px;
+          box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 0 1px rgba(0,0,0,.4); }
+.spread::after { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 40px; transform: translateX(-50%); pointer-events: none;
+                 background: linear-gradient(90deg, transparent, rgba(0,0,0,.16) 45%, rgba(0,0,0,.24) 50%, rgba(0,0,0,.16) 55%, transparent); }
+.pg { position: relative; min-height: 0; overflow-y: auto; overflow-x: hidden; padding: clamp(22px, 3.6vh, 40px) clamp(20px, 3.4vw, 44px);
+      scrollbar-width: thin; scrollbar-color: rgba(63,49,37,.25) transparent; transform-origin: left center; backface-visibility: hidden; }
+.pg-l { border-radius: 4px 0 0 4px; transform-origin: right center; }
+.pg-r { border-radius: 0 4px 4px 0; }
+/* a page turning */
+.spread.flip-next .pg-r { animation: leafOut .26s ease-in forwards; }
+.spread.flip-next .pg-l { animation: leafIn .36s .26s ease-out backwards; }
+.spread.flip-prev .pg-l { animation: leafOutL .26s ease-in forwards; }
+.spread.flip-prev .pg-r { animation: leafInR .36s .26s ease-out backwards; }
+@keyframes leafOut  { to { transform: rotateY(-88deg); filter: brightness(.7); } }
+@keyframes leafIn   { from { transform: rotateY(88deg); filter: brightness(.7); } to { transform: none; } }
+@keyframes leafOutL { to { transform: rotateY(88deg); filter: brightness(.7); } }
+@keyframes leafInR  { from { transform: rotateY(-88deg); filter: brightness(.7); } to { transform: none; } }
+
+/* the controls under the book */
+.turnbar { display: flex; align-items: center; gap: 10px; margin-top: 10px; width: 100%; }
+.turnbar > button { flex: none; width: 40px; height: 32px; font: 15px var(--mono); color: #d7dde1; border: 1px solid rgba(215,221,225,.28); border-radius: 2px; }
+.turnbar > button:disabled { opacity: .2; cursor: default; }
+.ribbons { flex: 1; display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 16px; }
+.ribbon { font-family: var(--hand); font-size: 20px; color: var(--mist); text-decoration: none; }
+.ribbon:hover, .ribbon.on { color: #fff; }
+.ribbon.on { border-bottom: 1px solid var(--gold); }
+.turn-pos { font: 10px var(--mono); color: var(--mist); opacity: .6; min-width: 44px; text-align: center; }
+
+/* the pencil */
+.pen-u { opacity: 0; transition: opacity .25s ease; }
+.pen-u.in { opacity: 1; }
+.pen-tip { display: inline-block; width: 0; height: 0; position: relative; }
+.pencil { position: absolute; left: 1px; bottom: -2px; width: 22px; height: 22px; animation: scribble .22s ease-in-out infinite alternate; pointer-events: none; }
+@keyframes scribble { from { transform: translate(0, 0) rotate(0); } to { transform: translate(1px, -2px) rotate(-6deg); } }
+
+/* one page at a time on a phone */
+@media (max-width: 760px) {
+  .spread { grid-template-columns: 1fr; }
+  .spread::after { display: none; }
+  .pg-l, .pg-r { border-radius: 4px; }
+  .book .pg-r { display: none; }
+  .book.show-right .pg-l { display: none; }
+  .book.show-right .pg-r { display: block; }
+  .spread.flip-next .pg-l, .spread.flip-prev .pg-l, .spread.flip-next .pg-r, .spread.flip-prev .pg-r { animation: none; }
+  .spread.flip-next, .spread.flip-prev { animation: fadeTurn .5s ease; }
+  @keyframes fadeTurn { 0% { opacity: 1; } 45% { opacity: 0; transform: translateX(-10px); } 100% { opacity: 1; transform: none; } }
+}
+@media (prefers-reduced-motion: reduce) { .pencil { display: none; } }
+
+/* ═══ THE NAV — journey, journal, the logbook, the darkroom ═══ */
+.site-nav { position: fixed; top: 12px; right: 14px; z-index: 40; display: flex; align-items: center; gap: 4px; padding: 4px 6px;
+            border-radius: 20px; background: rgba(11,13,15,.55); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 0 0 1px rgba(215,221,225,.12); }
+.site-nav a { display: inline-flex; align-items: center; justify-content: center; height: 30px; padding: 0 10px; border-radius: 15px;
+              font-family: var(--hand); font-size: 20px; color: #aab4bb; text-decoration: none; transition: color .2s, background .2s; }
+.site-nav a.icon { width: 34px; padding: 0; }
+.site-nav svg { width: 18px; height: 18px; fill: currentColor; stroke: currentColor; }
+.site-nav svg path[fill="none"], .site-nav svg circle { fill: none; }
+.site-nav a:hover { color: #fff; }
+.site-nav a.on { color: #fff; background: rgba(200,150,62,.22); }
+@media (max-width: 760px) { .site-nav { top: 8px; right: 8px; } .site-nav a { font-size: 18px; padding: 0 8px; } }
+/* leave room for the nav above the book */
+.desk { padding-top: 54px; }
+
+/* ═══ TURNING BY THE CORNER — a small dog-ear at the bottom of the page ═══ */
+.corner { position: absolute; bottom: 0; z-index: 5; width: 44px; height: 44px; padding: 0; transition: width .25s ease, height .25s ease, opacity .2s; }
+.corner.next { right: 0; }
+.corner.prev { left: 0; }
+.corner i { position: absolute; inset: 0; pointer-events: none; }
+/* the folded-over flap, and the dark desk showing where the page lifted */
+.corner.next i { border-radius: 0 0 4px 0;
+  background: linear-gradient(315deg, #0d1013 0 48.5%, rgba(0,0,0,.35) 49%, #d8cdb8 51%, #ece4d3 70%, #f6f0e4 100%);
+  filter: drop-shadow(-2px -2px 3px rgba(0,0,0,.18)); }
+.corner.prev i { border-radius: 0 0 0 4px;
+  background: linear-gradient(45deg, #0d1013 0 48.5%, rgba(0,0,0,.35) 49%, #d8cdb8 51%, #ece4d3 70%, #f6f0e4 100%);
+  filter: drop-shadow(2px -2px 3px rgba(0,0,0,.18)); }
+.corner:hover, .corner:focus-visible { width: 64px; height: 64px; outline: none; }
+.corner:active { width: 90px; height: 90px; }
+.corner:disabled { opacity: 0; pointer-events: none; }
+.corner::after { position: absolute; bottom: 6px; font-family: var(--hand); font-size: 14px; color: #8a7a64; opacity: 0; transition: opacity .2s; white-space: nowrap; pointer-events: none; }
+.corner.next::after { content: "turn"; right: 54px; }
+.corner.prev::after { content: "back"; left: 54px; }
+.corner:hover::after { opacity: 1; }
+.book.closed .corner { display: none; }
+.turnbar { justify-content: center; }
+@media (max-width: 760px) { .corner { width: 52px; height: 52px; } }
+/* words arrive like ink settling, not like a switch */
+.pen-u { transition: opacity .55s ease; }
+
+/* ═══ THE SIGNATURE — Arey... with two short strokes under the dots ═══ */
+.arey { white-space: nowrap; }
+.arey-dots { position: relative; display: inline-block; letter-spacing: .04em; }
+.arey-dots i { position: absolute; left: 6%; right: 2%; bottom: -.05em; height: .32em; pointer-events: none; }
+.arey-dots i::before, .arey-dots i::after { content: ""; position: absolute; left: 0; right: 0; height: .07em; min-height: 1.5px; border-radius: 2px; background: currentColor; opacity: .85; }
+.arey-dots i::before { top: 0; transform: rotate(-4deg); }
+.arey-dots i::after { top: .16em; left: 18%; right: 8%; transform: rotate(-2deg); opacity: .6; }
+.site-nav .nav-sep { width: 1px; height: 18px; background: rgba(215,221,225,.18); margin: 0 2px; }
+.site-nav a.classic { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; opacity: .6; }
+.site-nav a.classic:hover { opacity: 1; }
+
+/* ═══ THE RIBBON — a bookmark hanging from the top of the page ═══ */
+.site-nav { display: none; }
+.ribbon-nav { position: fixed; top: 0; right: clamp(18px, 4vw, 48px); z-index: 40; width: 172px; display: flex; flex-direction: column; align-items: flex-end; }
+.rb-pull { position: relative; width: 46px; padding: 10px 0 22px; display: flex; flex-direction: column; align-items: center; gap: 6px; color: #f6eedd;
+           background: linear-gradient(90deg, #7a1f1a, #9c2b23 45%, #842219); box-shadow: 0 4px 10px rgba(0,0,0,.45), inset 0 -1px 0 rgba(0,0,0,.2);
+           clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 86%, 0 100%); transition: padding .3s ease; }
+.rb-pull::before { content: ""; position: absolute; inset: 0 5px; border-left: 1px dashed rgba(255,230,200,.35); border-right: 1px dashed rgba(255,230,200,.35); pointer-events: none; }
+.rb-pull:hover, .ribbon-nav.open .rb-pull { padding-bottom: 30px; }
+.rb-pull .rb-mark svg { width: 20px; height: 20px; }
+.rb-here { font-family: var(--hand); font-size: 15px; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; }
+.rb-mark svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
+.rb-tabs { list-style: none; margin-top: -8px; padding: 14px 10px 10px; width: 100%; background: #f4ecdb; border-radius: 0 0 4px 4px;
+           box-shadow: 0 14px 30px rgba(0,0,0,.5); transform-origin: top right; transform: scaleY(0); opacity: 0; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+.ribbon-nav.open .rb-tabs { transform: scaleY(1); opacity: 1; }
+.rb-tabs a { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 3px; color: var(--earth); text-decoration: none; }
+.rb-tabs a:hover, .rb-tabs a:focus-visible { background: rgba(63,49,37,.07); outline: none; }
+.rb-tabs a.on { background: rgba(156,43,35,.1); box-shadow: inset 3px 0 0 #9c2b23; }
+.rb-tabs .rb-mark svg { width: 22px; height: 22px; color: #5d4a36; }
+.rb-l b { display: block; font-family: var(--hand); font-weight: 400; font-size: 20px; line-height: 1; }
+.rb-l small { display: block; font-style: italic; font-size: 11.5px; opacity: .65; }
+.rb-tabs li:last-child { border-top: 1px dashed rgba(63,49,37,.2); margin-top: 4px; padding-top: 4px; }
+@media (max-width: 760px) { .ribbon-nav { right: 12px; } .rb-pull { width: 40px; } }
+/* signature without the strokes under the dots */
+.arey-dots i { display: none; }

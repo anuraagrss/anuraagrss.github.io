@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- The logbook's classic view: the flights and airports sections from nomad.html, kept as they are.
+       Shown inside logbook.html (in a frame, so the old styles don't touch the new pages). -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>The logbook — classic</title>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/nomad.css">
+  <style>body { background: var(--paper, #f6f1e9); } #page { opacity: 1; } .flights-section { padding-top: 40px; }</style>
+</head>
+<body>
+<div id="page" class="vis">
+  <!-- ── FLIGHTS ── -->
+  <section class="flights-section">
+    <div class="section-header">
+      <div class="section-eyebrow">// THE OBSESSION</div>
+      <div class="section-title">FLIGHTS.</div>
+      <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
+    </div>
+    <div class="flight-stats" id="flightStats"></div>
+    <div class="fleet-section-header">
+      <div class="section-eyebrow" style="margin:0">// AIRCRAFT FLOWN</div>
+    </div>
+    <div class="fleet-grid-wrap" id="fleetGridWrap">
+      <!-- First 2 rows (6 cards) always visible -->
+      <div class="fleet-grid" id="fleetGrid"></div>
+      <!-- Hidden additional cards -->
+      <div class="fleet-grid-hidden" id="fleetGridHidden">
+        <div class="fleet-grid" id="fleetGridExtra"></div>
+      </div>
+    </div>
+    <!-- Airplane expand tab -->
+    <div class="fleet-expand-wrap" id="fleetExpandWrap" onclick="toggleFleetExpand()" style="display:none">
+      <div class="fleet-runway"></div>
+      <div class="fleet-expand-btn">
+        <span class="fleet-plane-icon" id="fleetPlaneIcon">✈</span>
+        <span id="fleetExpandLabel">MORE AIRCRAFT</span>
+        <span class="fleet-expand-count" id="fleetExpandCount"></span>
+      </div>
+    </div>
+    <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
+    <div class="bp-stack" id="boardingGrid"></div>
+    <div id="bpMoreWrap" style="margin-bottom:48px;display:none" onclick="expandBoardingPasses()" title="Click to see all boarding passes">
+      <div class="bp-stack-peek" id="bpStackPeek">
+        <div class="bp-peek-card bp-peek-3"></div>
+        <div class="bp-peek-card bp-peek-2"></div>
+        <div class="bp-peek-card bp-peek-1">
+          <div class="bp-peek-face">
+            <div class="bp-peek-label" id="bpMoreLabel">+ MORE BOARDING PASSES</div>
+            <div class="bp-peek-hint">CLICK THE STACK TO EXPAND</div>
+            <div class="bp-peek-arrow" id="bpPeekArrow">▾</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div class="section-eyebrow" style="margin:0">// FULL FLIGHT LOG</div>
+      <button class="expand-btn" id="logToggleBtn" onclick="toggleFlightLog()">
+        EXPAND LOG <span class="expand-btn-arrow" id="logArrow">▾</span>
+      </button>
+    </div>
+    <div id="flightLogWrap" style="display:none">
+      <div class="flight-log-wrap">
+        <table>
+          <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
+          <tbody id="flightLog"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── AIRPORTS ── -->
+  <section class="airports-section">
+    <div class="section-header">
+      <div class="section-eyebrow">// FAVOURITE AIRPORTS</div>
+      <div class="section-title">AIRPORTS.</div>
+      <div class="section-poem-line">Some cities you enter through their airports. The airport is already the story.</div>
+    </div>
+    <div class="passport-fold-wrap" id="passportFoldWrap">
+      <div class="airport-grid" id="airportGridVisible"></div>
+      <div class="airport-grid-hidden">
+        <div class="airport-grid" id="airportGridHidden"></div>
+      </div>
+    </div>
+    <div class="passport-fold-tab" onclick="togglePassport()">
+      <div class="fold-tab-inner">
+        <span id="foldLabel">UNFOLD PASSPORT</span>
+        <span class="fold-arrow" id="foldArrow">▾</span>
+      </div>
+    </div>
+  </section>
+</div>
+<script type="module" src="js/logbook-classic.js"></script>
+</body>
+</html>

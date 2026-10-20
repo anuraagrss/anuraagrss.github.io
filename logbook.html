@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/Logo.ico" type="image/x-icon">
+  <title>The logbook</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <link href="css/late-sun.css" rel="stylesheet">
+  <link href="css/book.css" rel="stylesheet">
+  <link href="css/logbook.css" rel="stylesheet">
+</head>
+<body class="logbook">
+  <!-- the whole logbook is one book: the letter, a spread per year, the machines, the stamps, the tally -->
+  <section class="desk" aria-label="the logbook">
+    <p class="lb-epi" id="lbEpi"></p>
+    <div class="views" role="tablist" aria-label="how to read the logbook">
+      <button type="button" role="tab" data-view="journal" aria-selected="true">the journal</button>
+      <button type="button" role="tab" data-view="classic" aria-selected="false">boarding passes &amp; airports</button>
+    </div>
+    <iframe class="classic" id="classic" title="flights, boarding passes and airports" hidden></iframe>
+    <div class="book" id="book">
+      <div class="spread">
+        <div class="pg pg-l paper"></div>
+        <div class="pg pg-r paper"></div>
+        <!-- turn a page by its corner -->
+        <button type="button" class="corner next" data-turn="next" aria-label="turn to the next page"><i></i></button>
+        <button type="button" class="corner prev" data-turn="prev" aria-label="turn back a page"><i></i></button>
+      </div>
+      <nav class="turnbar" aria-label="turn the page">
+        <div class="ribbons" data-turn="tabs"></div>
+        <span class="turn-pos" data-turn="pos"></span>
+      </nav>
+    </div>
+  </section>
+  <script type="module" src="js/logbook.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

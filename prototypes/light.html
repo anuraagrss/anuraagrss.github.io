@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prototype — Cursor as Light</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{ --gold:#F5A800; --paper:#F6F1E9;
+         --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace; --disp:'Bebas Neue',sans-serif; }
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#040302; color:var(--paper); font-family:var(--serif); overflow-x:hidden; }
+
+  .proto-nav{ position:fixed; top:0; left:0; right:0; z-index:200; padding:14px 28px;
+    display:flex; align-items:center; justify-content:space-between; }
+  .pn-title{ font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold); }
+  .pn-back{ font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(246,241,233,.4); text-decoration:none; }
+  .pn-back:hover{ color:var(--gold); }
+
+  .lead{ text-align:center; padding:100px 24px 26px; position:relative; z-index:60; }
+  .lead-eyebrow{ font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(245,168,0,.55); margin-bottom:14px; }
+  .lead-title{ font-family:var(--disp); font-size:clamp(40px,7vw,84px); letter-spacing:2px; line-height:.9; }
+  .lead-title .g{ color:var(--gold); }
+  .lead-sub{ font-style:italic; font-size:15px; color:rgba(246,241,233,.4); margin-top:14px; }
+
+  .wall{ position:relative; display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:16px; padding:10px 28px 140px; max-width:1500px; margin:0 auto; z-index:1; }
+  .pic{ position:relative; aspect-ratio:16/10; overflow:hidden; background:#0A0705;
+    border:1px solid rgba(245,168,0,.08); cursor:pointer; }
+  .pic img{ width:100%; height:100%; object-fit:cover; display:block; -webkit-user-drag:none;
+    filter:brightness(.9) contrast(1.05); }
+  .pic-cap{ position:absolute; left:0; right:0; bottom:0; z-index:3; padding:26px 14px 12px;
+    background:linear-gradient(to top,rgba(4,3,2,.92),transparent); pointer-events:none; }
+  .pc-title{ font-family:var(--disp); font-size:22px; letter-spacing:1px; line-height:1; }
+  .pc-loc{ font-family:var(--mono); font-size:8px; letter-spacing:1.5px; color:rgba(245,168,0,.6); margin-top:3px; }
+
+  /* The darkness overlay — a hole of light follows the cursor */
+  .dark{ position:fixed; inset:0; z-index:40; pointer-events:none;
+    background:radial-gradient(circle var(--r,200px) at var(--x,50%) var(--y,40%),
+      transparent 0%, rgba(4,3,2,.55) 45%, rgba(4,3,2,.97) 78%);
+    transition:background .08s linear; }
+  /* warm flashlight tint ring */
+  .glow{ position:fixed; top:0; left:0; z-index:41; pointer-events:none;
+    width:440px; height:440px; transform:translate(-50%,-50%);
+    background:radial-gradient(circle, rgba(245,168,0,.10) 0%, transparent 60%);
+    mix-blend-mode:screen; opacity:.9; }
+
+  .hint{ position:fixed; bottom:22px; left:0; right:0; z-index:60; text-align:center;
+    font-family:var(--mono); font-size:9px; letter-spacing:2px; color:rgba(246,241,233,.3); pointer-events:none; }
+
+  /* Lightbox */
+  .lb{ position:fixed; inset:0; z-index:300; background:rgba(4,3,2,.97); display:none;
+    align-items:center; justify-content:center; flex-direction:column; padding:40px; }
+  .lb.open{ display:flex; }
+  .lb img{ max-width:90vw; max-height:74vh; object-fit:contain; border:1px solid rgba(245,168,0,.2); }
+  .lb-meta{ text-align:center; margin-top:18px; max-width:560px; }
+  .lb-title{ font-family:var(--disp); font-size:38px; letter-spacing:1px; }
+  .lb-loc{ font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(245,168,0,.6); margin:6px 0 10px; }
+  .lb-story{ font-style:italic; font-size:14px; line-height:1.7; color:rgba(246,241,233,.6); }
+  .lb-close{ position:absolute; top:22px; right:26px; font-family:var(--mono); font-size:10px;
+    letter-spacing:2px; color:rgba(246,241,233,.4); cursor:pointer; border:1px solid rgba(246,241,233,.1);
+    padding:7px 14px; border-radius:2px; }
+  .lb-close:hover{ color:var(--gold); border-color:rgba(245,168,0,.4); }
+
+  @media(hover:none){ .dark,.glow{ display:none; } .hint{ display:none; } }
+</style>
+</head>
+<body>
+  <div class="proto-nav">
+    <div class="pn-title">// CURSOR AS LIGHT</div>
+    <a class="pn-back" href="index.html">← ALL PROTOTYPES</a>
+  </div>
+
+  <div class="lead">
+    <div class="lead-eyebrow">CONCEPT 03 · THE DARKROOM IS DARK</div>
+    <div class="lead-title">BRING A <span class="g">LIGHT</span>.</div>
+    <div class="lead-sub">The prints are pinned in the black. You can only see what you illuminate.</div>
+  </div>
+
+  <div class="wall" id="wall"></div>
+
+  <div class="dark" id="dark"></div>
+  <div class="glow" id="glow"></div>
+  <div class="hint">MOVE TO SWEEP THE LIGHT · CLICK A FRAME TO TURN THE LIGHTS ON</div>
+
+  <div class="lb" id="lb">
+    <div class="lb-close" id="lbClose">CLOSE ✕</div>
+    <img id="lbImg" src="" alt="">
+    <div class="lb-meta">
+      <div class="lb-title" id="lbTitle"></div>
+      <div class="lb-loc" id="lbLoc"></div>
+      <div class="lb-story" id="lbStory"></div>
+    </div>
+  </div>
+
+<script src="sample-photos.js"></script>
+<script>
+  const wall = document.getElementById('wall');
+  const dark = document.getElementById('dark');
+  const glow = document.getElementById('glow');
+
+  SAMPLE_PHOTOS.forEach((p,i)=>{
+    const d = document.createElement('div');
+    d.className = 'pic';
+    d.dataset.idx = i;
+    d.innerHTML = `<img src="${p.image_url}" alt="${p.title}" loading="lazy">
+      <div class="pic-cap"><div class="pc-title">${p.title}</div><div class="pc-loc">${p.location}</div></div>`;
+    d.addEventListener('click', ()=>openLb(i));
+    wall.appendChild(d);
+  });
+
+  window.addEventListener('mousemove', e=>{
+    dark.style.setProperty('--x', e.clientX+'px');
+    dark.style.setProperty('--y', e.clientY+'px');
+    glow.style.left = e.clientX+'px';
+    glow.style.top  = e.clientY+'px';
+  });
+
+  // Lightbox
+  const lb=document.getElementById('lb');
+  function openLb(i){
+    const p=SAMPLE_PHOTOS[i];
+    document.getElementById('lbImg').src=p.image_url;
+    document.getElementById('lbTitle').textContent=p.title;
+    document.getElementById('lbLoc').textContent=`${p.location} · ${p.date}`;
+    document.getElementById('lbStory').textContent=p.story;
+    lb.classList.add('open');
+  }
+  function closeLb(){ lb.classList.remove('open'); }
+  document.getElementById('lbClose').addEventListener('click', closeLb);
+  lb.addEventListener('click', e=>{ if(e.target===lb) closeLb(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeLb(); });
+</script>
+</body>
+</html>

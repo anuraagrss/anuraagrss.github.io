@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Photography Redesign — Prototypes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{ --gold:#F5A800; --paper:#F6F1E9;
+         --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace; --disp:'Bebas Neue',sans-serif; }
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#0A0604; color:var(--paper); font-family:var(--serif); min-height:100vh; }
+
+  .wrap{ max-width:1080px; margin:0 auto; padding:80px 28px 100px; }
+  .eyebrow{ font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(245,168,0,.55); margin-bottom:16px; }
+  h1{ font-family:var(--disp); font-size:clamp(44px,8vw,90px); letter-spacing:2px; line-height:.9; font-weight:400; }
+  h1 .g{ color:var(--gold); }
+  .sub{ font-style:italic; font-size:16px; color:rgba(246,241,233,.45); margin-top:16px; max-width:520px; line-height:1.7; }
+
+  .grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:18px; margin-top:50px; }
+  .card{ display:block; text-decoration:none; color:inherit; position:relative;
+    background:#0E0A04; border:1px solid rgba(245,168,0,.14); border-radius:3px;
+    padding:26px 22px 22px; overflow:hidden; transition:border-color .25s, transform .25s; }
+  .card:hover{ border-color:var(--gold); transform:translateY(-4px); }
+  .card-no{ font-family:var(--mono); font-size:9px; letter-spacing:3px; color:rgba(245,168,0,.5); }
+  .card-title{ font-family:var(--disp); font-size:34px; letter-spacing:1px; margin:10px 0 6px; line-height:1; }
+  .card-desc{ font-size:13px; line-height:1.65; color:rgba(246,241,233,.5); }
+  .card-go{ font-family:var(--mono); font-size:9px; letter-spacing:2px; color:var(--gold);
+    margin-top:18px; display:inline-flex; align-items:center; gap:6px; }
+  .card::after{ content:''; position:absolute; right:-30px; bottom:-30px; width:110px; height:110px;
+    border-radius:50%; background:radial-gradient(circle,rgba(245,168,0,.08),transparent 70%); }
+
+  .note{ margin-top:48px; font-family:var(--mono); font-size:10px; letter-spacing:1px;
+    color:rgba(246,241,233,.3); line-height:1.9; border-left:2px solid rgba(245,168,0,.2); padding-left:16px; }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="eyebrow">PHOTOGRAPHY PAGE · DESIGN R&amp;D</div>
+    <h1>THREE WAYS<br>TO <span class="g">SEE</span>.</h1>
+    <div class="sub">Working prototypes of three invented navigation concepts. Each uses sample landscape photos. Move your cursor — these are about the gesture, not the layout.</div>
+
+    <div class="grid">
+      <a class="card" href="gallery.html" style="border-color:var(--gold);grid-column:1/-1;background:#13100A;">
+        <div class="card-no" style="color:var(--gold)">CONCEPT 04 · THE LIGHT REDESIGN ★</div>
+        <div class="card-title" style="color:#F6F1E9">GALLERY · LOUPE · STORY</div>
+        <div class="card-desc">The real direction: a light photo-paper page. Matted gallery wall + click-to-inspect lightbox with a magnifier loupe + a cinematic auto-playing Story mode. Tags replace the elements.</div>
+        <div class="card-go">ENTER →</div>
+      </a>
+      <a class="card" href="loupe.html">
+        <div class="card-no">CONCEPT 01</div>
+        <div class="card-title">THE LOUPE</div>
+        <div class="card-desc">A wall of negatives. Drag a magnifier across them — whatever you inspect develops to full colour, with its story.</div>
+        <div class="card-go">ENTER →</div>
+      </a>
+      <a class="card" href="develop.html">
+        <div class="card-no">CONCEPT 02</div>
+        <div class="card-title">DEVELOP</div>
+        <div class="card-desc">Images aren't loaded, they're developed. Each frame comes up out of the chemical bath as you scroll to it.</div>
+        <div class="card-go">ENTER →</div>
+      </a>
+      <a class="card" href="light.html">
+        <div class="card-no">CONCEPT 03</div>
+        <div class="card-title">THE LIGHT</div>
+        <div class="card-desc">The room is dark. The prints are pinned in the black. Your cursor is the only light — sweep it to find them.</div>
+        <div class="card-go">ENTER →</div>
+      </a>
+    </div>
+
+    <div class="note">
+      NOTE · These are throwaway prototypes on sample images.<br>
+      Pick a direction and I'll wire the chosen one to your real Firebase photos + tag system.
+    </div>
+  </div>
+</body>
+</html>

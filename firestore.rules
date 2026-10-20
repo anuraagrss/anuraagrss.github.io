@@ -46,6 +46,21 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Proofs — strangers answer "what's the proof you're still alive?" at the bench.
+    // Anyone can leave one (short, plain text, waiting for me to read it); only the ones
+    // I've marked approved are readable. Nobody but an admin can edit or delete.
+    match /proofs/{docId} {
+      allow create: if request.resource.data.keys().hasOnly(['text', 'page', 'approved', 'createdAt'])
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 280
+                    && request.resource.data.page in ['journey', 'journal']
+                    && request.resource.data.approved == false
+                    && request.resource.data.createdAt == request.time;
+      allow read: if resource.data.approved == true || isAdmin();
+      allow update, delete: if isAdmin();
+    }
+
     // Everything else — any authenticated admin
     match /{document=**} {
       allow read, write: if isAdmin();

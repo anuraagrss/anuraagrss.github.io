@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="images/Logo.ico" type="image/x-icon">
+  <title>My darkroom — Arey...</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@400&family=Lora:ital,wght@1,400&display=swap" rel="stylesheet">
+  <link href="css/late-sun.css" rel="stylesheet">
+  <link href="css/book.css" rel="stylesheet">
+  <link href="css/darkroom.css" rel="stylesheet">
+</head>
+<body class="darkroom">
+  <div class="safelight" aria-hidden="true"></div>
+
+  <header class="dr-head">
+    <h1>my darkroom</h1>
+    <p class="dr-his" id="drHis" data-pen="w"></p>
+  </header>
+
+  <!-- the places, written on the darkroom wall -->
+  <nav class="dr-nav" aria-label="places">
+    <button id="pPrev" type="button" aria-label="previous place">←</button>
+    <div class="places" id="places"></div>
+    <button id="pNext" type="button" aria-label="next place">→</button>
+  </nav>
+
+  <!-- a drying line: this place's prints, pinned up, developing as you watch -->
+  <main class="line-wrap" id="lineWrap">
+    <svg class="string" viewBox="0 0 1000 40" preserveAspectRatio="none" aria-hidden="true"><path d="M0 8 Q500 34 1000 8"/></svg>
+    <div class="prints" id="prints"><p class="loading">mixing the developer…</p></div>
+  </main>
+  <p class="dr-foot"><span id="drPoem"></span></p>
+
+  <!-- a print, lifted out of the tray and written about -->
+  <div class="viewer" id="viewer" role="dialog" aria-modal="true" aria-labelledby="vCap" hidden>
+    <button class="v-close" id="vClose" type="button">← hang it back</button>
+    <div class="v-tray"><div class="v-photo" id="vPhoto"><img id="vImg" alt=""></div></div>
+    <article class="v-paper" id="vPaper">
+      <p class="v-where" id="vWhere"></p>
+      <h2 class="v-cap" id="vCap"></h2>
+      <div class="v-story" id="vStory"></div>
+      <p class="v-stamp" id="vStamp"></p>
+      <p class="v-sig"><span class="arey">Arey<span class="arey-dots">...<i></i></span></span></p>
+      <nav class="v-nav">
+        <button id="vPrev" type="button">← the print before</button>
+        <span id="vPos"></span>
+        <button id="vNext" type="button">the next print →</button>
+      </nav>
+    </article>
+  </div>
+
+  <script type="module" src="js/darkroom.js"></script>
+  <script type="module" src="js/nav.js"></script>
+</body>
+</html>

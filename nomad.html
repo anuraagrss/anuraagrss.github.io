@@ -2,508 +2,85 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <link rel="icon" href="images/Logo.png" type="image/x-icon">
-  <title>Nomad — Arey the dreamer</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Nomad — an interactive travel map and AI guide exploring the countries and flights of Arey the dreamer's journeys.">
-  <meta property="og:title" content="Nomad — Arey the dreamer">
-  <meta property="og:description" content="An interactive travel map and AI guide exploring the countries and flights of Arey the dreamer's journeys.">
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://404-nomad.com/nomad.html">
-  <meta property="og:image" content="https://404-nomad.com/images/Avatar.png">
-  <meta name="twitter:card" content="summary_large_image">
-  <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,600;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <link rel="stylesheet" href="css/terminal.css">
-  <link rel="stylesheet" href="css/nomad.css">
+  <link rel="icon" href="images/Logo.ico" type="image/x-icon">
+  <title>Arey...</title>
+  <meta property="og:image" content="images/late-sun/key.jpg">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;1,6..72,300;1,6..72,400&family=JetBrains+Mono:wght@400&family=Lora:ital,wght@1,400;1,600&family=Bebas+Neue&display=swap" rel="stylesheet">
+  <link href="css/late-sun.css" rel="stylesheet">
+  <link href="css/book.css" rel="stylesheet">
+  <link href="css/journal.css" rel="stylesheet">
+  <link href="css/journey.css" rel="stylesheet">
 </head>
 <body>
 
-<!-- ══ INTRO ══ -->
-<div id="intro">
-  <div class="intro-grain"></div>
-  <div class="intro-beam"></div>
-  <div class="intro-lines">
-    <p class="il sm" id="il1">I grew up in a small town in India.</p>
-    <p class="il sm" id="il2">Our world was the street, the school, the neighbours.</p>
-    <div class="ir" id="ir1"></div>
-    <p class="il lg" id="il3">"I thought that was the whole world."</p>
-    <div class="ir" id="ir2"></div>
-    <p class="il sm" id="il4">Then I left. And I never stopped leaving.</p>
-    <p class="il sm" id="il5">Every country was a classroom. Every stranger, a mirror.</p>
-    <div class="ir" id="ir3"></div>
-    <p class="il proof" id="il6">STILL COUNTING.</p>
-    <p class="il tag" id="il7">53 COUNTRIES · 7 CONTINENTS · STILL COUNTING</p>
-  </div>
-  <div class="intro-tear"><div class="tear-paper"></div></div>
-  <div class="intro-skip" id="introSkip">TAP ANYWHERE →</div>
-</div>
-
-<!-- ══ PAGE ══ -->
-<div id="page">
-  <nav class="top-nav" id="topNav">
-    <a class="nav-logo" href="index.html">AREY // DREAMER</a>
-    <a class="nav-back" href="index.html">← HOME</a>
-  </nav>
-
-  <!-- ── HERO ── -->
-  <section class="hero">
-    <div class="hero-content">
-      <div class="hero-eyebrow">// NOMAD CHRONICLES</div>
-      <h1 class="hero-title">
-        THE WORLD<br>
-        IS PROOF<br>
-        I AM <span class="proof-word">ALIVE.</span>
-      </h1>
-      <p class="hero-sub">From a small town in India to every continent on earth — one stamp, one stranger, one story at a time.</p>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-num"><span id="statCountries">—</span><span class="accent">+</span></div>
-          <div class="hero-stat-label">Countries</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num">7</div>
-          <div class="hero-stat-label">Continents</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num"><span id="statFlights">—</span></div>
-          <div class="hero-stat-label">Flights</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-num" id="statMilesTotal">—</div>
-          <div class="hero-stat-label">Miles in the air</div>
-        </div>
-      </div>
+  <!-- ── THE ARRIVAL: fire, his words, the walk, the door ── -->
+  <section class="scene" id="scene" aria-label="Arey walks toward the horizon">
+    <div class="plate" id="plate"></div>
+    <div class="drawn">
+      <div class="sky"></div>
+      <div class="door" id="door"></div>
+      <div class="horizon"></div>
+      <div class="water"></div>
+      <div class="spit"></div>
+      <div class="shore"></div>
     </div>
-    <div class="hero-avatar-wrap">
-      <img class="hero-avatar" src="images/photographer-cut.png" alt="Arey the dreamer">
-      <div class="avatar-caption">AREY · DREAMER</div>
+    <div class="steps" id="sceneSteps"></div>
+    <div class="fire" id="fire"><i></i><i></i><i></i></div>
+    <canvas class="embers" id="embers"></canvas>
+    <div class="walker" id="walker">
+      <img id="walkerImg" alt="" hidden>
+      <svg id="walkerSvg" viewBox="0 0 40 110" aria-hidden="true">
+        <circle cx="20" cy="11" r="8"/>
+        <path d="M9 24 Q20 19 31 24 L33 62 L26 62 L25 104 L19 104 L20 66 L19 104 L13 104 L13 62 L7 62 Z"/>
+      </svg>
     </div>
+    <video class="walk-video" id="walkVideo" muted playsinline preload="auto" hidden></video>
+
+    <!-- his words, as the production intro sets them; one line stays on top while he walks -->
+    <div class="intro" id="intro" aria-live="polite"></div>
+    <p class="topline" id="topline"></p>
+    <p class="sig" id="sig"><span class="arey">Arey<span class="arey-dots">...<i></i></span></span></p>
+    <button class="walk-in" id="w3" type="button">walk in ↓</button>
+
+    <button class="sound" id="fireSound" type="button" hidden>▸ the fire, the wind</button>
+    <audio id="fireAudio" preload="none"></audio>
   </section>
 
-  <!-- ── GLOBE ── -->
-  <section class="globe-section">
-    <div class="globe-outer">
-      <div class="globe-inner">
-        <div class="globe-stamp-row">
-          <div class="globe-stamp">
-            <span>✦</span>
-            <span id="globeStampText">LOADING…</span>
-          </div>
-          <div class="globe-toggle">
-            <button class="gtog active" id="togCountries" onclick="setGlobeMode('countries',this)">COUNTRIES</button>
-            <button class="gtog" id="togFlights" onclick="setGlobeMode('flights',this)">FLIGHT ROUTES</button>
-          </div>
-        </div>
-        <div class="globe-wrap" id="globeWrap">
-          <canvas id="globeCanvas"></canvas>
-          <div class="globe-hint" id="globeHint">DRAG TO SPIN · SCROLL TO ZOOM</div>
-          <div class="globe-tooltip" id="globeTip"></div>
-          <div class="globe-counter"><span id="visitCount">—</span> visited</div>
-          <div class="globe-legend" id="globeLegend">
-            <div class="leg-item"><div class="leg-dot" style="background:#D4792A"></div>VISITED</div>
-            <div class="leg-item"><div class="leg-dot" style="background:rgba(246,241,233,0.18)"></div>NOT YET</div>
-          </div>
-        </div>
-        <div class="globe-caption">Every <span>ember glow</span> is a country I've stood in</div>
-      </div>
-    </div>
+  <!-- ── THE JOURNEY: trips on both sides of the path ── -->
+  <p class="epigraph" id="epiHero"></p>
+  <main class="trail" id="trail" aria-label="trips">
+    <div class="trail-steps" id="trailSteps" aria-hidden="true"></div>
+    <div class="stops" id="stops"><p class="loading">opening my journals…</p></div>
+    <p class="faint-places" id="faint" hidden></p>
+  </main>
+  <p class="epigraph after" id="epiExp"></p>
+  <!-- ── THE BENCH: the walk ends here, and the poem writes itself if you stay ── -->
+  <section class="j-bench" id="jBench" aria-label="the bench">
+    <div class="clouds"><i></i><i></i><i></i></div>
+    <svg class="jb-sk" viewBox="0 0 220 120" aria-hidden="true">
+      <path d="M20 58 L200 54"/><path d="M18 66 L202 62"/><path d="M22 40 Q110 30 198 36"/><path d="M24 48 L196 44"/>
+      <path d="M40 66 L36 108"/><path d="M180 62 L184 106"/><path d="M48 66 L50 104"/><path d="M172 62 L170 104"/>
+      <path d="M6 110 Q110 104 214 110" class="ground"/></svg>
+    <p class="jb-h">stay a while.</p>
+    <p class="jb-sub">the road will wait. so will the light.</p>
+    <div class="jb-poem" id="jbPoem"></div>
   </section>
 
-  <!-- ── LETTERS ── -->
-  <section class="letters-section">
-    <div class="letters-inner">
-      <div class="section-eyebrow" style="margin-bottom:28px">// LETTERS ACROSS TIME</div>
-      <div class="letter-deck-outer" id="letterDeckOuter">
-        <div class="letter-peek-stack" id="letterPeekStack">
-          <div class="letter-peek-card"></div>
-          <div class="letter-peek-card"></div>
-          <div class="letter-peek-card"></div>
-        </div>
-        <div class="letter-card-wrap" id="letterCardWrap">
-          <div class="letter-card" id="letterCard"></div>
-        </div>
-      </div>
-      <div class="letter-nav">
-        <button class="letter-nav-btn" id="letterPrev" onclick="letterStep(-1)">← PREV</button>
-        <div class="letter-dots" id="letterDots"></div>
-        <button class="letter-nav-btn" id="letterNext" onclick="letterStep(1)">NEXT →</button>
-      </div>
-      <div class="letter-click-hint">CLICK LETTER TO TURN PAGE</div>
-    </div>
+  <section class="journey-end">
+    <a class="open-journal" href="journal.html">
+      <span class="mini-cover" aria-hidden="true">
+        <i class="mc-title">THE WORLD<br>IS PROOF<br>I AM <b>ALIVE.</b></i>
+        <img src="images/photographer-cut.png" alt="">
+        <i class="mc-strap"></i>
+      </span>
+      <span class="oj-text">open my journal →</span>
+    </a>
+    <p>my letters, the road I walked, and how far it's been.</p>
   </section>
 
-  <!-- ── FACTS STRIP ── -->
-  <div class="facts-strip">
-    <div class="fact-item"><div class="fact-num">7<span> continents</span></div><div class="fact-desc">Including Antarctica</div></div>
-    <div class="fact-item"><div class="fact-num" id="fCountries">—</div><div class="fact-desc">Countries visited</div></div>
-    <div class="fact-item"><div class="fact-num" id="fFlights">—</div><div class="fact-desc">Flights taken</div></div>
-    <div class="fact-item"><div class="fact-num" id="fMiles">—</div><div class="fact-desc">Miles in the air</div></div>
-    <div class="fact-item"><div class="fact-num" id="fAirlines">—</div><div class="fact-desc">Airlines flown</div></div>
-  </div>
-
-  <!-- ── EXPERIENCES ── -->
-  <section class="experiences">
-    <div class="section-header">
-      <div class="section-eyebrow">// FIELD NOTES</div>
-      <div class="section-title">EXPERIENCES.</div>
-      <div class="section-poem-line">The proof that turning up is enough. The rest writes itself.</div>
-    </div>
-    <div class="exp-tabs">
-      <button class="exp-tab active" onclick="switchTab('adventures',this)"><span class="tab-icon">⚡</span>ADVENTURES</button>
-      <button class="exp-tab" onclick="switchTab('people',this)"><span class="tab-icon">👤</span>PEOPLE</button>
-      <button class="exp-tab" onclick="switchTab('moments',this)"><span class="tab-icon">✦</span>MOMENTS</button>
-    </div>
-    <div class="reel-wrap active" id="tab-adventures">
-      <div class="tab-poem">// The adrenaline chapter</div>
-      <div class="sprocket-row" id="spr-t-adv"></div>
-      <div class="film-track-outer" id="track-adv"><div class="film-track" id="reel-adventures"></div></div>
-      <div class="sprocket-row" id="spr-b-adv"></div>
-    </div>
-    <div class="reel-wrap" id="tab-people">
-      <div class="tab-poem">// Human connections</div>
-      <div class="sprocket-row" id="spr-t-ppl"></div>
-      <div class="film-track-outer" id="track-ppl"><div class="film-track" id="reel-people"></div></div>
-      <div class="sprocket-row" id="spr-b-ppl"></div>
-    </div>
-    <div class="reel-wrap" id="tab-moments">
-      <div class="tab-poem">// The quiet ones</div>
-      <div class="sprocket-row" id="spr-t-mom"></div>
-      <div class="film-track-outer" id="track-mom"><div class="film-track" id="reel-moments"></div></div>
-      <div class="sprocket-row" id="spr-b-mom"></div>
-    </div>
-  </section>
-
-  <!-- ── FLIGHTS ── -->
-  <section class="flights-section">
-    <div class="section-header">
-      <div class="section-eyebrow">// THE OBSESSION</div>
-      <div class="section-title">FLIGHTS.</div>
-      <div class="section-poem-line">Every takeoff is a small act of faith. Every landing, proof you made it.</div>
-    </div>
-    <div class="flight-stats" id="flightStats"></div>
-    <div class="fleet-section-header">
-      <div class="section-eyebrow" style="margin:0">// AIRCRAFT FLOWN</div>
-    </div>
-    <div class="fleet-grid-wrap" id="fleetGridWrap">
-      <!-- First 2 rows (6 cards) always visible -->
-      <div class="fleet-grid" id="fleetGrid"></div>
-      <!-- Hidden additional cards -->
-      <div class="fleet-grid-hidden" id="fleetGridHidden">
-        <div class="fleet-grid" id="fleetGridExtra"></div>
-      </div>
-    </div>
-    <!-- Airplane expand tab -->
-    <div class="fleet-expand-wrap" id="fleetExpandWrap" onclick="toggleFleetExpand()" style="display:none">
-      <div class="fleet-runway"></div>
-      <div class="fleet-expand-btn">
-        <span class="fleet-plane-icon" id="fleetPlaneIcon">✈</span>
-        <span id="fleetExpandLabel">MORE AIRCRAFT</span>
-        <span class="fleet-expand-count" id="fleetExpandCount"></span>
-      </div>
-    </div>
-    <div class="section-eyebrow" style="margin-bottom:16px">// RECENT BOARDING PASSES</div>
-    <div class="bp-stack" id="boardingGrid"></div>
-    <div id="bpMoreWrap" style="margin-bottom:48px;display:none" onclick="expandBoardingPasses()" title="Click to see all boarding passes">
-      <div class="bp-stack-peek" id="bpStackPeek">
-        <div class="bp-peek-card bp-peek-3"></div>
-        <div class="bp-peek-card bp-peek-2"></div>
-        <div class="bp-peek-card bp-peek-1">
-          <div class="bp-peek-face">
-            <div class="bp-peek-label" id="bpMoreLabel">+ MORE BOARDING PASSES</div>
-            <div class="bp-peek-hint">CLICK THE STACK TO EXPAND</div>
-            <div class="bp-peek-arrow" id="bpPeekArrow">▾</div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
-      <div class="section-eyebrow" style="margin:0">// FULL FLIGHT LOG</div>
-      <button class="expand-btn" id="logToggleBtn" onclick="toggleFlightLog()">
-        EXPAND LOG <span class="expand-btn-arrow" id="logArrow">▾</span>
-      </button>
-    </div>
-    <div id="flightLogWrap" style="display:none">
-      <div class="flight-log-wrap">
-        <table>
-          <thead><tr><th>ROUTE</th><th>AIRLINE</th><th>DATE</th><th>AIRCRAFT</th><th>MILES</th></tr></thead>
-          <tbody id="flightLog"></tbody>
-        </table>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── AIRPORTS ── -->
-  <section class="airports-section">
-    <div class="section-header">
-      <div class="section-eyebrow">// FAVOURITE AIRPORTS</div>
-      <div class="section-title">AIRPORTS.</div>
-      <div class="section-poem-line">Some cities you enter through their airports. The airport is already the story.</div>
-    </div>
-    <div class="passport-fold-wrap" id="passportFoldWrap">
-      <div class="airport-grid" id="airportGridVisible"></div>
-      <div class="airport-grid-hidden">
-        <div class="airport-grid" id="airportGridHidden"></div>
-      </div>
-    </div>
-    <div class="passport-fold-tab" onclick="togglePassport()">
-      <div class="fold-tab-inner">
-        <span id="foldLabel">UNFOLD PASSPORT</span>
-        <span class="fold-arrow" id="foldArrow">▾</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── CAFES ── -->
-  <section class="cafes-section">
-    <div class="section-header">
-      <div class="section-eyebrow">// CAFFEINE & CULTURE</div>
-      <div class="section-title">CAFES.</div>
-      <div class="section-poem-line">Every cup is a city. Every city, a cup.</div>
-    </div>
-
-    <!-- Curtain wrap — first 2 rows always visible -->
-    <div class="cafe-curtain-wrap" id="cafeCurtainWrap">
-      <!-- First 2 rows -->
-      <div class="cafe-grid" id="cafeGridVisible"></div>
-      <!-- Hidden rows -->
-      <div class="cafe-hidden-rows">
-        <div class="cafe-grid" id="cafeGridHidden" style="margin-top:24px"></div>
-      </div>
-    </div>
-
-    <!-- Pull-down tab -->
-    <div class="cafe-seemore" id="cafeSeeMore" onclick="toggleCafeCurtain()" style="display:none">
-      <div class="cafe-seemore-stitches">
-        <div class="cafe-stitch"></div>
-        <div class="cafe-stitch"></div>
-        <div class="cafe-stitch"></div>
-        <div class="cafe-stitch"></div>
-        <div class="cafe-stitch"></div>
-      </div>
-      <div class="cafe-seemore-tab">
-        <span id="cafeSeeMoreLabel">SEE MORE CAFES</span>
-        <span class="cafe-count-badge" id="cafeSeeMoreCount"></span>
-        <span class="cafe-pull-arrow">▾</span>
-      </div>
-    </div>
-  </section>
-
-  <!-- ── COUNTRIES FLAG GRID ── -->
-  <section class="countries-section">
-    <div class="section-eyebrow">// EVERY FLAG</div>
-    <div class="section-title" style="font-size:clamp(36px,5vw,64px)">COUNTRIES.</div>
-    <div class="flags-grid" id="flagsGrid"></div>
-  </section>
-
-  <!-- ── CLOSING ── -->
-  <section class="closing-section" id="closingSection">
-    <div class="closing-poem" id="closingPoem">
-      <div class="poem-couplet" id="pc1">
-        <div class="poem-english">You carry your restlessness in your heart as you walk on</div>
-      </div>
-      <div class="poem-couplet" id="pc2">
-        <div class="poem-english">You carry lightning of dreams in your eyes as you walk on</div>
-      </div>
-      <div class="poem-couplet" id="pc3">
-        <div class="poem-english">Free as gusts of wind — you are</div>
-      </div>
-      <div class="poem-couplet" id="pc4">
-        <div class="poem-english">You who carry wonder in your eyes as you walk on</div>
-      </div>
-      <div class="poem-final" id="poemFinal">
-        <div class="poem-final-line">TOH <span class="gold">ZINDA</span><br>HO TUM.</div>
-        <div class="poem-final-sub">— JAVED AKHTAR, ZINDAGI NA MILEGI DOBARA</div>
-      </div>
-      <div class="closing-count">
-        <span id="closingCount">53</span> COUNTRIES · 7 CONTINENTS · <span>STILL COUNTING</span>
-      </div>
-    </div>
-  </section>
-
-  <footer class="page-footer">
-    <div class="footer-name">ANURAAG RAVULAPARTHI</div>
-    <div class="footer-links">
-      <a href="index.html">Home</a>
-      <a href="Profile.html">Profile</a>
-      <a href="Contact.html">Contact</a>
-    </div>
-  </footer>
-</div>
-
-<!-- Lightbox -->
-<div class="lightbox" id="lightbox" onclick="closeLB(event)">
-  <div class="lb-panel">
-    <button class="lb-close" onclick="closeLightbox()">ESC / CLOSE ✕</button>
-    <div class="lb-img-col">
-      <img id="lbImg" src="" alt="" style="display:none">
-      <div class="lb-img-placeholder" id="lbImgPlaceholder" style="display:none">NO PHOTO YET</div>
-      <div class="lb-img-overlay"></div>
-      <div class="lb-loc-badge" id="lbLoc"></div>
-    </div>
-    <div class="lb-text-col">
-      <div class="lb-tab-label" id="lbTab"></div>
-      <div class="lb-title" id="lbTitle"></div>
-      <div class="lb-story" id="lbStory"></div>
-      <div class="lb-nav">
-        <button class="lb-nav-btn" onclick="lbStep(-1)">← PREV</button>
-        <button class="lb-nav-btn" onclick="lbStep(1)">NEXT →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Cafe Lightbox -->
-<div class="lightbox" id="cafeLightbox" onclick="closeCafeLB(event)">
-  <div class="lb-panel">
-    <button class="lb-close" onclick="closeCafeLightbox()">ESC / CLOSE ✕</button>
-    <div class="lb-img-col">
-      <img id="cafeLbImg" src="" alt="" style="display:none">
-      <div class="lb-img-placeholder" id="cafeLbImgPlaceholder" style="display:none">☕</div>
-      <div class="lb-img-overlay"></div>
-      <div class="lb-loc-badge" id="cafeLbLoc"></div>
-      <div class="cafe-lb-img-nav" id="cafeLbImgNav" style="display:none">
-        <button class="cafe-lb-arrow" onclick="cafeLbImgStep(-1)">‹</button>
-        <div class="cafe-lb-dots" id="cafeLbDots"></div>
-        <button class="cafe-lb-arrow" onclick="cafeLbImgStep(1)">›</button>
-      </div>
-    </div>
-    <div class="lb-text-col">
-      <div class="lb-tab-label" id="cafeLbType"></div>
-      <div class="lb-title" id="cafeLbTitle"></div>
-      <div class="cafe-lb-caption" id="cafeLbVibe"></div>
-      <div class="cafe-lb-ordered" id="cafeLbOrdered"></div>
-      <div class="lb-story" id="cafeLbStory"></div>
-    </div>
-  </div>
-</div>
-
-<!-- Terminal -->
-<button class="term-trigger" id="termTrigger" onclick="openTerm()">
-  <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="14" fill="#1C1109" opacity="0.88"/><path d="M9 13L14 16L9 19" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M16 20h7" stroke="#2E8B7A" stroke-width="1.8" stroke-linecap="round"/></svg>
-  <div class="term-trigger-dot"></div>
-  <span class="term-trigger-label">TERMINAL</span>
-</button>
-<div class="term-backdrop" id="termBackdrop" onclick="closeTerm()"></div>
-<div class="term-drawer" id="termDrawer">
-  <div class="term-bar">
-    <div class="td td-r" onclick="closeTerm()"></div>
-    <div class="td td-y"></div><div class="td td-g"></div>
-    <span class="t-title">anuraag.sh — nomad</span>
-    <span class="t-clock" id="tClock"></span>
-  </div>
-  <div class="term-body" id="tBody"></div>
-  <div class="term-foot">
-    <span class="t-ps">anuraag@world:~$</span>
-    <input class="t-in" id="tIn" placeholder="type a command…" autocomplete="off" spellcheck="false">
-    <div class="t-cur"></div>
-  </div>
-</div>
-
-<!-- Social bar -->
-<div class="social-bar">
-  <a href="https://www.linkedin.com/in/anuraag-rss-50b9a678/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#3a506b"/><path d="M10.5 13.5v7h2v-7h-2zm1-2a1 1 0 110-2 1 1 0 010 2zm3.5 2v7h2v-4c0-1.1.9-2 2-2s2 .9 2 2v4h2v-4c0-2.2-1.8-4-4-4s-4 1.8-4 4z" fill="#fff"/></svg>
-  </a>
-  <a href="https://www.polarsteps.com/SwamisaiAnuraagRavul" target="_blank" rel="noopener noreferrer" aria-label="Polarsteps">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#2E8B7A"/><path d="M16 10c-3 0-5 2.4-5 5.2 0 3.2 4.2 7.8 4.6 8.2.2.2.6.2.8 0 .4-.4 4.6-5 4.6-8.2C21 12.4 19 10 16 10zm0 7.2a2 2 0 110-4 2 2 0 010 4z" fill="#fff"/></svg>
-  </a>
-  <a href="https://twitter.com/" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-    <svg viewBox="0 0 32 32" fill="none"><circle cx="16" cy="16" r="16" fill="#1c2541"/><path d="M24 12.5a4.5 4.5 0 01-1.3.36 2.25 2.25 0 00.99-1.24 4.5 4.5 0 01-1.43.55A2.25 2.25 0 0016 13.5a6.4 6.4 0 01-4.64-2.36 2.25 2.25 0 00.7 3A2.23 2.23 0 0112 14v.03a2.25 2.25 0 001.8 2.2c-.4.1-.8.1-1.2.04a2.25 2.25 0 002.1 1.56A4.5 4.5 0 0110 20.5a6.36 6.36 0 003.44 1c4.13 0 6.39-3.42 6.39-6.39 0-.1 0-.21-.01-.31A4.5 4.5 0 0124 12.5z" fill="#fff"/></svg>
-  </a>
-</div>
-
-<!-- ══════════════════════════════════════
-     NOMAD ORACLE — FULL-SCREEN EDITORIAL
-══════════════════════════════════════ -->
-
-<!-- Full-screen oracle overlay -->
-<div class="ai-oracle-overlay" id="aiOracleOverlay">
-  <div class="ai-oracle-grid">
-
-    <!-- LEFT: Portrait column -->
-    <div class="ai-portrait-col">
-      <img class="ai-portrait-img" src="images/photographer.jpeg" alt="Arey the dreamer" id="aiPortraitImg">
-      <div class="ai-portrait-grad"></div>
-
-      <!-- Idle state: suggestion chips -->
-      <div class="ai-oracle-idle" id="aiOracleIdle">
-        <div class="ai-idle-eyebrow">// ASK THE NOMAD</div>
-        <div class="ai-idle-title">WHAT DO YOU<br>WANT TO KNOW?</div>
-        <div class="ai-chips-grid">
-          <div class="ai-chip" onclick="sendAiChip(this)">What country changed you most?</div>
-          <div class="ai-chip" onclick="sendAiChip(this)">Describe your favourite flight</div>
-          <div class="ai-chip" onclick="sendAiChip(this)">What do you carry from home?</div>
-          <div class="ai-chip" onclick="sendAiChip(this)">A stranger who stayed with you</div>
-          <div class="ai-chip" onclick="sendAiChip(this)">Why do you keep leaving?</div>
-        </div>
-      </div>
-
-      <!-- Portrait caption + live stats -->
-      <div class="ai-portrait-cap">
-        <div class="ai-portrait-name">ANURAAG</div>
-        <div class="ai-portrait-tagline">NOMAD · ENGINEER · STORYTELLER</div>
-        <div class="ai-portrait-stats" id="aiPortraitStats">
-          <div class="ai-portrait-stat">
-            <div class="ai-ps-num" id="aiStatC">—</div>
-            <div class="ai-ps-label">COUNTRIES</div>
-          </div>
-          <div class="ai-portrait-stat">
-            <div class="ai-ps-num" id="aiStatF">—</div>
-            <div class="ai-ps-label">FLIGHTS</div>
-          </div>
-          <div class="ai-portrait-stat">
-            <div class="ai-ps-num">7</div>
-            <div class="ai-ps-label">CONTINENTS</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT: Conversation column -->
-    <div class="ai-convo-col">
-      <div class="ai-convo-bar">
-        <div class="ai-convo-title">// CONVERSATION WITH THE NOMAD</div>
-        <button class="ai-convo-close" onclick="closeAiChat()">CLOSE ✕</button>
-      </div>
-
-      <!-- Thread -->
-      <div class="ai-thread" id="aiThread">
-        <!-- Entries injected by JS -->
-      </div>
-
-      <!-- Input bar -->
-      <div class="ai-oracle-input-bar">
-        <div class="ai-input-inner">
-          <textarea
-            class="ai-input"
-            id="aiInput"
-            placeholder="Ask anything about the journey…"
-            rows="1"
-            onkeydown="handleAiKeydown(event)"
-            oninput="autoResizeAiInput(this)"
-          ></textarea>
-          <button class="ai-send-btn" onclick="sendAiMessage()" id="aiSendBtn">
-            <svg viewBox="0 0 16 16" fill="none"><path d="M2 8l12-6-6 12-2-4-4-2z" fill="white"/></svg>
-          </button>
-        </div>
-        <div class="ai-input-hint">ENTER TO SEND · SHIFT+ENTER FOR NEW LINE</div>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- Floating trigger -->
-<div class="ai-chat-trigger" id="aiChatTrigger" onclick="openAiChat()">
-  <div class="ai-trigger-hint">ASK THE NOMAD ✦</div>
-  <div style="position:relative">
-    <img class="ai-trigger-avatar" src="images/photographer.jpeg" alt="Ask Arey the dreamer">
-    <div class="ai-online-dot"></div>
-  </div>
-</div>
-
-<script src="js/terminal.js"></script>
-<script type="module" src="js/nomad.js"></script>
+  <script type="module" src="js/late-sun-scene.js"></script>
+  <script type="module" src="js/journey.js"></script>
+  <script type="module" src="js/nav.js"></script>
 </body>
 </html>

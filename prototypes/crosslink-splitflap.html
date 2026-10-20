@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype — click a flag, the arrivals board flaps to life</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=JetBrains+Mono:wght@500;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E9; --paper2:#EDE7DC; --paper3:#E3DBCD;
+    --ink:#1C1109; --ink2:#3D2B1A; --muted:#7A6A54; --faint:rgba(28,17,9,0.09);
+    --teal:#2E8B7A; --teal2:rgba(46,139,122,0.1);
+    --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace;
+    --disp:'Bebas Neue',sans-serif; --hand:'Caveat',cursive;
+    --gold:#C8912E; --board:#0A0A0C; --board2:#141416;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);margin:0;padding:0 0 140px;}
+
+  .proto-banner{position:sticky;top:0;z-index:60;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-align:center;padding:8px 16px;}
+  .proto-banner b{color:var(--gold)}
+
+  .top-nav{padding:13px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(246,241,233,0.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--faint);}
+  .nav-logo{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--teal);text-decoration:none;}
+
+  .wrap{max-width:980px;margin:0 auto;padding:48px 48px 0;}
+  .section-title{font-family:var(--disp);font-size:clamp(36px,5vw,56px);line-height:.95;margin:0 0 6px;}
+  .section-sub{font-family:var(--mono);font-size:11px;letter-spacing:2px;color:var(--muted);margin-bottom:36px;}
+
+  .flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+  .flag-card{background:#FEFCF8;border:1px solid var(--paper3);border-radius:3px;padding:10px 8px 8px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:1px 2px 8px rgba(28,17,9,.07);cursor:pointer;}
+  .flag-card::before{content:'';position:absolute;inset:4px;border:1px dashed rgba(28,17,9,.1);pointer-events:none;}
+  .flag-card:hover{transform:scale(1.06);box-shadow:3px 4px 16px rgba(28,17,9,.14);z-index:2;}
+  .flag-card.active{outline:2px solid var(--gold);outline-offset:-2px;}
+  .flag-emoji{font-size:26px;line-height:1;margin-bottom:6px;}
+  .flag-name{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--ink2);}
+
+  /* ================= BOARD ================= */
+  .board-wrap{max-height:0;overflow:hidden;transition:max-height .5s cubic-bezier(.4,0,.2,1);}
+  .board-wrap.open{max-height:3000px;}
+  .board{margin-top:28px;background:var(--board);border-radius:6px;padding:28px 30px 30px;box-shadow:0 20px 50px rgba(0,0,0,.35), inset 0 0 0 1px rgba(255,255,255,.03);position:relative;}
+  .board::before{content:'';position:absolute;inset:0;border-radius:6px;background:repeating-linear-gradient(0deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);pointer-events:none;}
+  .board-close{position:absolute;top:14px;right:18px;font-family:var(--mono);font-size:9px;letter-spacing:1.5px;color:rgba(244,239,230,.35);background:none;border:none;cursor:pointer;}
+  .board-close:hover{color:var(--gold);}
+
+  .brow{display:flex;align-items:center;gap:2px;margin-bottom:10px;flex-wrap:wrap;}
+  .brow.headline{margin-bottom:22px;}
+  .brow-label{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:rgba(244,239,230,.25);width:96px;flex-shrink:0;text-transform:uppercase;}
+  .bcols{display:flex;gap:22px;margin-bottom:6px;padding-left:96px;}
+  .bcol-h{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:rgba(200,145,58,.4);}
+
+  .flap-cell{display:inline-block;position:relative;width:15px;height:26px;perspective:80px;flex-shrink:0;}
+  .flap-cell.wide{width:15px;}
+  .flap-inner{position:absolute;inset:0;background:var(--board2);border-radius:2px;box-shadow:0 1px 0 rgba(0,0,0,.6), inset 0 0 0 1px rgba(255,255,255,.04);display:flex;align-items:center;justify-content:center;}
+  .flap-inner::after{content:'';position:absolute;left:0;right:0;top:50%;height:1px;background:rgba(0,0,0,.55);}
+  .flap-char{font-family:var(--mono);font-weight:700;font-size:14px;color:var(--gold);transition:transform .085s linear, opacity .085s linear;display:inline-block;}
+  .flap-cell.headline-cell{width:16px;height:30px;}
+  .flap-cell.headline-cell .flap-char{font-size:16px;}
+
+  .brow-line{display:inline-flex;gap:2px;flex-wrap:nowrap;}
+
+  .bdivider{height:1px;background:rgba(255,255,255,.05);margin:18px 0;}
+
+  .board-note{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:rgba(244,239,230,.2);margin-top:20px;text-align:center;}
+  .board-note.done{color:rgba(200,145,58,.45);}
+
+  /* content that fades in once flaps settle */
+  .board-extra{max-height:0;overflow:hidden;opacity:0;transition:max-height .6s ease, opacity .5s ease .1s;}
+  .board-extra.show{max-height:600px;opacity:1;}
+  .extra-inner{padding-top:22px;border-top:1px dashed rgba(255,255,255,.08);margin-top:22px;}
+  .extra-label{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:rgba(200,145,58,.5);margin-bottom:12px;}
+  .extra-photos{display:flex;gap:14px;overflow-x:auto;padding-bottom:6px;}
+  .extra-photo{flex:0 0 auto;width:120px;height:140px;border-radius:3px;position:relative;box-shadow:0 8px 24px rgba(0,0,0,.4);transform:rotate(var(--r));}
+  .extra-photo img{width:100%;height:100%;object-fit:cover;border-radius:2px;border:4px solid #f4efe6;box-sizing:border-box;display:block;}
+  .extra-cta{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--gold);text-decoration:none;display:inline-block;margin-top:10px;}
+  .extra-cta:hover{text-decoration:underline;}
+  .extra-people{display:flex;gap:16px;flex-wrap:wrap;}
+  .extra-person{text-align:center;width:76px;}
+  .extra-person img{width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid rgba(200,145,58,.4);}
+  .extra-person .pname{font-family:var(--mono);font-size:9px;letter-spacing:1px;color:rgba(244,239,230,.6);margin-top:6px;}
+
+  .empty-row{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:rgba(244,239,230,.2);padding-left:96px;}
+
+  .hint{margin-top:40px;padding:16px 20px;background:var(--teal2);border-left:3px solid var(--teal);font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink2);}
+  .hint code{background:rgba(28,17,9,.06);padding:1px 5px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="proto-banner">PROTOTYPE — mock data. Click a flag: the panel becomes an <b>arrivals board</b> that mechanically flaps its way to the country's story.</div>
+
+<nav class="top-nav"><a class="nav-logo" href="#">AREY // DREAMER</a></nav>
+
+<div class="wrap">
+  <h2 class="section-title">Countries</h2>
+  <div class="section-sub">CLICK A STAMPED COUNTRY — THE BOARD WILL CALL UP ITS STORY</div>
+
+  <div class="flags-grid" id="flagsGrid"></div>
+
+  <div class="board-wrap" id="boardWrap">
+    <div class="board" id="board">
+      <button class="board-close" id="boardClose">CLOSE ×</button>
+
+      <div class="brow headline">
+        <div class="brow-label">DESTINATION</div>
+        <div class="brow-line" id="rowHeadline"></div>
+      </div>
+
+      <div class="bcols">
+        <div class="bcol-h" style="width:70px">FLIGHT</div>
+        <div class="bcol-h" style="width:150px">ROUTE</div>
+        <div class="bcol-h" style="width:90px">DATE</div>
+        <div class="bcol-h">STATUS</div>
+      </div>
+      <div id="flightRows"></div>
+
+      <div class="bdivider"></div>
+
+      <div class="brow">
+        <div class="brow-label">AIRPORTS</div>
+        <div class="brow-line" id="rowAirports"></div>
+      </div>
+
+      <div class="brow">
+        <div class="brow-label">PEOPLE MET</div>
+        <div class="brow-line" id="rowPeople"></div>
+      </div>
+
+      <div class="board-note" id="boardStatus">CALLING UP RECORD…</div>
+
+      <div class="board-extra" id="boardExtra">
+        <div class="extra-inner">
+          <div class="extra-label">📷 PHOTOS CAPTURED HERE</div>
+          <div class="extra-photos" id="extraPhotos"></div>
+          <a class="extra-cta" id="extraCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a>
+
+          <div class="extra-label" style="margin-top:24px;">👥 TRAVELED WITH</div>
+          <div class="extra-people" id="extraPeople"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    behavior: click fires the mocked equivalent of four parallel Firestore queries (flights/airports/photos/people
+    joined by country_id, same as before). Instead of fading in, each field resolves through a Solari split-flap
+    animation — text rows (destination, flight rows, airport codes, people names) flap character-by-character
+    into place, cascading left→right and row→row. Once the last row settles, photos (which can't be represented
+    as flap-text) and portraits fade in below the board. Rows with no data show a dim placeholder instead of
+    flapping empty.
+  </div>
+</div>
+
+<script>
+const COUNTRIES = [
+  {id:'in', name:'INDIA', emoji:'🇮🇳'}, {id:'jp', name:'JAPAN', emoji:'🇯🇵'},
+  {id:'pt', name:'PORTUGAL', emoji:'🇵🇹'}, {id:'th', name:'THAILAND', emoji:'🇹🇭'},
+  {id:'is', name:'ICELAND', emoji:'🇮🇸'}, {id:'ma', name:'MOROCCO', emoji:'🇲🇦'},
+  {id:'nz', name:'NEW ZEALAND', emoji:'🇳🇿'}, {id:'gr', name:'GREECE', emoji:'🇬🇷'},
+];
+
+const COUNTRY_DATA = {
+  jp: { name:'JAPAN',
+    flights: [
+      {flight:'UA837', route:'SFO-NRT', date:'12MAR24', status:'LOGGED'},
+      {flight:'JL123', route:'NRT-KIX', date:'18MAR24', status:'LOGGED'},
+      {flight:'UA838', route:'KIX-SFO', date:'24MAR24', status:'LOGGED'},
+    ],
+    airports:['NRT','KIX','HND'],
+    people:['KENJI','YUKI'],
+    photos:[
+      {url:'https://picsum.photos/seed/jp1/200/240',cap:'Shibuya'},
+      {url:'https://picsum.photos/seed/jp2/200/240',cap:'Kyoto'},
+      {url:'https://picsum.photos/seed/jp3/200/240',cap:'Fuji'},
+      {url:'https://picsum.photos/seed/jp4/200/240',cap:'Osaka'},
+    ],
+    peoplePhotos:[
+      {name:'Kenji', img:'https://picsum.photos/seed/person2/200/200'},
+      {name:'Yuki', img:'https://picsum.photos/seed/person4/200/200'},
+    ],
+  },
+  in: { name:'INDIA',
+    flights:[
+      {flight:'6E204', route:'BLR-DEL', date:'04JAN24', status:'LOGGED'},
+      {flight:'AI662', route:'DEL-BOM', date:'09JAN24', status:'LOGGED'},
+    ],
+    airports:['DEL','BOM','BLR'],
+    people:['PRIYA'],
+    photos:[
+      {url:'https://picsum.photos/seed/in1/200/240',cap:'Hampi'},
+      {url:'https://picsum.photos/seed/in2/200/240',cap:'Delhi'},
+      {url:'https://picsum.photos/seed/in3/200/240',cap:'Kerala'},
+    ],
+    peoplePhotos:[{name:'Priya', img:'https://picsum.photos/seed/person3/200/200'}],
+  },
+  pt: { name:'PORTUGAL',
+    flights:[{flight:'TP204', route:'JFK-LIS', date:'11JUN23', status:'LOGGED'}],
+    airports:['LIS'],
+    people:['MARIA','TIAGO'],
+    photos:[
+      {url:'https://picsum.photos/seed/pt1/200/240',cap:'Lisbon'},
+      {url:'https://picsum.photos/seed/pt2/200/240',cap:'Porto'},
+    ],
+    peoplePhotos:[
+      {name:'Maria', img:'https://picsum.photos/seed/person1/200/200'},
+      {name:'Tiago', img:'https://picsum.photos/seed/person5/200/200'},
+    ],
+  },
+  is: { name:'ICELAND', flights:[], airports:['KEF'], people:[],
+    photos:[{url:'https://picsum.photos/seed/is1/200/240',cap:'Ring road'}], peoplePhotos:[] },
+};
+
+const CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789- →·';
+
+function makeFlapCell(extraClass){
+  const cell = document.createElement('div');
+  cell.className = 'flap-cell' + (extraClass ? ' '+extraClass : '');
+  cell.innerHTML = `<div class="flap-inner"><span class="flap-char">&nbsp;</span></div>`;
+  return cell;
+}
+
+// resolves one flap-cell to `ch`, cycling through random glyphs first
+function flapCell(cell, ch, delay){
+  const span = cell.querySelector('.flap-char');
+  return new Promise(resolve=>{
+    setTimeout(()=>{
+      let ticks = 4 + Math.floor(Math.random()*4);
+      let i = 0;
+      const step = ()=>{
+        span.style.transform = 'rotateX(90deg)';
+        span.style.opacity = '0.2';
+        setTimeout(()=>{
+          span.textContent = i < ticks-1 ? CHARS[Math.floor(Math.random()*CHARS.length)] : (ch === ' ' ? ' ' : ch);
+          span.style.transform = 'rotateX(0deg)';
+          span.style.opacity = '1';
+          i++;
+          if (i < ticks) setTimeout(step, 55);
+          else resolve();
+        }, 85);
+      };
+      step();
+    }, delay);
+  });
+}
+
+// builds a row of flap cells for `text`, staggering left-to-right, returns the row element + promise
+function flapRow(container, text, opts={}){
+  const row = document.createElement('div');
+  row.className = 'brow-line';
+  container.appendChild(row);
+  const chars = text.split('');
+  const cells = chars.map(()=> {
+    const c = makeFlapCell(opts.headline ? 'headline-cell' : '');
+    row.appendChild(c);
+    return c;
+  });
+  const baseDelay = opts.baseDelay || 0;
+  const stagger = opts.stagger ?? 18;
+  const proms = chars.map((ch,i)=> flapCell(cells[i], ch, baseDelay + i*stagger));
+  return Promise.all(proms);
+}
+
+const grid = document.getElementById('flagsGrid');
+const boardWrap = document.getElementById('boardWrap');
+const boardClose = document.getElementById('boardClose');
+const boardStatus = document.getElementById('boardStatus');
+const boardExtra = document.getElementById('boardExtra');
+let activeCard = null;
+let runToken = 0;
+
+function fetchCountryStory(id){
+  return new Promise(res => setTimeout(()=> res(COUNTRY_DATA[id] || null), 200));
+}
+
+function buildFlags(){
+  COUNTRIES.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'flag-card';
+    card.innerHTML = `<div class="flag-emoji">${c.emoji}</div><div class="flag-name">${c.name}</div>`;
+    card.addEventListener('click', ()=> onCountryClick(c, card));
+    grid.appendChild(card);
+  });
+}
+
+async function onCountryClick(country, cardEl){
+  const reopening = activeCard === cardEl && boardWrap.classList.contains('open');
+  if (activeCard) activeCard.classList.remove('active');
+
+  if (reopening){
+    boardWrap.classList.remove('open');
+    activeCard = null;
+    return;
+  }
+
+  cardEl.classList.add('active');
+  activeCard = cardEl;
+  const myToken = ++runToken;
+
+  boardWrap.classList.add('open');
+  boardExtra.classList.remove('show');
+  boardStatus.textContent = 'CALLING UP RECORD…';
+  boardStatus.classList.remove('done');
+  document.getElementById('rowHeadline').innerHTML = '';
+  document.getElementById('flightRows').innerHTML = '';
+  document.getElementById('rowAirports').innerHTML = '';
+  document.getElementById('rowPeople').innerHTML = '';
+  boardWrap.scrollIntoView({behavior:'smooth', block:'nearest'});
+
+  const data = await fetchCountryStory(country.id);
+  if (myToken !== runToken) return; // a newer click superseded this one
+
+  const headlineEl = document.getElementById('rowHeadline');
+  const flightsEl = document.getElementById('flightRows');
+  const airportsEl = document.getElementById('rowAirports');
+  const peopleEl = document.getElementById('rowPeople');
+
+  if (!data){
+    await flapRow(headlineEl, country.name.padEnd(14,' '), {headline:true, baseDelay:100});
+    flightsEl.innerHTML = `<div class="empty-row">NO RECORDS ON FILE</div>`;
+    boardStatus.textContent = 'NOTHING LOGGED YET';
+    return;
+  }
+
+  await flapRow(headlineEl, data.name.padEnd(14,' '), {headline:true, baseDelay:100});
+
+  let delay = 0;
+  if (data.flights.length){
+    for (const f of data.flights){
+      const row = document.createElement('div');
+      row.className = 'brow';
+      row.style.paddingLeft = '96px';
+      row.style.gap = '22px';
+      row.style.display = 'flex';
+      const line = f.flight.padEnd(6,' ');
+      const routeLine = f.route.padEnd(12,' ');
+      const dateLine = f.date.padEnd(8,' ');
+      const statusLine = f.status;
+      const wrap1 = document.createElement('div'); wrap1.style.width='70px';
+      const wrap2 = document.createElement('div'); wrap2.style.width='150px';
+      const wrap3 = document.createElement('div'); wrap3.style.width='90px';
+      const wrap4 = document.createElement('div');
+      [wrap1,wrap2,wrap3,wrap4].forEach(w=>row.appendChild(w));
+      flightsEl.appendChild(row);
+      await Promise.all([
+        flapRow(wrap1, line, {baseDelay:delay}).then(()=>{}),
+        flapRow(wrap2, routeLine, {baseDelay:delay}),
+        flapRow(wrap3, dateLine, {baseDelay:delay}),
+        flapRow(wrap4, statusLine, {baseDelay:delay}),
+      ]);
+      // the four flapRow calls above each append their own row into wrap1..4 but we already appended
+      // wrap elements as containers — flapRow appends a NEW .brow-line inside; remove the outer empties
+      delay = 0; // next row starts fresh visually (already sequential via await)
+    }
+  } else {
+    flightsEl.innerHTML = `<div class="empty-row">NO FLIGHTS LOGGED FOR THIS COUNTRY YET</div>`;
+  }
+  if (myToken !== runToken) return;
+
+  if (data.airports.length){
+    await flapRow(airportsEl, data.airports.join('  ·  '), {baseDelay:0, stagger:14});
+  } else {
+    airportsEl.parentElement.querySelector('.empty-row')?.remove();
+    document.getElementById('rowAirports').parentElement.innerHTML = '<div class="brow-label">AIRPORTS</div><div class="empty-row" style="padding-left:0">NONE LOGGED</div>';
+  }
+  if (myToken !== runToken) return;
+
+  if (data.people.length){
+    await flapRow(peopleEl, data.people.join('  ·  '), {baseDelay:0, stagger:14});
+  } else {
+    document.getElementById('rowPeople').parentElement.innerHTML = '<div class="brow-label">PEOPLE MET</div><div class="empty-row" style="padding-left:0">NONE TAGGED YET</div>';
+  }
+  if (myToken !== runToken) return;
+
+  boardStatus.textContent = '✓ RECORD COMPLETE';
+  boardStatus.classList.add('done');
+
+  // photos + portraits fade in beneath the board
+  const extraPhotos = document.getElementById('extraPhotos');
+  const extraCta = document.getElementById('extraCta');
+  const extraPeople = document.getElementById('extraPeople');
+  extraPhotos.innerHTML = data.photos.length ? data.photos.map((p,i)=>`
+    <div class="extra-photo" style="--r:${(i%2?1:-1)*(1.5+i)}deg"><img src="${p.url}" alt="${p.cap}"></div>
+  `).join('') : `<div class="empty-row" style="padding-left:0">No photos tagged with this country yet.</div>`;
+  extraCta.style.display = data.photos.length ? 'inline-block' : 'none';
+  extraCta.href = `photography-deeplink.html?country=${country.id}`;
+  extraPeople.innerHTML = data.peoplePhotos.length ? data.peoplePhotos.map(p=>`
+    <div class="extra-person"><img src="${p.img}" alt="${p.name}"><div class="pname">${p.name.toUpperCase()}</div></div>
+  `).join('') : `<div class="empty-row" style="padding-left:0">No one tagged here yet.</div>`;
+
+  boardExtra.classList.add('show');
+}
+
+boardClose.addEventListener('click', ()=>{
+  boardWrap.classList.remove('open');
+  if (activeCard) activeCard.classList.remove('active');
+  activeCard = null;
+});
+
+buildFlags();
+</script>
+</body>
+</html>

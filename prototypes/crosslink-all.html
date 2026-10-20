@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype — deep-linking across nomad sections</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=JetBrains+Mono:wght@400;500&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E9; --paper2:#EDE7DC; --paper3:#E3DBCD;
+    --ink:#1C1109; --ink2:#3D2B1A; --muted:#7A6A54; --faint:rgba(28,17,9,0.09);
+    --teal:#2E8B7A; --teal2:rgba(46,139,122,0.1);
+    --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace;
+    --disp:'Bebas Neue',sans-serif; --hand:'Caveat',cursive;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);margin:0;padding:0 0 120px;}
+
+  .proto-banner{position:sticky;top:0;z-index:60;background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-align:center;padding:8px 16px;}
+  .proto-banner b{color:#E8B84B}
+
+  .top-nav{position:sticky;top:29px;z-index:50;padding:13px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(246,241,233,0.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--faint);}
+  .nav-logo{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--teal);text-decoration:none;}
+  .nav-forward{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);text-decoration:none;}
+  .nav-forward:hover{color:var(--teal)}
+
+  .wrap{max-width:900px;margin:0 auto;padding:48px 48px 0;}
+  section{margin-bottom:64px;}
+  .section-title{font-family:var(--disp);font-size:clamp(32px,4.5vw,48px);line-height:.95;margin:0 0 4px;}
+  .section-sub{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;color:var(--muted);margin-bottom:28px;}
+  .section-note{font-family:var(--mono);font-size:9.5px;letter-spacing:.5px;color:var(--muted);margin:-20px 0 24px;padding:8px 12px;background:rgba(28,17,9,.04);border-left:2px solid var(--paper3);line-height:1.6;}
+  .section-note b{color:var(--ink2)}
+
+  /* ---- shared inline strip (reused across every section) ---- */
+  .strip-wrap{max-height:0;overflow:hidden;transition:max-height .45s cubic-bezier(.4,0,.2,1);}
+  .strip-wrap.open{max-height:260px;}
+  .strip-inner{margin-top:20px;padding:20px 22px;background:var(--paper2);border:1px solid var(--faint);border-radius:4px;}
+  .strip-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;flex-wrap:wrap;gap:8px;}
+  .strip-title{font-family:var(--hand);font-weight:600;font-size:22px;color:var(--ink2);}
+  .strip-link{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--teal);text-decoration:none;white-space:nowrap;}
+  .strip-link:hover{text-decoration:underline;}
+  .strip-track{display:flex;gap:14px;overflow-x:auto;padding-bottom:4px;}
+  .strip-photo{flex:0 0 auto;width:120px;height:140px;border-radius:3px;position:relative;box-shadow:2px 4px 14px rgba(28,17,9,.15);transform:rotate(var(--r));transition:transform .2s;}
+  .strip-photo:hover{transform:rotate(0deg) scale(1.04);z-index:3;}
+  .strip-photo img{width:100%;height:100%;object-fit:cover;border-radius:2px;border:5px solid #fff;box-sizing:border-box;display:block;}
+  .strip-photo .cap{position:absolute;bottom:-2px;left:6px;right:6px;font-family:var(--mono);font-size:7.5px;letter-spacing:.5px;color:var(--muted);text-align:center;}
+  .strip-empty{font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted);padding:8px 0;}
+
+  /* ---- flags (unchanged from prod, just clickable) ---- */
+  .flags-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:12px;}
+  .flag-card{background:#FEFCF8;border:1px solid var(--paper3);border-radius:3px;padding:10px 8px 8px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:1px 2px 8px rgba(28,17,9,.07);}
+  .flag-card::before{content:'';position:absolute;inset:4px;border:1px dashed rgba(28,17,9,.1);pointer-events:none;}
+  .flag-card:hover{transform:scale(1.06);box-shadow:3px 4px 16px rgba(28,17,9,.14);z-index:2;}
+  .flag-card.has-photos{cursor:pointer;}
+  .flag-card.no-photos{cursor:default;opacity:.55;}
+  .flag-card.active{outline:2px solid var(--teal);outline-offset:-2px;}
+  .flag-emoji{font-size:26px;line-height:1;margin-bottom:6px;}
+  .flag-name{font-family:var(--mono);font-size:9.5px;letter-spacing:1px;color:var(--ink2);}
+  .flag-badge{position:absolute;top:4px;right:4px;background:var(--teal);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.5px;padding:1px 5px;border-radius:8px;}
+
+  /* ---- flights: boarding-pass row (mirrors prod .bp-card) ---- */
+  .bp-list{display:flex;flex-direction:column;gap:10px;}
+  .bp-card{background:#FEFCF8;border:1px solid var(--paper3);border-radius:4px;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;box-shadow:2px 3px 14px rgba(28,17,9,.09);cursor:pointer;transition:transform .2s,box-shadow .2s;}
+  .bp-card:hover{transform:translateY(-2px);box-shadow:4px 6px 20px rgba(28,17,9,.13);}
+  .bp-card.active{outline:2px solid var(--teal);outline-offset:-2px;}
+  .bp-route{font-family:var(--disp);font-size:24px;letter-spacing:1px;color:var(--ink);}
+  .bp-meta{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted);margin-top:2px;}
+  .bp-badge{font-family:var(--mono);font-size:9px;letter-spacing:.5px;color:var(--teal);border:1px solid var(--teal);border-radius:10px;padding:3px 9px;white-space:nowrap;}
+  .bp-badge.none{color:var(--muted);border-color:var(--paper3);}
+
+  /* ---- airports: stamp grid (mirrors prod .airport-stamp-card) ---- */
+  .airports-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;}
+  .airport-stamp-card{background:#FEFCF8;border:1px solid var(--paper3);border-radius:3px;padding:14px 10px 10px;text-align:center;position:relative;overflow:hidden;transition:transform .2s,box-shadow .2s;box-shadow:1px 2px 8px rgba(28,17,9,.07);}
+  .airport-stamp-card::before{content:'';position:absolute;inset:4px;border:1px dashed rgba(28,17,9,.09);pointer-events:none;border-radius:1px;}
+  .airport-stamp-card:hover{transform:translateY(-3px) rotate(-0.5deg);box-shadow:3px 5px 18px rgba(28,17,9,.13);z-index:2;}
+  .airport-stamp-card.has-photos{cursor:pointer;}
+  .airport-stamp-card.no-photos{cursor:default;opacity:.5;}
+  .airport-stamp-card.active{outline:2px solid var(--teal);outline-offset:-2px;}
+  .airport-code{font-family:var(--disp);font-size:28px;letter-spacing:1px;color:var(--ink);}
+  .airport-city{font-family:var(--mono);font-size:8.5px;letter-spacing:1px;color:var(--muted);margin-top:2px;}
+  .airport-badge{position:absolute;top:4px;right:4px;background:var(--teal);color:#fff;font-family:var(--mono);font-size:8px;letter-spacing:.5px;padding:1px 5px;border-radius:8px;}
+
+  /* ---- experiences: film-frame track (mirrors prod .film-frame) ---- */
+  .film-track-outer{background:var(--ink);overflow-x:auto;overflow-y:visible;padding:20px 24px;border-radius:4px;}
+  .film-track{display:flex;gap:18px;width:max-content;align-items:flex-end;}
+  .film-frame{flex-shrink:0;cursor:pointer;transition:transform .25s;width:130px;}
+  .film-frame:nth-child(odd){transform:rotate(-2deg);}
+  .film-frame:nth-child(even){transform:rotate(1.6deg);}
+  .film-frame:hover{transform:rotate(0deg) scale(1.05) translateY(-4px) !important;}
+  .film-frame.active .film-print{box-shadow:3px 4px 16px rgba(46,139,122,.35), 0 0 0 2px var(--teal);}
+  .film-print{background:#fff;padding:8px 8px 22px;border-radius:2px;box-shadow:2px 4px 14px rgba(0,0,0,.35);}
+  .film-print img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:1px;}
+  .film-print .flabel{font-family:var(--hand);font-weight:600;font-size:14px;color:var(--ink2);text-align:center;margin-top:6px;}
+  .strip-wrap.on-dark .strip-inner{background:var(--paper2);}
+
+  .hint{margin-top:8px;padding:16px 20px;background:var(--teal2);border-left:3px solid var(--teal);font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink2);}
+  .hint code{background:rgba(28,17,9,.06);padding:1px 5px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="proto-banner">PROTOTYPE — mock data, not wired to Firestore. Same click→preview→deep-link pattern applied to every section.</div>
+
+<nav class="top-nav">
+  <a class="nav-logo" href="#">AREY // DREAMER</a>
+  <a class="nav-forward" href="#" id="lensLink">LENS →</a>
+</nav>
+
+<div class="wrap">
+
+  <!-- ================= FLAGS (kept exactly as before) ================= -->
+  <section>
+    <h2 class="section-title">Countries</h2>
+    <div class="section-sub">CLICK A STAMPED COUNTRY TO PREVIEW ITS PHOTOS</div>
+    <div class="flags-grid" id="flagsGrid"></div>
+    <div class="strip-wrap" id="flagsStrip"><div class="strip-inner">
+      <div class="strip-head"><div class="strip-title" id="flagsStripTitle">—</div><a class="strip-link" id="flagsStripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a></div>
+      <div class="strip-track" id="flagsStripTrack"></div>
+    </div></div>
+  </section>
+
+  <!-- ================= FLIGHTS ================= -->
+  <section>
+    <h2 class="section-title">Flights</h2>
+    <div class="section-sub">CLICK A ROUTE TO PREVIEW PHOTOS FROM THAT TRIP</div>
+    <div class="section-note">
+      Real <code>flights</code> docs have no <b>country_id</b>/<b>trip_id</b>/<b>tags</b> today — this demo
+      derives the join from the destination airport's country via the existing <code>AIRPORT_META</code> lookup
+      (<code>js/nomad.js:726</code>), same source the Airports section already uses.
+    </div>
+    <div class="bp-list" id="flightsList"></div>
+    <div class="strip-wrap" id="flightsStrip"><div class="strip-inner">
+      <div class="strip-head"><div class="strip-title" id="flightsStripTitle">—</div><a class="strip-link" id="flightsStripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a></div>
+      <div class="strip-track" id="flightsStripTrack"></div>
+    </div></div>
+  </section>
+
+  <!-- ================= AIRPORTS ================= -->
+  <section>
+    <h2 class="section-title">Airports</h2>
+    <div class="section-sub">CLICK A STAMP TO PREVIEW PHOTOS FROM THAT COUNTRY</div>
+    <div class="airports-grid" id="airportsGrid"></div>
+    <div class="strip-wrap" id="airportsStrip"><div class="strip-inner">
+      <div class="strip-head"><div class="strip-title" id="airportsStripTitle">—</div><a class="strip-link" id="airportsStripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a></div>
+      <div class="strip-track" id="airportsStripTrack"></div>
+    </div></div>
+  </section>
+
+  <!-- ================= EXPERIENCES: PEOPLE ================= -->
+  <section>
+    <h2 class="section-title">People</h2>
+    <div class="section-sub">CLICK A FACE TO PREVIEW PHOTOS TAGGED WITH THEM</div>
+    <div class="section-note">
+      Real <code>experiences</code> docs (tab='people') have no <b>tags</b> field today — this demo assumes a
+      future <code>tags: [personSlug]</code> field written alongside the existing <code>label</code>, so a
+      person card can link to <code>photography.html?tag=&lt;personSlug&gt;</code>.
+    </div>
+    <div class="film-track-outer"><div class="film-track" id="peopleTrack"></div></div>
+    <div class="strip-wrap on-dark" id="peopleStrip"><div class="strip-inner">
+      <div class="strip-head"><div class="strip-title" id="peopleStripTitle">—</div><a class="strip-link" id="peopleStripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a></div>
+      <div class="strip-track" id="peopleStripTrack"></div>
+    </div></div>
+  </section>
+
+  <!-- ================= EXPERIENCES: ADVENTURES / MOMENTS ================= -->
+  <section>
+    <h2 class="section-title">Adventures</h2>
+    <div class="section-sub">CLICK A FRAME TO PREVIEW PHOTOS FROM THAT MOMENT</div>
+    <div class="film-track-outer"><div class="film-track" id="advTrack"></div></div>
+    <div class="strip-wrap on-dark" id="advStrip"><div class="strip-inner">
+      <div class="strip-head"><div class="strip-title" id="advStripTitle">—</div><a class="strip-link" id="advStripCta" href="#" target="_blank" rel="noopener">SEE FULL GALLERY →</a></div>
+      <div class="strip-track" id="advStripTrack"></div>
+    </div></div>
+  </section>
+
+  <div class="hint">
+    behavior, all sections: click swaps the active card, lazily fetches (simulated) matching <code>photos</code>,
+    and opens a shared inline strip component ending in a link to <code>photography-deeplink.html</code> with the
+    right filter param — <code>?country=X</code> for Flags/Airports/Flights, <code>?tag=X</code> for People/Adventures.
+    Cards with zero matches render dimmed/non-interactive rather than opening an empty strip.
+  </div>
+</div>
+
+<script>
+// ---------- shared strip-builder ----------
+function makeStripController(ids){
+  const strip = document.getElementById(ids.strip);
+  const title = document.getElementById(ids.title);
+  const cta = document.getElementById(ids.cta);
+  const track = document.getElementById(ids.track);
+  let active = null;
+  return {
+    async open(cardEl, label, ctaHref, fetchFn){
+      const reopening = active === cardEl && strip.classList.contains('open');
+      if (active) active.classList.remove('active');
+      if (reopening){ strip.classList.remove('open'); active = null; return; }
+      cardEl.classList.add('active');
+      active = cardEl;
+      const photos = await fetchFn();
+      title.textContent = label;
+      cta.href = ctaHref;
+      track.innerHTML = photos.length ? photos.map((p,i)=>`
+        <div class="strip-photo" style="--r:${(i%2?1:-1)*(2+i)}deg">
+          <img src="${p.url}" alt="${p.cap}"><div class="cap">${p.cap}</div>
+        </div>`).join('') : `<div class="strip-empty">No photos matched yet — this would just link straight through.</div>`;
+      strip.classList.add('open');
+      strip.scrollIntoView({behavior:'smooth', block:'nearest'});
+    }
+  };
+}
+function mockFetch(photos){ return () => new Promise(res => setTimeout(()=>res(photos), 220)); }
+
+// ============ FLAGS ============
+const COUNTRIES = [
+  {id:'in', name:'INDIA', emoji:'🇮🇳'}, {id:'jp', name:'JAPAN', emoji:'🇯🇵'},
+  {id:'pt', name:'PORTUGAL', emoji:'🇵🇹'}, {id:'th', name:'THAILAND', emoji:'🇹🇭'},
+  {id:'is', name:'ICELAND', emoji:'🇮🇸'}, {id:'ma', name:'MOROCCO', emoji:'🇲🇦'},
+];
+const PHOTOS_BY_COUNTRY = {
+  in: [{url:'https://picsum.photos/seed/in1/200/240',cap:'Hampi, sunrise'},{url:'https://picsum.photos/seed/in2/200/240',cap:'Old Delhi lanes'},{url:'https://picsum.photos/seed/in3/200/240',cap:'Kerala backwaters'}],
+  jp: [{url:'https://picsum.photos/seed/jp1/200/240',cap:'Shibuya crossing'},{url:'https://picsum.photos/seed/jp2/200/240',cap:'Kyoto bamboo'},{url:'https://picsum.photos/seed/jp3/200/240',cap:'Fuji, dusk'},{url:'https://picsum.photos/seed/jp4/200/240',cap:'Osaka street food'}],
+  pt: [{url:'https://picsum.photos/seed/pt1/200/240',cap:'Lisbon trams'},{url:'https://picsum.photos/seed/pt2/200/240',cap:'Porto rooftops'}],
+  is: [{url:'https://picsum.photos/seed/is1/200/240',cap:'Ring road, storm'}],
+};
+const flagsCtl = makeStripController({strip:'flagsStrip',title:'flagsStripTitle',cta:'flagsStripCta',track:'flagsStripTrack'});
+(function buildFlags(){
+  const grid = document.getElementById('flagsGrid');
+  COUNTRIES.forEach(c=>{
+    const photos = PHOTOS_BY_COUNTRY[c.id] || [];
+    const card = document.createElement('div');
+    card.className = 'flag-card ' + (photos.length ? 'has-photos' : 'no-photos');
+    card.innerHTML = `<div class="flag-emoji">${c.emoji}</div><div class="flag-name">${c.name}</div>${photos.length?`<div class="flag-badge">${photos.length}</div>`:''}`;
+    if (photos.length) card.addEventListener('click', () => flagsCtl.open(card, `Photos from ${c.name[0]}${c.name.slice(1).toLowerCase()}`, `photography-deeplink.html?country=${c.id}`, mockFetch(photos)));
+    grid.appendChild(card);
+  });
+})();
+
+// ============ FLIGHTS (join via destination airport → country) ============
+const AIRPORT_META = { // mirrors js/nomad.js:726 shape
+  NRT:{city:'Tokyo', country:'jp'}, HND:{city:'Tokyo', country:'jp'},
+  DEL:{city:'Delhi', country:'in'}, BOM:{city:'Mumbai', country:'in'},
+  LIS:{city:'Lisbon', country:'pt'}, KEF:{city:'Reykjavik', country:'is'},
+  BKK:{city:'Bangkok', country:'th'}, RAK:{city:'Marrakech', country:'ma'},
+};
+const FLIGHTS = [
+  {route:'SFO → NRT', flight:'UA837', date:'MAR 2024', to:'NRT'},
+  {route:'NRT → KIX', flight:'JL123', date:'MAR 2024', to:'NRT'},
+  {route:'JFK → LIS', flight:'TP204', date:'JUN 2023', to:'LIS'},
+  {route:'SFO → RAK', flight:'—', date:'SEP 2022', to:'RAK'},
+  {route:'BLR → DEL', flight:'6E204', date:'JAN 2024', to:'DEL'},
+];
+const flightsCtl = makeStripController({strip:'flightsStrip',title:'flightsStripTitle',cta:'flightsStripCta',track:'flightsStripTrack'});
+(function buildFlights(){
+  const list = document.getElementById('flightsList');
+  FLIGHTS.forEach(f=>{
+    const meta = AIRPORT_META[f.to];
+    const countryId = meta && meta.country;
+    const photos = countryId ? (PHOTOS_BY_COUNTRY[countryId] || []) : [];
+    const card = document.createElement('div');
+    card.className = 'bp-card';
+    card.innerHTML = `
+      <div><div class="bp-route">${f.route}</div><div class="bp-meta">${f.flight} · ${f.date}</div></div>
+      <div class="bp-badge ${photos.length?'':'none'}">${photos.length ? photos.length+' PHOTOS' : 'NO PHOTOS'}</div>
+    `;
+    card.addEventListener('click', () => {
+      if (!photos.length) return;
+      flightsCtl.open(card, `Photos from ${meta.city}`, `photography-deeplink.html?country=${countryId}`, mockFetch(photos));
+    });
+    list.appendChild(card);
+  });
+})();
+
+// ============ AIRPORTS (same join as flights, direct) ============
+const airportsCtl = makeStripController({strip:'airportsStrip',title:'airportsStripTitle',cta:'airportsStripCta',track:'airportsStripTrack'});
+(function buildAirports(){
+  const grid = document.getElementById('airportsGrid');
+  Object.entries(AIRPORT_META).forEach(([code, meta])=>{
+    const photos = PHOTOS_BY_COUNTRY[meta.country] || [];
+    const card = document.createElement('div');
+    card.className = 'airport-stamp-card ' + (photos.length ? 'has-photos' : 'no-photos');
+    card.innerHTML = `<div class="airport-code">${code}</div><div class="airport-city">${meta.city.toUpperCase()}</div>${photos.length?`<div class="airport-badge">${photos.length}</div>`:''}`;
+    if (photos.length) card.addEventListener('click', () => airportsCtl.open(card, `Photos from ${meta.city}`, `photography-deeplink.html?country=${meta.country}`, mockFetch(photos)));
+    grid.appendChild(card);
+  });
+})();
+
+// ============ PEOPLE (join via hypothetical tag) ============
+const PEOPLE = [
+  {name:'Maria', slug:'maria', img:'https://picsum.photos/seed/person1/200/200'},
+  {name:'Kenji', slug:'kenji', img:'https://picsum.photos/seed/person2/200/200'},
+  {name:'Priya', slug:'priya', img:'https://picsum.photos/seed/person3/200/200'},
+];
+const PHOTOS_BY_TAG = {
+  maria: [{url:'https://picsum.photos/seed/tagm1/200/240',cap:'Porto, with Maria'},{url:'https://picsum.photos/seed/tagm2/200/240',cap:'Late dinner, Lisbon'}],
+  kenji: [{url:'https://picsum.photos/seed/tagk1/200/240',cap:'Ramen w/ Kenji'}],
+  hiking: [{url:'https://picsum.photos/seed/tagh1/200/240',cap:'Ridge trail'},{url:'https://picsum.photos/seed/tagh2/200/240',cap:'Summit, fog'}],
+};
+const peopleCtl = makeStripController({strip:'peopleStrip',title:'peopleStripTitle',cta:'peopleStripCta',track:'peopleStripTrack'});
+(function buildPeople(){
+  const track = document.getElementById('peopleTrack');
+  PEOPLE.forEach(p=>{
+    const photos = PHOTOS_BY_TAG[p.slug] || [];
+    const frame = document.createElement('div');
+    frame.className = 'film-frame';
+    frame.innerHTML = `<div class="film-print"><img src="${p.img}" alt="${p.name}"><div class="flabel">${p.name}</div></div>`;
+    if (photos.length) frame.addEventListener('click', () => peopleCtl.open(frame, `Photos with ${p.name}`, `photography-deeplink.html?tag=${p.slug}`, mockFetch(photos)));
+    track.appendChild(frame);
+  });
+})();
+
+// ============ ADVENTURES / MOMENTS (join via hypothetical tag) ============
+const ADVENTURES = [
+  {label:'Ridge hike', slug:'hiking', img:'https://picsum.photos/seed/adv1/200/200'},
+  {label:'Desert camp', slug:'desert', img:'https://picsum.photos/seed/adv2/200/200'},
+  {label:'Night market', slug:'street', img:'https://picsum.photos/seed/adv3/200/200'},
+];
+const advCtl = makeStripController({strip:'advStrip',title:'advStripTitle',cta:'advStripCta',track:'advStripTrack'});
+(function buildAdv(){
+  const track = document.getElementById('advTrack');
+  ADVENTURES.forEach(a=>{
+    const photos = PHOTOS_BY_TAG[a.slug] || [];
+    const frame = document.createElement('div');
+    frame.className = 'film-frame';
+    frame.innerHTML = `<div class="film-print"><img src="${a.img}" alt="${a.label}"><div class="flabel">${a.label}</div></div>`;
+    if (photos.length) frame.addEventListener('click', () => advCtl.open(frame, a.label, `photography-deeplink.html?tag=${a.slug}`, mockFetch(photos)));
+    track.appendChild(frame);
+  });
+})();
+
+document.getElementById('lensLink').addEventListener('click', (e)=>{ e.preventDefault(); window.open('photography-deeplink.html','_blank'); });
+</script>
+</body>
+</html>

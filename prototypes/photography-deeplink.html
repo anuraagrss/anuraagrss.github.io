@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Prototype — photography.html deep-link filter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Caveat:wght@600&family=JetBrains+Mono:wght@400;500&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F6F1E9; --paper2:#EDE7DC; --paper3:#E3DBCD;
+    --ink:#1C1109; --ink2:#3D2B1A; --muted:#7A6A54; --faint:rgba(28,17,9,0.09);
+    --teal:#2E8B7A; --teal2:rgba(46,139,122,0.1);
+    --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace;
+    --disp:'Bebas Neue',sans-serif; --hand:'Caveat',cursive;
+  }
+  *{box-sizing:border-box}
+  body{background:var(--paper);color:var(--ink);font-family:var(--serif);margin:0;padding:0 0 120px;}
+
+  .proto-banner{background:var(--ink);color:var(--paper);font-family:var(--mono);font-size:11px;letter-spacing:1.5px;text-align:center;padding:8px;}
+  .proto-banner b{color:#E8B84B}
+
+  .top-nav{position:sticky;top:0;z-index:50;padding:13px 48px;display:flex;align-items:center;justify-content:space-between;background:rgba(246,241,233,0.93);backdrop-filter:blur(10px);border-bottom:1px solid var(--faint);}
+  .nav-logo{font-family:var(--mono);font-size:12px;letter-spacing:2px;color:var(--teal);text-decoration:none;}
+  .nav-back{font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--muted);text-decoration:none;}
+  .nav-back:hover{color:var(--teal)}
+
+  .wrap{max-width:1000px;margin:0 auto;padding:48px 48px 0;}
+  .section-title{font-family:var(--disp);font-size:clamp(40px,6vw,64px);line-height:.92;margin:0 0 6px;}
+
+  .filter-banner{display:none;align-items:center;justify-content:space-between;gap:12px;margin:18px 0 8px;padding:10px 16px;background:var(--teal2);border:1px solid var(--teal);border-radius:4px;font-family:var(--mono);font-size:11px;letter-spacing:1px;color:var(--ink2);}
+  .filter-banner.show{display:flex;}
+  .filter-banner b{color:var(--teal);}
+  .filter-clear{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted);text-decoration:none;border-bottom:1px dashed var(--muted);}
+  .filter-clear:hover{color:var(--ink);}
+
+  .ft-track{display:flex;gap:10px;overflow-x:auto;padding:20px 0;}
+  .ft-frame{flex:0 0 auto;padding:6px 14px;border:1px solid var(--paper3);border-radius:3px;background:#FEFCF8;font-family:var(--mono);font-size:10.5px;letter-spacing:1px;color:var(--muted);cursor:pointer;transition:all .2s;}
+  .ft-frame:hover{color:var(--ink);}
+  .ft-frame.active{background:var(--ink);color:var(--paper);border-color:var(--ink);}
+
+  .wall{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:16px;margin-top:16px;}
+  .wcard{background:#fff;padding:8px 8px 14px;box-shadow:2px 4px 14px rgba(28,17,9,.1);border-radius:2px;transition:transform .2s;}
+  .wcard:hover{transform:translateY(-4px);}
+  .wcard img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block;}
+  .wcard .cap{font-family:var(--hand);font-weight:600;font-size:16px;color:var(--ink2);margin-top:8px;text-align:center;}
+  .wcard .loc{font-family:var(--mono);font-size:8.5px;letter-spacing:1px;color:var(--muted);text-align:center;margin-top:2px;}
+
+  .empty{padding:60px 20px;text-align:center;font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--muted);}
+
+  .hint{margin-top:40px;padding:16px 20px;background:var(--teal2);border-left:3px solid var(--teal);font-family:var(--mono);font-size:11px;line-height:1.8;color:var(--ink2);}
+  .hint code{background:rgba(28,17,9,.06);padding:1px 5px;border-radius:2px;}
+</style>
+</head>
+<body>
+
+<div class="proto-banner">PROTOTYPE — receiving side of the crosslink. Try appending <b>?country=jp</b> or <b>?tag=street</b> to this URL.</div>
+
+<nav class="top-nav">
+  <a class="nav-logo" href="#">AR // LENS</a>
+  <a class="nav-back" href="crosslink-flags.html">← NOMAD</a>
+</nav>
+
+<div class="wrap">
+  <h2 class="section-title">Photography</h2>
+
+  <div class="filter-banner" id="filterBanner">
+    <span>Filtered by <b id="filterLabel"></b> — <span id="filterCount"></span></span>
+    <a class="filter-clear" id="filterClear" href="photography-deeplink.html">CLEAR FILTER ×</a>
+  </div>
+
+  <div class="ft-track" id="ftTrack"></div>
+
+  <div class="wall" id="wall"></div>
+
+  <div class="hint">
+    behavior: on load, reads <code>new URLSearchParams(location.search)</code> for <code>country</code> / <code>tag</code>
+    / <code>trip</code> (none exist in prod photography-module.js today). If present, applies the same
+    filter path the tag-ticker already uses (<code>view = allPhotos.filter(...)</code>) and shows the
+    banner above so the filtered state is visible, not silent. Clearing resets to the full unfiltered wall —
+    matching current <code>filterTag('all')</code> behavior.
+  </div>
+</div>
+
+<script>
+const ALL_PHOTOS = [
+  {id:1, url:'https://picsum.photos/seed/in1/300/380', cap:'Hampi, sunrise', location:'Hampi, India', country_id:'in', tags:['temple','sunrise']},
+  {id:2, url:'https://picsum.photos/seed/in2/300/380', cap:'Old Delhi lanes', location:'Delhi, India', country_id:'in', tags:['street']},
+  {id:3, url:'https://picsum.photos/seed/in3/300/380', cap:'Kerala backwaters', location:'Kerala, India', country_id:'in', tags:['water','calm']},
+  {id:4, url:'https://picsum.photos/seed/jp1/300/380', cap:'Shibuya crossing', location:'Tokyo, Japan', country_id:'jp', tags:['street','city']},
+  {id:5, url:'https://picsum.photos/seed/jp2/300/380', cap:'Kyoto bamboo', location:'Kyoto, Japan', country_id:'jp', tags:['nature','calm']},
+  {id:6, url:'https://picsum.photos/seed/jp3/300/380', cap:'Fuji, dusk', location:'Yamanashi, Japan', country_id:'jp', tags:['mountain']},
+  {id:7, url:'https://picsum.photos/seed/jp4/300/380', cap:'Osaka street food', location:'Osaka, Japan', country_id:'jp', tags:['street','food']},
+  {id:8, url:'https://picsum.photos/seed/pt1/300/380', cap:'Lisbon trams', location:'Lisbon, Portugal', country_id:'pt', tags:['street','city']},
+  {id:9, url:'https://picsum.photos/seed/pt2/300/380', cap:'Porto rooftops', location:'Porto, Portugal', country_id:'pt', tags:['city']},
+  {id:10, url:'https://picsum.photos/seed/is1/300/380', cap:'Ring road, storm', location:'Iceland', country_id:'is', tags:['nature','storm']},
+];
+
+let view = [...ALL_PHOTOS];
+const wall = document.getElementById('wall');
+const ftTrack = document.getElementById('ftTrack');
+const filterBanner = document.getElementById('filterBanner');
+const filterLabel = document.getElementById('filterLabel');
+const filterCount = document.getElementById('filterCount');
+
+function renderWall(){
+  wall.innerHTML = view.length ? view.map(p=>`
+    <div class="wcard">
+      <img src="${p.url}" alt="${p.cap}">
+      <div class="cap">${p.cap}</div>
+      <div class="loc">${p.location.toUpperCase()}</div>
+    </div>
+  `).join('') : `<div class="empty">No photos match this filter yet.</div>`;
+}
+
+function buildTagTicker(){
+  const tags = [...new Set(ALL_PHOTOS.flatMap(p=>p.tags))];
+  ftTrack.innerHTML = ['all', ...tags].map(t=>`<div class="ft-frame" data-tag="${t}">${t.toUpperCase()}</div>`).join('');
+  ftTrack.addEventListener('click', e=>{
+    const frame = e.target.closest('.ft-frame');
+    if (!frame) return;
+    filterTag(frame.dataset.tag);
+  });
+}
+
+function filterTag(t){
+  view = t === 'all' ? [...ALL_PHOTOS] : ALL_PHOTOS.filter(p => p.tags.includes(t));
+  [...ftTrack.children].forEach(f => f.classList.toggle('active', f.dataset.tag === t));
+  hideBanner();
+  renderWall();
+}
+
+function showBanner(labelHtml){
+  filterLabel.innerHTML = labelHtml;
+  filterCount.textContent = `${view.length} photo${view.length===1?'':'s'}`;
+  filterBanner.classList.add('show');
+}
+function hideBanner(){ filterBanner.classList.remove('show'); }
+
+function applyDeepLink(){
+  const params = new URLSearchParams(location.search);
+  const country = params.get('country');
+  const tag = params.get('trip') ? null : params.get('tag'); // tag/trip mutually exclusive for this demo
+  const trip = params.get('trip');
+
+  if (country) {
+    view = ALL_PHOTOS.filter(p => p.country_id === country);
+    const name = {in:'India', jp:'Japan', pt:'Portugal', th:'Thailand', is:'Iceland'}[country] || country;
+    showBanner(`country: ${name}`);
+  } else if (tag) {
+    filterTag(tag); // reuses existing path, sets its own banner state below
+    showBanner(`tag: ${tag}`);
+    return;
+  } else if (trip) {
+    view = ALL_PHOTOS.filter(p => p.trip_id === trip);
+    showBanner(`trip: ${trip}`);
+  }
+  renderWall();
+}
+
+buildTagTicker();
+applyDeepLink();
+if (!location.search) renderWall();
+</script>
+</body>
+</html>

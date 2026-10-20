@@ -1,0 +1,96 @@
+/* ═══ MY DARKROOM — a drying line under the safelight ═══ */
+.darkroom { height: 100vh; height: 100svh; overflow: hidden; display: flex; flex-direction: column; background: #0f0605; color: #d9b3a6; }
+.safelight { position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background: radial-gradient(ellipse 60% 45% at 50% -8%, rgba(190,40,25,.42), transparent 70%),
+              radial-gradient(ellipse 120% 80% at 50% 120%, rgba(0,0,0,.6), transparent 60%);
+  animation: hum 7s ease-in-out infinite alternate; }
+@keyframes hum { from { opacity: .85; } to { opacity: 1; } }
+.darkroom > .dr-head, .darkroom > .dr-nav, .darkroom > .line-wrap, .darkroom > .dr-foot { position: relative; z-index: 1; }
+
+.dr-head { flex: none; padding: 34px clamp(16px, 5vw, 60px) 4px; max-width: 900px; }
+.dr-head h1 { font-family: var(--hand); font-weight: 400; font-size: clamp(40px, 5.4vw, 60px); line-height: 1; color: #f0cdbd; }
+.dr-his { font-family: 'Lora', var(--serif); font-style: italic; font-size: clamp(15px, 1.7vw, 19px); margin-top: 6px; color: #e2bfb1; }
+
+/* the places, chalked on the wall */
+.dr-nav { flex: none; display: flex; align-items: center; gap: 10px; width: 100%; padding: 10px clamp(16px, 5vw, 60px) 0; }
+.dr-nav > button { flex: none; width: 36px; height: 30px; border: 1px solid rgba(217,179,166,.3); color: #f0cdbd; font: 14px var(--mono); }
+.dr-nav > button:disabled { opacity: .2; }
+.places { flex: 1; display: flex; gap: 18px; overflow-x: auto; scrollbar-width: none; white-space: nowrap; padding: 4px 0;
+          mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent); }
+.places::-webkit-scrollbar { display: none; }
+.places button { font-family: var(--hand); font-size: 22px; color: #c99a8b; opacity: .6; }
+.places button small { font: 9px var(--mono); margin-left: 4px; opacity: .6; vertical-align: super; }
+.places button.on, .places button:hover { opacity: 1; color: #f6d9cb; }
+.places button.on { border-bottom: 1px solid rgba(240,205,189,.7); }
+
+/* the drying line */
+.line-wrap { flex: 1; min-height: 0; position: relative; display: flex; flex-direction: column; justify-content: center; }
+.string { position: absolute; left: 0; right: 0; top: 18%; width: 100%; height: 40px; pointer-events: none; }
+.string path { fill: none; stroke: #8a6a55; stroke-width: 1.4; vector-effect: non-scaling-stroke; }
+.prints { display: flex; gap: clamp(18px, 3vw, 34px); overflow-x: auto; scroll-snap-type: x proximity; padding: 30px clamp(20px, 6vw, 80px) 20px;
+          scrollbar-width: thin; scrollbar-color: rgba(217,179,166,.25) transparent; }
+.prints .loading { font-family: var(--hand); font-size: 22px; }
+.print { position: relative; flex: none; scroll-snap-align: center; width: clamp(150px, 19vw, 230px); padding: 8px 8px 30px; background: #f1e9dc;
+         box-shadow: 0 10px 22px rgba(0,0,0,.55); transform-origin: 50% -18px; transform: rotate(var(--r));
+         animation: sway 6s ease-in-out var(--d) infinite alternate; transition: box-shadow .3s; }
+@keyframes sway { from { transform: rotate(var(--r)); } to { transform: rotate(calc(var(--r) * -1 + .6deg)); } }
+.print:hover, .print:focus-visible { box-shadow: 0 16px 30px rgba(0,0,0,.65), 0 0 0 1px rgba(240,205,189,.4); outline: none; }
+.print img { display: block; width: 100%; aspect-ratio: 4 / 5; object-fit: cover; background: #2a120d;
+             filter: grayscale(1) brightness(.18) sepia(1) hue-rotate(-28deg) saturate(3.2) blur(2px); transition: filter 3.2s ease; }
+.print.dev img { filter: none; }
+.print .p-cap { position: absolute; left: 10px; right: 10px; bottom: 6px; font-family: var(--hand); font-size: 16px; line-height: 1.05; color: #3f3125;
+                white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-align: left; opacity: 0; transition: opacity 1.2s ease 1.6s; }
+.print.dev .p-cap { opacity: 1; }
+/* a wooden peg holding it to the line */
+.pin { position: absolute; top: -26px; left: 50%; width: 12px; height: 38px; transform: translateX(-50%); border-radius: 2px;
+       background: linear-gradient(90deg, #b88b5c, #d9ad7a 45%, #a7784b); box-shadow: 0 2px 3px rgba(0,0,0,.5); }
+.pin::after { content: ""; position: absolute; left: 50%; top: 14px; width: 1px; height: 14px; background: rgba(60,30,10,.5); }
+
+.dr-foot { flex: none; padding: 0 16px 22px; text-align: center; font-family: var(--hand); font-size: clamp(18px, 2vw, 24px); line-height: 1.25; color: #e2bfb1; opacity: .8; }
+
+/* ═══ A PRINT, LIFTED OUT — the tray, then my words on paper ═══ */
+.viewer { position: fixed; inset: 0; z-index: 30; display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(320px, 1fr); gap: clamp(16px, 3vw, 40px);
+          align-items: center; padding: 56px clamp(16px, 4vw, 54px) 28px; background: radial-gradient(ellipse at 30% 30%, #2a0d09, #0c0504 70%); }
+.viewer[hidden] { display: none; }
+.v-close { position: absolute; top: 16px; left: 18px; font-family: var(--hand); font-size: 22px; color: #f0cdbd; z-index: 2; }
+.v-tray { position: relative; padding: clamp(14px, 2.4vw, 28px); border-radius: 6px; background: linear-gradient(#3a1612, #241009);
+          box-shadow: inset 0 0 0 2px rgba(0,0,0,.4), inset 0 12px 30px rgba(0,0,0,.6), 0 18px 40px rgba(0,0,0,.6); }
+.v-photo { display: flex; justify-content: center; }
+.v-photo img { max-width: 100%; max-height: 68vh; object-fit: contain; border: 8px solid #f1e9dc;
+               filter: grayscale(1) brightness(.12) sepia(1) hue-rotate(-28deg) saturate(3) blur(6px); transition: filter 3.6s ease; }
+.v-photo.clear img { filter: none; }
+.v-paper { max-height: calc(100svh - 110px); overflow-y: auto; padding: clamp(22px, 3vw, 36px); background: #f3efe7; color: var(--earth); border-radius: 3px;
+           box-shadow: 0 20px 50px rgba(0,0,0,.6); transform: rotate(.6deg); scrollbar-width: thin;
+           background-image: repeating-linear-gradient(transparent 0 33px, rgba(93,107,120,.12) 33px 34px); background-position: 0 14px; }
+.v-where { font: 10px var(--mono); letter-spacing: .14em; text-transform: uppercase; opacity: .55; }
+.v-cap { font-family: var(--hand); font-weight: 400; font-size: clamp(30px, 3.2vw, 42px); line-height: 1.1; margin: 6px 0 14px; }
+.v-story { font-family: 'Lora', var(--serif); font-style: italic; font-size: clamp(15px, 1.4vw, 17.5px); line-height: 34px; }
+.v-story p { margin-bottom: 34px; }
+.v-stamp { display: inline-block; margin-top: 4px; padding: 6px 10px; border: 1.5px solid rgba(140,40,30,.55); color: rgba(140,40,30,.75); border-radius: 3px;
+           font: 9.5px var(--mono); letter-spacing: .06em; transform: rotate(-2deg); mix-blend-mode: multiply; }
+.v-sig { font-family: var(--hand); font-size: 32px; text-align: right; transform: rotate(-4deg); margin-top: 12px; }
+.v-nav { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 18px; padding-top: 12px; border-top: 1px dashed rgba(63,49,37,.2); }
+.v-nav button { font-family: var(--hand); font-size: 19px; color: var(--earth); }
+.v-nav button:disabled { opacity: .25; }
+.v-nav span { font: 10px var(--mono); opacity: .5; }
+
+@media (max-width: 860px) {
+  .viewer { grid-template-columns: 1fr; align-content: start; overflow-y: auto; }
+  .v-photo img { max-height: 42vh; }
+  .v-paper { max-height: none; overflow: visible; }
+  .string { top: 14%; }
+}
+@media (prefers-reduced-motion: reduce) { .print { animation: none; } }
+
+/* every story here is set the way it is everywhere: room for the short lines, the true sentence lifted, one line in gold */
+.v-story p.one { font-size: 1.3em; line-height: 1.5; margin: 1.4em 0; }
+.v-story .lift { font-family: var(--hand); font-style: normal; font-size: 1.4em; line-height: 1.2; color: #2b2119; }
+.v-story .gold, .v-story .lift.gold { color: #a87a2c; }
+.v-story p.end { font-family: var(--hand); font-style: normal; font-size: 1.6em; line-height: 1.2; margin-top: 1.4em; }
+
+/* the note pinned first on the line: how I take pictures */
+.print.note { width: clamp(220px, 24vw, 290px); padding: 18px 16px 16px; background: #efe6d4; color: var(--earth); text-align: left; cursor: default;
+              background-image: repeating-linear-gradient(transparent 0 25px, rgba(93,107,120,.14) 25px 26px); background-position: 0 12px; }
+.print.note .n-k { font: 9px var(--mono); letter-spacing: .14em; text-transform: uppercase; opacity: .55; margin-bottom: 6px; }
+.print.note p:not(.n-k):not(.n-sig) { font-family: var(--hand); font-size: clamp(15px, 1.4vw, 18px); line-height: 26px; margin-bottom: 4px; }
+.print.note .n-sig { font-family: var(--hand); font-size: 24px; text-align: right; transform: rotate(-4deg); margin-top: 4px; }

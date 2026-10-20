@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <!-- The 404 hour. At switch-over this file becomes 404.html, which GitHub Pages
+       serves for every address that doesn't exist — including /home, on purpose. -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/images/Logo.ico" type="image/x-icon">
+  <title>Not found.</title>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600&family=Newsreader:ital,opsz,wght@0,6..72,300;1,6..72,300&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root { --gold: #c8963e; --mist: #8a96a0; --ink: #aab4bb; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body { height: 100%; background: #0b0d0f; }
+    body { position: relative; overflow: hidden; color: var(--ink); font-family: 'Newsreader', Georgia, serif; }
+    .sky { position: absolute; inset: 0; background: linear-gradient(#0b0e12 0%, #18202a 62%, #0e1215 62.2%, #0b0d0f 100%); }
+    .horizon { position: absolute; left: 0; right: 0; top: 62%; height: 1px; background: rgba(170,180,187,.22); }
+    .sun { position: absolute; left: 50%; top: 62%; width: 0; height: 2px; transform: translate(-50%, -50%); background: var(--gold);
+           box-shadow: 0 0 0 0 rgba(200,150,62,0); transition: width 7s cubic-bezier(.2,.6,.2,1), box-shadow 7s ease; }
+    body.light .sun { width: min(30vw, 280px); box-shadow: 0 0 110px 40px rgba(200,150,62,.32), 0 0 260px 90px rgba(200,120,50,.1); }
+    .clouds i { position: absolute; width: 60%; height: 26%; border-radius: 50%; background: radial-gradient(ellipse, rgba(160,175,185,.16), transparent 70%);
+                filter: blur(14px); animation: drift 90s linear infinite; }
+    .clouds i:nth-child(1) { top: 18%; } .clouds i:nth-child(2) { top: 40%; animation-duration: 130s; animation-delay: -60s; }
+    @keyframes drift { from { transform: translateX(-60%); } to { transform: translateX(180%); } }
+    .words { position: absolute; left: 0; right: 0; top: 20%; text-align: center; padding: 0 16px; }
+    .ln { opacity: 0; transition: opacity 1.8s ease; font-family: 'Caveat', cursive; font-size: clamp(30px, 5vw, 46px); line-height: 1.25; }
+    .ln.big { font-family: 'Newsreader', Georgia, serif; font-style: italic; font-size: clamp(18px, 2.4vw, 23px); margin-top: 12px; }
+    .ln.on { opacity: 1; }
+    .code { position: absolute; left: 16px; top: 14px; font: 10px 'JetBrains Mono', monospace; letter-spacing: .14em; opacity: .4; }
+    .walk { position: absolute; left: 0; right: 0; bottom: 9%; text-align: center; opacity: 0; transition: opacity 2s ease; }
+    .walk.on { opacity: 1; }
+    .walk a { font-family: 'Caveat', cursive; font-size: 26px; color: #d7dde1; text-decoration: none; }
+    .walk a:hover { color: #fff; }
+    .arey { white-space: nowrap; } .arey-dots { position: relative; display: inline-block; } .arey-dots i { display: none; position: absolute; left: 6%; right: 2%; bottom: -.05em; height: .32em; }
+    .arey-dots i::before, .arey-dots i::after { content: ""; position: absolute; left: 0; right: 0; height: 2px; border-radius: 2px; background: currentColor; }
+    .arey-dots i::before { top: 0; transform: rotate(-4deg); } .arey-dots i::after { top: .16em; left: 18%; right: 8%; transform: rotate(-2deg); opacity: .6; }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+  </style>
+</head>
+<body>
+  <div class="sky"></div>
+  <div class="clouds"><i></i><i></i></div>
+  <div class="horizon"></div>
+  <div class="sun"></div>
+  <span class="code">404</span>
+
+  <div class="words" id="words">
+    <p class="ln"><span class="arey">Arey<span class="arey-dots">...<i></i></span></span></p>
+    <p class="ln">Not found.</p>
+    <p class="ln">Good.</p>
+    <p class="ln big">This is where I start.</p>
+  </div>
+  <p class="walk" id="walk"><a href="/nomad.html">walk in →</a></p>
+
+  <script>
+    // /home stays empty on purpose.
+    if (/^\/home\/?(\.html)?$/i.test(location.pathname)) {
+      document.title = 'Still looking.';
+      document.getElementById('words').innerHTML =
+        '<p class="ln">Still looking.</p><p class="ln big">I\'ll let you know.</p>';
+    }
+    const ls = document.querySelectorAll('.ln'), still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const at = [600, 2200, 3400, 4800];
+    ls.forEach((l, i) => still ? l.classList.add('on') : setTimeout(() => l.classList.add('on'), at[i] || 1200 * (i + 1)));
+    setTimeout(() => document.body.classList.add('light'), still ? 0 : 6200);
+    setTimeout(() => document.getElementById('walk').classList.add('on'), still ? 0 : 9000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prototype — Develop on View</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<link href="https://fonts.googleapis.com/css2?family=Lora:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Bebas+Neue&display=swap" rel="stylesheet">
+<style>
+  :root{ --gold:#F5A800; --gold2:#C8861A; --red:#8B1A1A; --paper:#F6F1E9;
+         --serif:'Lora',Georgia,serif; --mono:'JetBrains Mono',monospace; --disp:'Bebas Neue',sans-serif; }
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  body{ background:#0A0604; color:var(--paper); font-family:var(--serif); overflow-x:hidden; }
+
+  .proto-nav{ position:fixed; top:0; left:0; right:0; z-index:200; padding:14px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+    background:linear-gradient(to bottom,rgba(10,6,4,0.92),transparent); }
+  .pn-title{ font-family:var(--mono); font-size:11px; letter-spacing:3px; color:var(--gold); }
+  .pn-back{ font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(246,241,233,.4); text-decoration:none; }
+  .pn-back:hover{ color:var(--gold); }
+
+  .lead{ text-align:center; padding:110px 24px 20px; }
+  .lead-eyebrow{ font-family:var(--mono); font-size:9px; letter-spacing:4px; color:rgba(245,168,0,.55); margin-bottom:14px; }
+  .lead-title{ font-family:var(--disp); font-size:clamp(40px,7vw,84px); letter-spacing:2px; line-height:.9; }
+  .lead-title .g{ color:var(--gold); }
+  .lead-sub{ font-style:italic; font-size:15px; color:rgba(246,241,233,.4); margin-top:14px; max-width:440px; margin-inline:auto; line-height:1.7; }
+
+  .stream{ max-width:1080px; margin:0 auto; padding:40px 24px 120px; display:flex; flex-direction:column; gap:120px; }
+
+  .plate{ position:relative; }
+  .plate-frame{ position:relative; width:100%; border-radius:2px; overflow:hidden;
+    background:#060402; border:1px solid rgba(245,168,0,.12);
+    box-shadow:0 30px 80px rgba(0,0,0,.6); }
+  .plate-frame img{ display:block; width:100%; height:auto; -webkit-user-drag:none;
+    /* latent / undeveloped state */
+    filter:brightness(1.6) contrast(.35) saturate(0) sepia(.4);
+    opacity:.25; transform:scale(1.04);
+    transition:filter 2.4s ease, opacity 2.4s ease, transform 2.6s ease; }
+  .plate.dev .plate-frame img{ filter:none; opacity:1; transform:scale(1); }
+
+  /* developer bath shimmer that fades as it develops */
+  .plate-frame::after{ content:''; position:absolute; inset:0; pointer-events:none; z-index:2;
+    background:radial-gradient(ellipse 120% 90% at 50% 120%, rgba(139,26,26,.18), transparent 60%);
+    opacity:1; transition:opacity 2.4s ease; }
+  .plate.dev .plate-frame::after{ opacity:0; }
+
+  .plate-status{ position:absolute; top:14px; left:14px; z-index:5; font-family:var(--mono);
+    font-size:9px; letter-spacing:2px; padding:4px 10px; border-radius:2px;
+    background:rgba(10,6,4,.7); border:1px solid rgba(245,168,0,.25); color:rgba(245,168,0,.7);
+    backdrop-filter:blur(6px); transition:opacity .6s; }
+  .plate.dev .plate-status{ opacity:0; }
+
+  .plate-meta{ display:flex; justify-content:space-between; align-items:flex-end; gap:20px;
+    margin-top:18px; opacity:0; transform:translateY(12px); transition:opacity .8s ease .5s, transform .8s ease .5s; }
+  .plate.dev .plate-meta{ opacity:1; transform:translateY(0); }
+  .pm-no{ font-family:var(--mono); font-size:9px; letter-spacing:3px; color:rgba(245,168,0,.6); margin-bottom:4px; }
+  .pm-title{ font-family:var(--disp); font-size:clamp(28px,4vw,46px); letter-spacing:1px; line-height:.95; }
+  .pm-loc{ font-family:var(--mono); font-size:10px; letter-spacing:2px; color:rgba(246,241,233,.45); margin-top:5px; }
+  .pm-story{ font-style:italic; font-size:14px; line-height:1.75; color:rgba(246,241,233,.6); max-width:440px; margin-top:10px; }
+  .pm-right{ text-align:right; flex-shrink:0; }
+  .pm-tags{ display:flex; gap:5px; justify-content:flex-end; flex-wrap:wrap; margin-bottom:8px; }
+  .pm-tags span{ font-family:var(--mono); font-size:8px; letter-spacing:1px; padding:2px 8px;
+    border-radius:20px; background:rgba(245,168,0,.12); color:var(--gold); }
+  .pm-exif{ font-family:var(--mono); font-size:8px; letter-spacing:1px; color:rgba(246,241,233,.3); line-height:1.8; }
+</style>
+</head>
+<body>
+  <div class="proto-nav">
+    <div class="pn-title">// DEVELOP ON VIEW</div>
+    <a class="pn-back" href="index.html">← ALL PROTOTYPES</a>
+  </div>
+
+  <div class="lead">
+    <div class="lead-eyebrow">CONCEPT 02 · THE DARKROOM TRAY</div>
+    <div class="lead-title">WATCH IT <span class="g">DEVELOP</span>.</div>
+    <div class="lead-sub">Nothing is loaded — it's developed. Scroll, and each frame comes up out of the bath in real time.</div>
+  </div>
+
+  <div class="stream" id="stream"></div>
+
+<script src="sample-photos.js"></script>
+<script>
+  const stream = document.getElementById('stream');
+  SAMPLE_PHOTOS.forEach((p,i)=>{
+    const el = document.createElement('div');
+    el.className = 'plate';
+    el.innerHTML = `
+      <div class="plate-frame">
+        <div class="plate-status">DEVELOPING…</div>
+        <img src="${p.image_url}" alt="${p.title}" loading="lazy">
+      </div>
+      <div class="plate-meta">
+        <div>
+          <div class="pm-no">FRAME ${String(i+1).padStart(3,'0')}</div>
+          <div class="pm-title">${p.title}</div>
+          <div class="pm-loc">${p.location} · ${p.date}</div>
+          <div class="pm-story">${p.story}</div>
+        </div>
+        <div class="pm-right">
+          <div class="pm-tags">${p.tags.map(t=>`<span>${t}</span>`).join('')}</div>
+          <div class="pm-exif">${p.exif.camera}<br>${p.exif.lens}<br>${p.exif.settings}</div>
+        </div>
+      </div>`;
+    stream.appendChild(el);
+  });
+
+  // Develop when scrolled into view; stagger slightly so it feels chemical, not instant.
+  // Manual visibility check (more reliable across browsers/embeds than IntersectionObserver).
+  const plates = [...document.querySelectorAll('.plate')];
+  function develop(){
+    const trigger = window.innerHeight * 0.78; // start developing once its top crosses ~78% down
+    plates.forEach(p=>{
+      if(p.classList.contains('dev')) return;
+      const r = p.getBoundingClientRect();
+      if(r.top < trigger && r.bottom > 40){
+        setTimeout(()=> p.classList.add('dev'), 100);
+      }
+    });
+  }
+  window.addEventListener('scroll', develop, { passive:true });
+  window.addEventListener('resize', develop);
+  window.addEventListener('load', develop);
+  develop();
+</script>
+</body>
+</html>

@@ -1,0 +1,109 @@
+/* ═══ THE JOURNEY — the walk-in, then trips on both sides of the path ═══ */
+
+/* his words, set the way the production intro sets them */
+.intro { top: 9%; }
+.intro .il { opacity: 1; font-family: 'Lora', var(--serif); font-style: italic; line-height: 1.65; color: rgba(246,241,233,0); transition: color .9s ease; text-shadow: 0 1px 14px rgba(0,0,0,.7); }
+.intro .il.vis { color: rgba(246,241,233,.88); }
+.intro .il.sm { font-size: clamp(14px, 2vw, 19px); margin-bottom: 7px; }
+.intro .il.lg { font-size: clamp(22px, 4.5vw, 46px); font-weight: 600; margin-bottom: 22px; transition: color 1s ease; }
+.intro .il.lg.vis { color: rgba(246,241,233,.96); }
+.intro .il.proof { font-family: 'Bebas Neue', var(--mono); font-style: normal; font-size: clamp(28px, 5vw, 58px); letter-spacing: 3px; line-height: 1; margin-top: 8px; color: rgba(200,145,58,0); transition: color 1.2s ease; }
+.intro .il.proof.vis { color: rgba(200,145,58,.95); }
+.intro .il.tag { font-family: var(--mono); font-style: normal; font-size: clamp(10px, 1.3vw, 13px); letter-spacing: 3px; margin-top: 4px; color: rgba(200,145,58,0); }
+.intro .il.tag.vis { color: rgba(200,145,58,.85); }
+.intro .ir { width: 0; height: 1px; margin: 14px auto; background: linear-gradient(to right, transparent, rgba(200,145,58,.5), transparent); transition: width 1.4s ease; }
+.intro .ir.vis { width: 80px; }
+.intro.gone { opacity: 0; }
+
+/* the one line that stays while he walks */
+.topline { position: absolute; left: 0; right: 0; top: 18px; text-align: center; padding: 0 150px; pointer-events: none;
+           font-family: 'Lora', var(--serif); font-style: italic; font-size: clamp(14px, 1.7vw, 18px); color: rgba(246,241,233,.85);
+           text-shadow: 0 1px 12px rgba(0,0,0,.7); opacity: 0; transition: opacity 1.6s ease; }
+.topline.on { opacity: 1; }
+.topline b { font-family: 'Bebas Neue', var(--mono); font-style: normal; font-weight: 400; letter-spacing: 2px; color: rgba(200,145,58,.95); margin-left: 8px; }
+@media (max-width: 760px) { .topline { top: 56px; padding: 0 16px; } }
+
+/* the trips, both sides of the path */
+.stop { width: min(100%, 330px); }
+.stop .st-snap { float: right; width: 74px; height: 74px; object-fit: cover; margin: 2px 0 6px 12px; border: 4px solid #f2efe8; box-shadow: 0 2px 10px rgba(0,0,0,.4); transform: rotate(3deg); }
+.stop:nth-child(even) .st-snap { float: left; margin: 2px 12px 6px 0; transform: rotate(-3deg); }
+
+.journey-end { background: var(--road); padding: 10px 16px 90px; text-align: center; }
+.journey-end a { font-family: var(--hand); font-size: 34px; color: #e3e7ea; text-decoration: none; border-bottom: 1px solid rgba(200,150,62,.6); }
+.journey-end a:hover { color: #fff; }
+.journey-end p { font-style: italic; color: var(--mist); margin-top: 8px; }
+
+/* ═══ THE BENCH, at the end of the walk ═══ */
+.j-bench { position: relative; overflow: hidden; min-height: 100vh; min-height: 100svh; padding: 80px 16px 70px; display: flex; flex-direction: column; align-items: center;
+           background: linear-gradient(#0b0d0f 0%, #1d242b 45%, #2e3236 85%, #1c1a17 100%); color: #d7dde1; text-align: center; }
+.jb-sk { width: min(70%, 300px); stroke: #c5ccd1; stroke-width: 1.6; fill: none; stroke-linecap: round; opacity: .7; margin-top: 4vh; }
+.jb-sk .ground { stroke-width: 1; opacity: .5; }
+.jb-h { font-family: var(--hand); font-size: clamp(34px, 4vw, 46px); margin-top: 10px; }
+.jb-sub { font-style: italic; color: var(--mist); }
+.jb-poem { max-width: 620px; margin-top: 34px; }
+.jb-poem .bp { font-family: 'Lora', var(--serif); font-style: italic; font-size: clamp(16px, 1.8vw, 20px); line-height: 1.9; color: #e3e7ea; }
+.jb-poem .bp-final { font-family: var(--hand); font-size: clamp(40px, 5vw, 58px); line-height: 1.1; color: var(--gold); margin-top: 18px; }
+.jb-poem .bp-credit { font: 10px var(--mono); letter-spacing: .14em; color: var(--mist); margin-bottom: 40px; }
+.jb-poem .bq { font-family: var(--hand); font-size: clamp(28px, 3.2vw, 38px); line-height: 1.15; color: #fff; }
+.jb-poem textarea { width: 100%; min-height: 80px; margin-top: 14px; border: none; border-bottom: 1px solid rgba(215,221,225,.3); background: transparent;
+                    font-family: var(--hand); font-size: 24px; color: #e3e7ea; resize: vertical; outline: none; text-align: center; }
+.jb-poem .bq-note { font-style: italic; font-size: 13px; color: var(--mist); margin-top: 6px; }
+.jb-poem .bench-sig { font-family: var(--hand); font-size: 34px; color: #e3e7ea; text-align: right; transform: rotate(-4deg); margin-top: 22px; }
+.j-bench .pencil path:first-child { fill: #d8b46a; }
+
+/* ═══ OPEN MY JOURNAL — with a little copy of its cover ═══ */
+.open-journal { display: inline-flex; align-items: center; gap: 18px; text-decoration: none; perspective: 500px; }
+.open-journal .oj-text { font-family: var(--hand); font-size: 34px; color: #e3e7ea; border-bottom: 1px solid rgba(200,150,62,.6); }
+.open-journal:hover .oj-text { color: #fff; }
+.mini-cover { position: relative; width: 66px; height: 88px; border-radius: 2px 6px 6px 2px; overflow: hidden; transform-origin: left center; transition: transform .5s ease;
+  background: radial-gradient(ellipse 120% 90% at 40% 35%, #94552e 0%, #7e4424 50%, #5c2f18 88%, #3f1f0f 100%);
+  box-shadow: 0 8px 18px rgba(0,0,0,.55), inset 0 0 10px rgba(25,10,3,.6), inset 3px 0 4px -1px rgba(0,0,0,.45); }
+.mini-cover::before { content: ""; position: absolute; inset: 4px; border: 1px dashed rgba(214,178,132,.35); border-radius: 1px 4px 4px 1px; }
+.mc-title { position: absolute; left: 7px; top: 8px; font-family: 'Bebas Neue', var(--mono); font-style: normal; font-size: 9.5px; line-height: .95; color: rgba(52,22,8,.8); text-shadow: 0 .5px 0 rgba(255,214,176,.2); }
+.mc-title b { font-weight: 400; color: #d6b062; }
+.mini-cover img { position: absolute; right: 4px; bottom: 18px; width: 20px; filter: drop-shadow(1px 0 0 #f1e8d6) drop-shadow(-1px 0 0 #f1e8d6) drop-shadow(0 1px 0 #f1e8d6); }
+.mc-strap { position: absolute; left: 0; right: 0; bottom: 9px; height: 7px; background: #1a110b; box-shadow: 0 1px 2px rgba(0,0,0,.5); }
+.open-journal:hover .mini-cover { transform: rotateY(-28deg); }
+.journey-end a.open-journal { border-bottom: none; }
+
+/* pencil outlines of each country, and my emoji where I've set one */
+.st-outline { display: block; width: 58px; height: 58px; margin-bottom: 2px; }
+.stop:nth-child(even) .st-outline { margin-left: auto; }
+.outline { width: 100%; height: 100%; overflow: visible; }
+.outline path { fill: none; stroke: #c9c3b6; stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; stroke-dasharray: 1; stroke-dashoffset: 1; }
+.outline .o2 { stroke-width: .7; opacity: .45; transform: translate(.8px, .6px); }   /* a second, lighter pass, like a pencil gone over twice */
+.st-outline.draw .outline path { transition: stroke-dashoffset 2.4s ease; stroke-dashoffset: 0; }
+.st-outline.draw .outline .o2 { transition-delay: .5s; }
+.stop { position: relative; }
+/* my emoji, tucked beside the name like a sticker on the page edge — no background, a slow float */
+.st-emoji { display: inline-block; margin-left: 8px; font-size: 24px; line-height: 1; vertical-align: 6px; transform: rotate(-10deg);
+            filter: drop-shadow(0 2px 3px rgba(0,0,0,.55)) drop-shadow(0 0 10px rgba(200,150,62,.25)); animation: drift-e 5s ease-in-out infinite alternate; }
+.stop:nth-child(even) .st-emoji { transform: rotate(10deg); }
+@keyframes drift-e { from { translate: 0 0; } to { translate: 0 -4px; } }
+
+/* ═══ I APPEAR, THEN FADE INTO THE LIGHT ═══ */
+.walker.standing { transition: opacity 2.6s ease; }
+.walker.here.into-light { opacity: 0; filter: brightness(2.2) saturate(.4) blur(1.5px); transition: opacity 3.2s ease, filter 3.2s ease; }
+.topline { display: none; }
+.scene.bloom .door { width: min(40vw, 420px); height: 4px; transition: width 3.4s cubic-bezier(.2,.6,.2,1), height 3.4s, box-shadow 3.4s ease;
+                     box-shadow: 0 0 160px 70px rgba(200,150,62,.5), 0 0 460px 220px rgba(210,130,55,.2); }
+.scene .plate, .scene .drawn { transition: filter 2.6s ease, opacity 3s ease; }
+.scene.leaving .plate, .scene.leaving .drawn { filter: brightness(.55) saturate(.8); }
+/* the scene's foot melts into the dark of the path below */
+.scene::after { content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 22%; pointer-events: none; z-index: 3;
+                background: linear-gradient(transparent, rgba(11,13,15,.0) 30%, var(--road)); }
+
+/* ═══ THE JOURNEY RISES TO MEET YOU ═══ */
+.epigraph, .stop, .faint-places { opacity: 0; transform: translateY(26px); transition: opacity 1.4s ease, transform 1.4s cubic-bezier(.2,.7,.2,1); }
+.epigraph.in, .stop.in, .faint-places.in { opacity: 1; transform: none; }
+.trail-steps .fp { transition: opacity 1.2s ease; }
+@media (prefers-reduced-motion: reduce) { .epigraph, .stop, .faint-places { opacity: 1; transform: none; } }
+/* trips fade and sharpen instead of moving, so the footprints stay lined up with them */
+.stop { transform: none; filter: blur(5px); transition: opacity 1.4s ease, filter 1.4s ease; }
+.stop.in { filter: none; }
+
+/* each place titled by what it was to me; the country's name sits small above */
+.st-country { display: block; font: 10px var(--mono); letter-spacing: .22em; text-transform: uppercase; color: var(--mist); margin-bottom: 4px; }
+.st-country .st-emoji { font-size: 18px; vertical-align: -2px; margin-left: 8px; letter-spacing: 0; }
+.stop .name { font-size: clamp(24px, 2.8vw, 32px); line-height: 1.12; max-width: 14em; }
+.stop:nth-child(even) .name { margin-left: auto; }
