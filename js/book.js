@@ -8,11 +8,13 @@ const PENCIL = '<svg class="pencil" viewBox="0 0 24 24" aria-hidden="true"><path
 // ── the pencil ──
 // Elements marked data-pen="c" are written letter by letter (handwriting),
 // data-pen="w" word by word (longer prose). They are written in document order.
-export function pencil(root, { speed = 1, follow = null } = {}) {
+export function pencil(root, { speed = 1, follow = null, wait = 0 } = {}) {
   let cancelled = false, userMoved = false;
   const items = [...root.querySelectorAll('[data-pen]')];
-  const finishAll = () => { cancelled = true; root.querySelectorAll('.pen-u').forEach(s => s.classList.add('in')); root.querySelectorAll('.pen-tip').forEach(p => p.remove()); };
-  if (reduced || !items.length) return { cancel: () => { cancelled = true; }, finish: finishAll };
+  // things marked .pen-after (a photo, a note) wait until the words beside them have been written
+  const showAfter = scope => scope.querySelectorAll('.pen-after').forEach(a => a.classList.add('shown'));
+  const finishAll = () => { cancelled = true; root.querySelectorAll('.pen-u').forEach(s => s.classList.add('in')); root.querySelectorAll('.pen-tip').forEach(p => p.remove()); showAfter(root); };
+  if (reduced || !items.length) { showAfter(root); return { cancel: () => { cancelled = true; }, finish: finishAll }; }
 
   // wrap every letter/word in a hidden span, keeping any markup inside
   items.forEach(el => {
@@ -48,6 +50,8 @@ export function pencil(root, { speed = 1, follow = null } = {}) {
     return (base + t.length * 6 + (/[.!?]["')]*$/.test(t) ? 520 : /[,;:—–]["')]*$/.test(t) ? 220 : 0)) / speed;
   };
   (async () => {
+    if (wait) await new Promise(r => setTimeout(r, wait));   // let the page settle before the pencil touches it
+    if (cancelled) return;
     const tip = document.createElement('span'); tip.className = 'pen-tip'; tip.innerHTML = PENCIL;
     for (const el of items) {
       const units = [...el.querySelectorAll('.pen-u')], mode = el.dataset.pen;
@@ -61,9 +65,11 @@ export function pencil(root, { speed = 1, follow = null } = {}) {
         await new Promise(r => setTimeout(r, pause(u.textContent, mode)));
       }
       if (cancelled) return;
+      if (el.parentElement) el.parentElement.querySelectorAll(':scope > .pen-after').forEach(a => a.classList.add('shown'));
       await new Promise(r => setTimeout(r, (mode === 'c' ? 240 : 650) / speed));   // a breath between lines
     }
     tip.remove();
+    showAfter(root);
   })();
   return { cancel: () => { cancelled = true; }, finish: finishAll };
 }
@@ -110,14 +116,15 @@ export function createBook({ root, spreads, tabs = [], onTurn }) {
     : `<button class="ribbon" type="button" data-key="${t.key}">${t.label}</button>`).join(''));
   tabBox && tabBox.querySelectorAll('[data-key]').forEach(b => b.onclick = () => goKey(b.dataset.key));
 
-  function paint() {
+  function paint({ wait = 0 } = {}) {
     const s = spreads[at];
     pen && pen.finish();
     L.innerHTML = s.left || ''; R.innerHTML = s.right || '';
     root.classList.toggle('show-right', single() && side === 1);
     L.scrollTop = 0; R.scrollTop = 0;
     const shown = single() ? (side ? R : L) : root.querySelector('.spread');
-    pen = pencil(shown);
+    // nothing is written while the journal is closed — the pencil waits for the cover to open
+    pen = root.classList.contains('closed') ? null : pencil(shown, { wait });
     s.onShow && s.onShow(L, R);
     if (prev) prev.disabled = at === 0 && side === 0;
     if (next) next.disabled = at === spreads.length - 1 && (!single() || side === 1);
@@ -130,8 +137,8 @@ export function createBook({ root, spreads, tabs = [], onTurn }) {
     if (reduced) { to(); paint(); return; }
     sp.classList.remove('flip-next', 'flip-prev'); void sp.offsetWidth;
     sp.classList.add(dir > 0 ? 'flip-next' : 'flip-prev');
-    setTimeout(() => { to(); paint(); }, 260);
-    setTimeout(() => sp.classList.remove('flip-next', 'flip-prev'), 620);
+    setTimeout(() => { to(); paint({ wait: 700 }); }, 520);                 // the new page lands, then the pencil starts
+    setTimeout(() => sp.classList.remove('flip-next', 'flip-prev'), 1300);
   }
   function step(dir) {
     if (single()) {
@@ -160,8 +167,13 @@ export function createBook({ root, spreads, tabs = [], onTurn }) {
   let sx = null;
   root.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
   root.addEventListener('touchend', e => { if (sx === null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 60) step(dx < 0 ? 1 : -1); sx = null; });
-  addEventListener('resize', () => { side = 0; paint(); });
+  let rz; addEventListener('resize', () => { clearTimeout(rz); rz = setTimeout(() => { side = 0; paint(); }, 200); });
 
   paint();
-  return { go, goKey, step, repaint: paint, get at() { return at; } };
+  // swap in a new set of spreads (e.g. the page got taller and fits more), staying on the same spread
+  function setSpreads(next) {
+    const key = spreads[at] && spreads[at].key;
+    spreads = next; at = Math.max(0, spreads.findIndex(s => s.key === key)); side = 0; paint();
+  }
+  return { go, goKey, step, setSpreads, repaint: paint, get at() { return at; } };
 }

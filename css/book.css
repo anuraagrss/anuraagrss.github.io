@@ -11,11 +11,11 @@
 .pg-l { border-radius: 4px 0 0 4px; transform-origin: right center; }
 .pg-r { border-radius: 0 4px 4px 0; }
 /* a page turning */
-.spread.flip-next .pg-r { animation: leafOut .26s ease-in forwards; }
-.spread.flip-next .pg-l { animation: leafIn .36s .26s ease-out backwards; }
-.spread.flip-prev .pg-l { animation: leafOutL .26s ease-in forwards; }
-.spread.flip-prev .pg-r { animation: leafInR .36s .26s ease-out backwards; }
-@keyframes leafOut  { to { transform: rotateY(-88deg); filter: brightness(.7); } }
+.spread.flip-next .pg-r { animation: leafOut .52s cubic-bezier(.45,.05,.55,.95) forwards; }
+.spread.flip-next .pg-l { animation: leafIn .75s .52s cubic-bezier(.2,.7,.25,1) backwards; }
+.spread.flip-prev .pg-l { animation: leafOutL .52s cubic-bezier(.45,.05,.55,.95) forwards; }
+.spread.flip-prev .pg-r { animation: leafInR .75s .52s cubic-bezier(.2,.7,.25,1) backwards; }
+@keyframes leafOut  { to { transform: rotateY(-88deg); filter: brightness(.75); } }
 @keyframes leafIn   { from { transform: rotateY(88deg); filter: brightness(.7); } to { transform: none; } }
 @keyframes leafOutL { to { transform: rotateY(88deg); filter: brightness(.7); } }
 @keyframes leafInR  { from { transform: rotateY(-88deg); filter: brightness(.7); } to { transform: none; } }
@@ -46,7 +46,7 @@
   .book.show-right .pg-l { display: none; }
   .book.show-right .pg-r { display: block; }
   .spread.flip-next .pg-l, .spread.flip-prev .pg-l, .spread.flip-next .pg-r, .spread.flip-prev .pg-r { animation: none; }
-  .spread.flip-next, .spread.flip-prev { animation: fadeTurn .5s ease; }
+  .spread.flip-next, .spread.flip-prev { animation: fadeTurn 1.1s ease; }
   @keyframes fadeTurn { 0% { opacity: 1; } 45% { opacity: 0; transform: translateX(-10px); } 100% { opacity: 1; transform: none; } }
 }
 @media (prefers-reduced-motion: reduce) { .pencil { display: none; } }
@@ -89,7 +89,7 @@
 .turnbar { justify-content: center; }
 @media (max-width: 760px) { .corner { width: 52px; height: 52px; } }
 /* words arrive like ink settling, not like a switch */
-.pen-u { transition: opacity .55s ease; }
+.pen-u { transition: opacity .7s ease; }
 
 /* ═══ THE SIGNATURE — Arey... with two short strokes under the dots ═══ */
 .arey { white-space: nowrap; }
@@ -114,7 +114,7 @@
 .rb-here { font-family: var(--hand); font-size: 15px; writing-mode: vertical-rl; transform: rotate(180deg); letter-spacing: .04em; }
 .rb-mark svg { fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .rb-tabs { list-style: none; margin-top: -8px; padding: 14px 10px 10px; width: 100%; background: #f4ecdb; border-radius: 0 0 4px 4px;
-           box-shadow: 0 14px 30px rgba(0,0,0,.5); transform-origin: top right; transform: scaleY(0); opacity: 0; transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s; }
+           box-shadow: 0 14px 30px rgba(0,0,0,.5); transform-origin: top right; transform: scaleY(0); opacity: 0; transition: transform .6s cubic-bezier(.2,.8,.2,1), opacity .5s; }
 .ribbon-nav.open .rb-tabs { transform: scaleY(1); opacity: 1; }
 .rb-tabs a { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: 3px; color: var(--earth); text-decoration: none; }
 .rb-tabs a:hover, .rb-tabs a:focus-visible { background: rgba(63,49,37,.07); outline: none; }
@@ -126,3 +126,10 @@
 @media (max-width: 760px) { .ribbon-nav { right: 12px; } .rb-pull { width: 40px; } }
 /* signature without the strokes under the dots */
 .arey-dots i { display: none; }
+
+/* a photo or a note that waits for the words beside it.
+   Hidden with !important so a page's own opacity (a faint note at .55) can't show it early;
+   once shown, the element falls back to its own opacity, fading in slowly. */
+.pen-after { transition: opacity 1.6s ease, translate 1.6s ease; }
+.pen-after:not(.shown) { opacity: 0 !important; translate: 0 8px; }
+.pen-after.shown { translate: 0 0; }

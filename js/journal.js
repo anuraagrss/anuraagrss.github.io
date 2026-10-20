@@ -79,7 +79,7 @@ function renderLetter(root = document) {
         ${openLt < letters.length - 1 ? `<button type="button" data-lt="next">the next letter →</button>` : ''}</div>
     </div>`;
   desk.closest('.pg').scrollTop = 0;
-  setTimeout(() => { letterPen = pencil(desk.querySelector('.unfolded'), { follow: desk.closest('.pg') }); }, 650);   // after it unfolds
+  setTimeout(() => { letterPen = pencil(desk.querySelector('.unfolded'), { follow: desk.closest('.pg') }); }, 1150);   // after it unfolds
 }
 
 // ── THE FIRST PAGE: what are you looking for, as cards that flip ──
@@ -137,10 +137,10 @@ function placeBlock(j, pos) {
   const snap = (j.photos[0] && j.photos[0].image_url) || (j.stories.find(x => x.img) || {}).img || '';
   const note = j.country && j.country.notes ? j.country.notes : j.stories[0].title;
   return `<button class="place p${pos}" type="button" data-j="${i}">
-    ${snap ? `<img class="pl-snap" src="${esc(snap)}" alt="" loading="lazy">` : ''}
+    ${snap ? `<img class="pl-snap pen-after" src="${esc(snap)}" alt="" loading="lazy">` : ''}
     <span class="pl-name" data-pen="c">${esc(j.name.toLowerCase())}</span>
-    <span class="pl-meta">${esc(countLine(j))}</span>
-    <span class="pl-note">${esc(note)}</span>
+    <span class="pl-meta pen-after">${esc(countLine(j))}</span>
+    <span class="pl-note pen-after">${esc(note)}</span>
   </button>`;
 }
 
@@ -164,7 +164,7 @@ function stepsOn(page) {
       f.style.left = (a2.x + dx * d / len + nx * (side + wob)) + 'px';
       f.style.top = (a2.y + dy * d / len + ny * (side + wob)) + 'px';
       f.style.transform = `translate(-50%,-50%) rotate(${ang}deg)`;
-      f.style.animationDelay = (n * 45) + 'ms';
+      f.style.animationDelay = (n * 90) + 'ms';
       page.appendChild(f);
     }
   }
@@ -231,13 +231,25 @@ function benchPoem(R) {
   proofHere(box.querySelector('.bq').insertAdjacentElement('afterend', Object.assign(document.createElement('div'), { className: 'late' })), 'journal');
 }
 
+// as many places as the page has room for — three on a laptop, more on a tall screen
+function perPage() {
+  const pg = document.querySelector('#book .pg-l'), h = pg ? pg.clientHeight : 600;
+  return Math.max(2, Math.min(6, Math.floor((h - 40) / 175)));
+}
+let lastPer = 0;
+addEventListener('resize', () => {
+  clearTimeout(perPage.t);
+  perPage.t = setTimeout(() => { if (book && data && perPage() !== lastPer) { lastPer = perPage(); book.setSpreads(spreads()); } }, 250);
+});
+
 function spreads() {
+  lastPer = perPage();
   const out = [];
   letters = LETTERS.map(l => ({ ...l }));
   const boy = boyLetter(data.flights); if (boy) letters.push({ ...boy, stampIcon: '✈', stampLabel: 'THE LOGBOOK', postmark: 'IN FLIGHT' });
   out.push({ key: 'begin', left: pocketPage(), right: waysPage(), onShow: L => renderLetter(L) });
 
-  const places = S.journals.filter(j => j.stories.length), PER = 3;
+  const places = S.journals.filter(j => j.stories.length), PER = perPage();
   const pages = [];
   for (let i = 0; i < places.length; i += PER) pages.push(places.slice(i, i + PER));
   for (let i = 0; i < pages.length; i += 2) {
@@ -300,9 +312,12 @@ $('book').addEventListener('click', e => {
 const bookEl = $('book'), cover = $('cover');
 const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
 function openBook() {
-  if (!bookEl.classList.contains('closed') || !data) return;
+  if (!bookEl.classList.contains('closed') || bookEl.classList.contains('opening') || !data) return;
   bookEl.classList.add('opening');
-  setTimeout(() => { bookEl.classList.remove('closed', 'opening'); cover.hidden = true; }, still ? 0 : 1300);
+  // the cover swings slowly; once it has passed the spine the pages are uncovered,
+  // and only after it has settled does the pencil begin
+  setTimeout(() => { bookEl.classList.remove('closed'); book.repaint({ wait: still ? 0 : 1300 }); }, still ? 0 : 1000);
+  setTimeout(() => { bookEl.classList.remove('opening'); cover.hidden = true; }, still ? 0 : 2200);
 }
 function closeBook() {
   if (bookEl.classList.contains('closed')) return;
@@ -310,7 +325,7 @@ function closeBook() {
   setTimeout(() => {
     cover.hidden = false; bookEl.classList.add('closed', 'opening'); void cover.offsetWidth;
     bookEl.classList.remove('opening');
-  }, still ? 0 : 700);
+  }, still ? 0 : 1400);
 }
 cover.addEventListener('click', openBook);
 cover.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openBook(); } });

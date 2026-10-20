@@ -170,7 +170,7 @@ function intoTheLight() {
 // an eased glide down to the start of the journey — stops the moment you take over
 function carryDown() {
   const target = document.getElementById('epiHero'); if (!target) return;
-  const from = scrollY, to = target.getBoundingClientRect().top + scrollY - 20, dur = 2600, t0 = performance.now();
+  const from = scrollY, to = target.getBoundingClientRect().top + scrollY - 20, dur = 3600, t0 = performance.now();
   scene.classList.add('leaving');
   const ease = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
   (function step(now) {
