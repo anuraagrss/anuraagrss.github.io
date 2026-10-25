@@ -7,6 +7,7 @@ const ASSETS = {
   plate:  'images/late-sun/shore.jpg',   // the shore, the fire, no person
   figure: 'images/late-sun/figure.png',  // Arey from behind, transparent background
   fire:   'images/late-sun/fire.mp3',    // only if he recorded it
+  music:  'images/late-sun/intro.mp3',   // the slow reprise for the intro, if it's there
   video:  'images/late-sun/walk.mp4',    // the walk, from key.jpg to shore.jpg
   key:    'images/late-sun/key.jpg',     // the walk's first frame
 };
@@ -72,6 +73,22 @@ function layout() {
   sizeCanvas();
   if (walkDone) placeWalker(STAND);
 }
+
+// ── THE MUSIC: never plays on its own — a quiet switch on the shore, fading in and out ──
+fetch(ASSETS.music, { method: 'HEAD' }).then(r => {
+  if (!r.ok) return;
+  const btn = $('musicBtn'), audio = new Audio(ASSETS.music);
+  audio.loop = true; audio.volume = 0; btn.hidden = false;
+  let fade = null;
+  const ramp = (to, ms, then) => {
+    clearInterval(fade); const from = audio.volume, t0 = performance.now();
+    fade = setInterval(() => { const p = Math.min(1, (performance.now() - t0) / ms); audio.volume = from + (to - from) * p; if (p >= 1) { clearInterval(fade); then && then(); } }, 50);
+  };
+  btn.onclick = () => {
+    if (audio.paused) { audio.play().then(() => ramp(.45, 3000)); btn.textContent = '■ the music'; btn.setAttribute('aria-pressed', 'true'); }
+    else { ramp(0, 1500, () => audio.pause()); btn.textContent = '▸ the music'; btn.setAttribute('aria-pressed', 'false'); }
+  };
+}).catch(() => {});
 
 // ── EMBERS ──
 const cv = $('embers'), cx = cv.getContext('2d');
@@ -150,7 +167,6 @@ $('intro').innerHTML = `
   <p class="il sm">${l1}</p><p class="il sm">${l2}</p><div class="ir"></div>
   <p class="il lg">${quote}</p><div class="ir"></div>
   <p class="il sm">${l4}</p><p class="il sm">${l5}</p><div class="ir"></div>
-  <p class="il proof">STILL COUNTING.</p>
   <p class="il tag" id="introTag">7 CONTINENTS · STILL COUNTING</p>`;
 loadAll().then(d => { $('introTag').textContent = `${d.countries.length} COUNTRIES · 7 CONTINENTS · STILL COUNTING`; }).catch(() => {});
 

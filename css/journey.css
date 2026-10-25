@@ -107,3 +107,6 @@
 .st-country .st-emoji { font-size: 18px; vertical-align: -2px; margin-left: 8px; letter-spacing: 0; }
 .stop .name { font-size: clamp(24px, 2.8vw, 32px); line-height: 1.12; max-width: 14em; }
 .stop:nth-child(even) .name { margin-left: auto; }
+/* the music switch sits beside the fire's, bottom left of the shore */
+.sound.music { left: auto; right: auto; left: 50%; transform: translateX(-50%); bottom: 60px; z-index: 5; }
+#fireSound:not([hidden]) ~ .sound.music { left: 190px; transform: none; }
